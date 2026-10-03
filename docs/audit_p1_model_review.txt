@@ -1,0 +1,64 @@
+Independent P1 model/structure review (2026-10-03)
+Reviewer: execution_engine_sol; reviewed graph.py, models.py, training.py and their
+synthetic tests. No changes made to those implementation files by this reviewer.
+
+Scope and evidence
+- tests/test_graph.py + tests/test_models.py: 28 passed.
+- Inline actual fit_model synthetic smoke: 700 causal windows, 600 selected training
+  rows, temporal + nonlinear experts, dynamic gate, one training epoch. Replacing
+  every unselected future X/y left fitted scaler, ridge coefficients and residual
+  calibration alpha exactly equal. Same-model prediction prefix was unchanged.
+  Saved model reloaded from work/p1_review/roundtrip_model and matched predictions.
+  This linear synthetic signal calibrated residual alpha to zero: correct fallback,
+  not evidence of beneficial nonlinear model performance. Gradient tests separately
+  demonstrate all expert/gate parameters are trainable on artificial data.
+- Own execution/portfolio/statistics modules: 16 synthetic tests and lint passed.
+
+Semantic conclusions
+1. Temporal filters consume each trailing scale and emit one endpoint. Nonlinear
+   expert uses the current endpoint and window mean. Neither component consults a
+   later stream observation; dataset-window construction remains the caller's duty.
+2. Parameter counting agrees with actual architecture for tested mutations. Width,
+   depth, scale, added/dropped experts and feature operations construct physically
+   different layers/input dimensions. Loss and optimizer choices are consumed by
+   fit_model; they are configuration changes rather than added network parameters.
+3. Feature operations form an ordered DAG with only already available inputs.
+   Removal of a still-referenced feature/operation fails validation. Pure trailing
+   transformations preserve the supplied input window's temporal information set.
+4. Static and dynamic softmax gates express relative expert allocations. Code does
+   not label allocations as calibrated confidence or predictive certainty.
+5. Compatible inheritance checks raw-feature order, operation definitions, window
+   length, expert layout and gate/expert ordering. Copying equal-shaped but
+   semantically reordered inputs is rejected. It is explicitly initialization,
+   with no claim to preserve the entire function after a structural edit.
+6. Training targets are simple return divided by causal volatility scale; residual
+   network learns in that scaled unit. Inference combines ridge and calibrated
+   residual in scaled space, then multiplies by per-sample scale before portfolio
+   use. Portfolio input remains expected simple return, not a raw normalized score.
+7. Neural fit and chronological calibration are disjoint. Fitting uses labels
+   mature before calibration starts. Network/scaler are not refit using calibration
+   after alpha selection. Caller remains responsible for the outer search/test
+   cutoff and label maturity protocol.
+8. Execution limits apply to pre-trade target weights. Actual post-cost/mark/funding
+   exposure is observable in the ledger; no hard post-cost or net exposure limit is
+   claimed. Costs and held-position drift can exceed those target fractions. A
+   maintenance stress breach fails closed, without invented exchange liquidation.
+
+Findings communicated to root
+- training.py originally hard-coded prediction clipping at 0.1 and did not validate
+  dataset shape/window compatibility or enforce the frozen protocol parameter
+  budget before fitting. Root reports these are being corrected; this review does
+  not certify a correction until the resulting source and tests are inspected.
+- FittedModel.predict with zero rows and residual alpha > 0 originally invokes
+  concatenate([]). Root was advised to return a validated empty prediction array.
+- Graph expert names initially accept ModuleDict attribute names. Confirmed:
+  ExpertSpec('training', ...) passes validate_graph but build_model raises KeyError
+  "attribute 'training' already exists". Recommendation: reject reserved module
+  names in validation, or record construction failures as failed candidate proposals.
+
+Limitations
+These are synthetic code/semantic checks. They do not establish historical market
+performance, candidate superiority, robust cross-universe generality, risk-bound
+attainment under funding/cost/drift, or future forward performance. Broader P1
+acceptance still needs the bounded real-data end-to-end run and root's resolution
+record for the findings above. No live order connection was reviewed or enabled.

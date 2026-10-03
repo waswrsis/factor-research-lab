@@ -1,0 +1,103 @@
+"""Collect actual run evidence into the user-facing implementation report."""
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from factorlab.protocol import project_path, save_json
+
+
+def read(path):
+    return json.loads(project_path(path).read_text('utf-8'))
+
+
+def main():
+    result = read('runs/policy-replay-v1/results.json')
+    ablation = read('outputs/phase_audits/residual_ablation.json')
+    forward = read('outputs/phase_audits/P4.json')
+    labels = {'A_ridge': 'A 简单 Ridge', 'B_fixed': 'B 固定专家',
+              'C_random_search': 'C 随机结构搜索', 'D_diagnostic_agent': 'D GPT 结构搜索'}
+    lines = [
+        '自演化因子研究平台：落地与验收报告',
+        '工作目录：D:/FactorResearch；生成日：2026-10-03（东京时间）',
+        '',
+        '结论',
+        '已完成有边界的本地研究原型：数据、内部参数训练、结构变更、agent 提案、',
+        '多截点回测、确认回退、冻结与前瞻预测记录已实际运行。每阶段均留有独立语义/代码审查。',
+        '当前没有证据支持策略盈利或 GPT 搜索的可靠优势。工程通过与投资有效性是两项不同结论。',
+        '',
+        '阶段状态',
+        'P0 已验收：固定协议、UTC 可用/成熟时间、校验和、缺口与因果特征。',
+        'P1 已验收：Ridge、可学习时间滤波/交互专家、静态/动态门控与残差回退；独立资金账本。',
+        'P2 已验收：增删专家、维度/交互、宽深度、时间尺度、损失、优化器；谱系与预算。',
+        'P3 已验收研究原型：三个历史截点，随机与真实 GPT 子代理各 12 个候选，全部评估。',
+        'P4 观察器工程已验收：216 条历史重放预测完成成熟评分；真实前瞻已记录 3 条，尚无成熟结果。',
+        '',
+        '数据与计算',
+        'BTCUSDT / ETHUSDT / SOLUSDT 的 2025-01 至 2025-06 USD-M 永续公开归档。',
+        '54 个来源归档经过 SHA-256 校验；行情和标记价格各 13,032 行，资金费 1,629 行。',
+        '监督样本为 12,705 × 48 小时 × 12 个特征；固定主目标为延迟成交后的 12 小时简单收益。',
+        'GPU 训练在本机 CUDA 上完成；只验证了当前小模型和预算，不能外推到无限结构搜索。',
+        '子代理统一 GPT-6.1 Sol / High。研究提案通过当前 Codex 会话提供，未配置独立 API agent。',
+        '',
+        '样本外成绩：2025 年 4—6 月，共 2,184 个组合小时',
+        '路线                    扣费后累计收益       最大回撤',
+    ]
+    for arm, label in labels.items():
+        risk = result['aggregate'][arm]['risk']
+        lines.append(f'{label:20} {risk["total_return"]:>10.2%}        {risk["max_drawdown"]:>10.2%}')
+    lines += [
+        '',
+        '以上是未经确认通过的候选研究路径。所有确认门槛均未通过，确认后的策略路径均保留基线。',
+        '本次确认只有 7 天，而预设要求至少 20 个 48 小时时间块；不能据此批准候选。',
+        '所有候选相对 Ridge 的探索性配对区间都跨过零。扣费含单边 5 bps 费用、3 bps 不利滑点',
+        '与真实资金费事件；另保存双倍成本场景。阶段结束平仓收费，空仓小时不删除。',
+        '',
+        '额外诊断：为校准残差，复杂模型只用训练段前部拟合，简单基线使用完整训练段。',
+        '因此另做同一复杂模型内部的 alpha=0 对照，避免把样本差异全归于网络。没有新增拟合或改选择。',
+        f'该匹配基线累计收益为 {ablation["baseline_component_risk"]["total_return"]:.2%}；',
+        '固定专家相对它的区间也跨过零。这是结果后的诊断，不是新增的预注册显著性结论。',
+        '',
+        '审计与证据',
+        '最终回归：158 tests passed；Ruff 检查通过。审查修复了协议范围、有限参数、到达延迟、',
+        '预测截断、空预测、NaT 时间、提案来源、失败留档、具体结构参数、回退报告及中断恢复等问题。',
+        'docs/audit_*.txt：各阶段独立语义与代码审查；docs/FINAL_ACCEPTANCE_REVIEW.txt：最终独立验收。',
+        'outputs/phase_audits/P0.json 至 P4.json：阶段证据；data_manifest.json：数据版本。',
+        'runs/policy-replay-v1/results.json：全结果；各 fold 内有模型、交易、净值、预测和候选谱系。',
+        'runs/policy-replay-v1/source：运行时源码快照；运行后只修复非默认短 lookback 配置边界。',
+        '',
+        '真实前瞻状态',
+        '3 条前瞻预测在实际接收行情后写入；再次执行全部识别为重复并跳过。',
+        f'首批标签最早成熟：{forward["first_label_available_at"]}，即东京时间 2026-10-03 15:00:05。',
+        '冻结观察器使用的是训练标签截止 2025 年 3 月的工程基线；当前市场盈利能力没有验证。',
+        '每条实际输入张量、来源哈希、模型哈希和接收时间已保留。没有设置定时器，没有交易所下单。',
+        '观察器记录预测误差；连续组合纸面执行、完整交易所保证金/强平机制尚未提供。',
+        '',
+        '使用入口',
+        '阅读 D:/FactorResearch/START_HERE.txt。',
+        '先在 PowerShell 中运行 . D:/FactorResearch/scripts/Enter-Research.ps1。',
+        '本地规则 agent 全流程：./.venv/Scripts/python.exe scripts/run_research.py --output runs/新的目录名',
+        '一次前瞻观察：./scripts/Observe-Research.ps1',
+        '成熟后补记：./scripts/Observe-Research.ps1 -Settle',
+        '',
+        '适用边界与下一步',
+        '当前是三个固定幸存资产的小样本；未重建全市场历史上市/退市和可交易资产池。',
+        '历史到达延迟、小时开盘成交和标记价均有明确代理假设；不等同于逐笔成交可实现收益。',
+        '可自动搜索的是审核过的结构/算子空间，可通过组合增加表示；没有开放执行 agent 任意新代码。',
+        '本轮 GPT 文件桥接依赖一个持续回答请求的 Codex/外部 agent；纯 CLI 默认是本地规则。',
+        '没有将 RD-Agent 的 Linux 源码参考说成 Windows 上已运行的服务。',
+        '后续应先扩展时间与资产覆盖、改善信号与换手、预先制定有足够统计长度的新确认协议，',
+        '并积累真实前瞻证据，再决定是否扩大模型。不能反复更改当前测试规则直到出现好成绩。',
+    ]
+    project_path('outputs/IMPLEMENTATION_REPORT.txt').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+    save_json('outputs/phase_audits/implementation_summary.json', {
+        'engineering': 'bounded_research_prototype_implemented_and_audited',
+        'financial_effectiveness': 'not_demonstrated', 'future_effectiveness': 'not_observed_yet',
+        'tests_passed': 158, 'lint': 'passed', 'workspace': 'D:/FactorResearch',
+        'subagent_model': 'gpt-6.1-sol', 'subagent_reasoning': 'high',
+        'full_replay': 'runs/policy-replay-v1/results.json', 'aggregate': result['aggregate'],
+        'phase_files': [f'outputs/phase_audits/P{i}.json' for i in range(5)]})
+
+
+if __name__ == '__main__':
+    main()

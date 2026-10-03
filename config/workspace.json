@@ -1,0 +1,22 @@
+{
+  "root": "D:/FactorResearch",
+  "python_environment": "D:/FactorResearch/.venv",
+  "python_installations": "D:/FactorResearch/.tools/python",
+  "cache": "D:/FactorResearch/.cache",
+  "data": "D:/FactorResearch/data",
+  "models": "D:/FactorResearch/models",
+  "experiments": "D:/FactorResearch/runs",
+  "deliverables": "D:/FactorResearch/outputs",
+  "external_source": "D:/FactorResearch/external",
+  "automatic_market_data_downloads": false,
+  "live_trading_enabled": false,
+  "llm_provider_configured": false,
+  "rd_agent_status": "source_reference_only_linux_runtime_required",
+  "scope": "Local bounded research prototype; explicit commands fetch public data and run research. No live order execution.",
+  "public_data_pipeline_implemented": true,
+  "local_training_implemented": true,
+  "offline_backtesting_implemented": true,
+  "structured_architecture_search_implemented": true,
+  "native_codex_subagent_model": "gpt-6.1-sol",
+  "native_codex_subagent_reasoning": "high"
+}

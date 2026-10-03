@@ -1,0 +1,99 @@
+Discovery v4：可选因果上下文和冻结表示诊断
+========================================
+
+旧 config/discovery.json、旧 build_task_dataset 和旧 v3 归档不改变。
+新增数据必须显式启用，并冻结新的数据源、特征模式和上下文规则。
+这些能力是输入与诊断机制；小型合成检查不是市场效果证据。
+
+1. 点时上下文导入
+
+context_data.read_context_table(path, kind) 读取项目D盘 CSV/parquet。
+kind 为 funding 或 open_interest。四个必需列：
+symbol, observed_at, available_at, value
+时间必须带明确时区，例如 2025-01-03T12:00:00Z；观测不得晚于可用。
+value 必须有限；持仓量不得为负。源缺失行应省略，不以虚构数据补全。
+允许旧观测在较晚时间修订；同一观测/可用时间重复记录会拒绝。
+
+available_at 是来源或导入者对当时可获得信息的明确断言。
+校验器验证逻辑与格式，并不能认证其历史真实性。
+不得把现时下载数据的事件时间当成历史发布时间。
+现有 funding CSV 解析器的 event_time + 5秒属于 assumed_live_delay，
+不能直接作为此次点时证据。funding_archive_context(frame, received_at)
+可复用旧解析数值，但将其可用时间设为实际接收时间。
+
+build_context_dataset(bars, spec, funding=table, open_interest=table,
+                      cross_assets=True, max_age_hours=24)
+或者 augment_context(existing_data, bars, ...) 为每个lookback时间点连接
+当时已经可用的最新事件；延迟到达的更旧事件不会覆盖较新的已知事件。
+修订只在其收到之后生效。
+每种表追加 value、observed、age_hours 三个通道；超过冻结最大事件年龄
+或从未收到时为 value=0, observed=0, age=0。零值只表示有限占位，必须
+和mask一起解释。真实零值为 observed=1。没有伪造历史持仓量。
+
+cross_assets 为每个冻结标的增加其他标的最新已可用的小时收益、
+24小时波动、收益差、24小时收益相关。每个值带 observed 通道。
+自身的peer列恒为未观测。连接为向后asof，peer滞后超过1小时（或更小的
+max_age_hours）则未观测；相关窗口在自身或peer的缺口/重复蜡烛后重启。
+这是假设的历史K线close-plus-delay可用规则，不能认证真实历史投递延迟。
+
+meta.attrs.context_policy 包含规则、源内容hash、可用时间依据与peer范围。
+新实验必须将它冻结到运行identity/manifest；TaskDataset.schema 仅覆盖
+features/lookback/tasks，不能单独证明上下文政策相同。
+
+2. 有边界的数据获取入口
+
+在 D:/FactorResearch 的 PowerShell 中先执行：
+. ./scripts/Enter-Research.ps1 -Quiet
+
+资金费率，一次公开HTTP请求，limit为1..1000，无自动大规模分页：
+& ./.venv/Scripts/python.exe -m factorlab.discovery.context_data funding `
+  --symbol BTCUSDT --start 2025-01-01 --end 2025-01-03 --limit 100 `
+  --output data/context/funding-receipt-new.parquet
+
+当前持仓量快照：
+& ./.venv/Scripts/python.exe -m factorlab.discovery.context_data open_interest `
+  --symbol BTCUSDT --output data/context/oi-receipt-new.parquet
+
+输出拒绝覆盖，并保留源端点、请求、接收时间、checksum和来源说明。
+资金费率 observed_at 使用 fundingTime，available_at 使用本次实际HTTP
+接收时间。下载老历史因而不能给2025年的模型增加当时已知信息。
+OI快照 observed_at 使用响应time，同样用实际接收时间作available_at。
+OI快照不接受历史start/end。按官方文档，openInterestHist仅提供最近
+一个月，不能用它补出2025年全年历史；必须另外取得可验证的历史点时源。
+资金费率接口返回数量受limit限制；没有宣称请求得到完整历史。
+
+官方来源（2026-10-03核对）：
+https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#get-funding-rate-history
+https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#open-interest
+https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data#open-interest-statistics
+
+3. 更细事件时间
+
+TaskSpec 已支持任意递增整数小时event_bins，最后必须等于horizon_hours。
+例如12小时任务可设 (1,2,3,4,6,8,10,12)，输出17个联合类别。
+这是新协议/新schema，不能改旧实验的冻结event_bins再复用其结果。
+小时K线不能认证分钟/秒级首触时间；双边同小时触碰仍按原语义删失。
+
+4. 冻结表示诊断
+
+diagnostics.representation_diagnostics(model, development_data,
+    cutoff=information_cutoff, state_feature='return_24h', state_threshold=.01)
+支持FittedResearchModel和同一结构的ModelGroup。
+
+modules[*].tasks[task].loss_increase：冻结表示中把该模块坐标置零、
+保持原head并重新计算gate后，相对原预测增加的损失。正值表示该已训练
+预测器依赖它；负值可能说明其当前作用有害。此实验不是删模块后重训，
+不证明重新训练后的架构增益。
+
+redundancy：每个种子内部模块坐标的最大/平均绝对Pearson相关，然后
+汇总各种子的最大值。常量/少量样本明确返回不可估；没有跨重训对齐坐标。
+该统计仅提示线性冗余，不意味着两个模块信息完全等价。
+
+states：由origin时刻的指定输入特征和预先冻结阈值分为down/flat/up。
+不是使用未来标签或全样本分位数定义状态。没有指定输入则states为空。
+cutoff 排除未来origin并屏蔽未成熟标签，保留每个任务支持数/损失。
+调用者必须只传开发资料；函数不自动识别开发/确认区间。不得把确认
+资料的诊断反馈送入新一轮研究记忆。
+
+诊断不重训、不修改模型。基于合成数据的验收测试覆盖延迟、修订、
+缺失、过期、跨标的缺口、追加未来不改过去、细事件模式和冻结置零语义。

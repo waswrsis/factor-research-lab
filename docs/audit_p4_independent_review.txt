@@ -1,0 +1,61 @@
+Independent P4 semantic and code audit
+Reviewer: independent Codex subagent; reviewed 2026-10-03
+Scope: factorlab/shadow.py, docs/shadow_contract.txt, tests/test_shadow.py.
+Reference: AGENTS.md and docs/IMPLEMENTATION_PLAN.txt.
+
+Disposition: no blocking defect identified for the declared frozen-artifact and
+paper-observation primitives. This audit does not establish a running forward
+collector, elapsed forward observation, portfolio profitability or live trading.
+
+Semantic/code review
+- Frozen trees include file SHA256/size and empty directories, plus a canonical
+  manifest hash. Verification detects changed, missing and extra tree entries.
+  Freeze uses a separate staging directory, fsync, a destination lock and rename;
+  existing bundles are reused only if the complete tree and metadata agree.
+  Source changes during copying fail before publishing the snapshot.
+- Source/destination overlap, ancestors outside the D workspace, symlinks and
+  Windows junctions are rejected. Hashing never constitutes an OS access-control
+  boundary or a signature. The contract correctly requires comparing the bundle
+  hash with an independently retained trusted value for coordinated replacement.
+- Ledger metadata binds protocol/model digests, 12-hour return units, latency,
+  execution rule and explicit historical_replay/forward mode. Reopening a ledger
+  with altered configuration is rejected.
+- Prediction entries are unique, inputs must be available by observation time,
+  entry is the first whole UTC hour strictly after availability, and label end
+  is exactly 12 hours later. Forward calls additionally enforce actual wall-clock
+  freshness, less than one hour input age and an entry still in the future.
+- Outcomes require a prior prediction and the exact frozen maturity timestamp;
+  outcomes submitted before that time or duplicated are rejected. Summary/score
+  consumes only valid mature outcomes and explicitly identifies immature,
+  mature-without-outcome and invalid rows. No outcome yields null forecast errors.
+- SQLite immediate transactions serialize writes; FULL synchronous commits and
+  append-only triggers prevent normal application updates/deletes. Observation
+  rows bind even summary calls to a monotonic clock. This remains application
+  integrity, with database-administrator replacement explicitly out of scope.
+- Forecast MAE/MSE is clearly labelled as forecast-error evidence. Historical
+  replay does not count toward actual elapsed forward observation. No exchange
+  order interface is present.
+
+Execution evidence
+The final focused P2/P3/P4 check used project Python after Enter-Research.ps1:
+44 tests passed in 6.89 seconds, including all tests/test_shadow.py cases.
+Shadow cases include exact maturity boundary, replay/forward mismatch, wall-clock
+and stale-input counterexamples, append-only triggers, concurrent duplicate
+commit, frozen tree tampering, and a real Windows junction rejection.
+The reviewer separately read each implementation branch and its contract.
+
+Limitations / conditions for operational use
+1. Ledger model/protocol digests are references. The caller must verify the bundle
+   against its retained trusted hash, match protocol settings, construct causal
+   features and supply evidence-backed source availability. The primitive does
+   not independently inspect a model's input provenance or fetch market data.
+2. Historical mode deliberately permits retrospective clocks and cannot prove
+   prospective prediction submission. Only forward mode plus an actual collector
+   and passage of wall time can provide future observation evidence.
+3. This module supplies a durable forecast journal, not a complete continuously
+   running shadow trading service or PnL ledger. Future observation remains
+   pending until genuine predictions mature and actual evidence is recorded.
+4. Hash verification protects against alteration relative to trusted hashes;
+   administrator tampering, concurrent hostile filesystem replacement, and
+   provider timestamp truthfulness require operational controls outside this
+   explicitly limited offline prototype.

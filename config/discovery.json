@@ -1,0 +1,72 @@
+{
+  "version": "discovery-v3",
+  "tasks": [
+    {
+      "name": "volatility",
+      "kind": "volatility",
+      "horizon_hours": 12,
+      "event_bins": [
+        4,
+        12
+      ],
+      "barrier_multiplier": 1.0
+    },
+    {
+      "name": "first_event",
+      "kind": "first_event",
+      "horizon_hours": 12,
+      "event_bins": [
+        4,
+        12
+      ],
+      "barrier_multiplier": 1.0
+    },
+    {
+      "name": "state",
+      "kind": "state",
+      "horizon_hours": 12,
+      "event_bins": [
+        4,
+        12
+      ],
+      "barrier_multiplier": 1.0
+    }
+  ],
+  "primary_task": "volatility",
+  "lookback": 48,
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "start": "2025-01-01",
+  "train_end": "2025-07-01",
+  "dev_end": "2025-09-01",
+  "calibration_end": "2025-10-01",
+  "end": "2026-01-01",
+  "training": {
+    "epochs": 8,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "l2": 0.001,
+    "patience": 3,
+    "min_delta": 0.0001,
+    "clip_norm": 5.0,
+    "seed": 17,
+    "max_parameters": 200000,
+    "max_seconds": 120
+  },
+  "training_seeds": [
+    17,
+    29
+  ],
+  "candidates": 4,
+  "search_seconds": 900,
+  "bootstrap_block_hours": 48,
+  "bootstrap_samples": 1000,
+  "min_blocks": 20,
+  "minimum_increment": 0.005,
+  "confidence": 0.95,
+  "seed": 17,
+  "availability_delay_seconds": 5
+}

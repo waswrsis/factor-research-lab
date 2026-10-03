@@ -1,0 +1,100 @@
+第四版：持续因子研究、影子比较与可恢复演化
+
+本版本只生成因子表示、任务评分和研究证据，不管理持仓或提交交易。
+工作区保持 D:/FactorResearch。先在PowerShell进入该目录，再运行：
+  . ./scripts/Enter-Research.ps1
+以下命令均使用 ./.venv/Scripts/python.exe。
+
+运行闭环
+预测与结算按真实可用时间推进。到达预定研究时刻（或满足成熟损失恶化触发条件）后，
+只使用当时已经成熟的历史进行训练和结构搜索。候选在后续时刻与现用模型并行输出；
+双方完整影子观察期成熟后，只比较一次。达到事前固定的最小增量及区间要求才替换，
+否则保留现用版本。复杂模型不胜出也是有效的研究结果。
+
+参数更新：compatible warm start可继承相同语义模块，沿用祖先仅从更早历史得到的
+输入/目标标准化参数；变化模块重新初始化，优化器状态不继承。每次记录实际继承量。
+结构搜索：保留原结构与多个不同分支，增删、选择性合并、改维数/宽度/深度/时间尺度/
+输入子集/组合方式/学习率；使用固定菜单内的结构化动作，不直接执行Agent生成的代码。
+“自主演化”不是无上限扩张，也不表示能够自行发明任意新算法。
+
+建议使用独立v4协议，不修改旧冻结文件：
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-evolution
+
+默认v4是2025年已使用的开发资料，主任务为未来12小时波动；首次事件观察20小时，
+时间分箱2/4/8/12/16/20小时。辅助事件输出不能借主任务结果宣称方向预测成功。
+影子观察168小时，24小时时间块、至少6块，只是运作筛选规则，短区间估计仍很不稳定。
+正式独立确认继续使用run --confirm的隔离流程；2025 Q4已用，不能再次充当未见资料。
+
+真实LLM研究（使用本机已有Codex登录，不需要在代码中保存API密钥）：
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-agent-evolution --search external --worker-backend codex
+
+自动启动有时间/调用上限的提案消费者，默认gpt-6.1-sol/high，只接收净化的开发资料包，
+不开放命令、文件、浏览器、MCP或委派工具。共享请求锁、原子响应、持久尝试次数和停止
+信号用于控制重复；无法保证远端服务在响应丢失时恰好计费一次。机器仍需保持运行。
+--worker-backend rules为独立规则提案器，不能称为LLM。
+如不使用内置worker，external模式必须有单独消费者；scripts/Start-ResearchWorker.ps1
+支持多个exchange目录。source、假设、证伪条件和实际动作均保存。
+标准evolve入口的研究记忆按输入schema、标的、窗口、可用延迟、context规则及feed身份
+隔离，允许同语义资料随时间追加。旧未绑定事实不会自动加入。独立worker的可选
+--memory-path仅按任务/协议/截止筛选，不自动识别完整输入context；标准CLI没有启用它。
+
+恢复与观察
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-evolution --resume
+  ./.venv/Scripts/python.exe -m factorlab.discovery inspect-evolution runs/my-evolution
+  ./.venv/Scripts/python.exe -m factorlab.discovery evolution-report --run runs/my-evolution --output outputs/my-evolution-report
+
+恢复必须保留任务、政策、源码、已观察资料和模型身份。SQLite事务将同一时刻的预测/
+结算/状态作为整体提交；中断的搜索占用原预算槽，标为中断并保留现用版，不无限重试。
+已保存的候选影子期可继续。检查会核对模型hash、事件链和完整预测/结算/周期/预算账本。
+这是完整性检查，不是对拥有整个工作区写权限者的密码学防篡改保证。
+新运行同时归档完整factorlab源码、pyproject.toml和uv.lock；检查历史结果读取归档，
+恢复运行则要求当前源码与归档一致。旧hash-only演化记录仍可检查，但不可恢复，需新建
+实验。源码归档不包含Python二进制、驱动或整个操作系统，也不保证跨设备逐位一致。
+--max-ticks可分段运行；后续使用--resume。--watch在有限watch-seconds内重新载入追加资料。
+检查和导出报告应在本轮运行结束或停止watch后执行，以读取同一份已停止写入的账本；
+当前报告不是持续刷新中的一致快照监控面板。
+新增未来数据允许追加；已经预测过的输入或当时已成熟标签发生改变会被拒绝。
+
+共同初始模型和三种程序比较
+先保存一个仅用起点以前资料的初始模型：
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/common-initial --initialize-only
+随后使用其initial-model路径分别运行--mode fixed、refit、evolve：
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-fixed --mode fixed --initial-checkpoint runs/common-initial/initial-model
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-refit --mode refit --initial-checkpoint runs/common-initial/initial-model
+  ./.venv/Scripts/python.exe -m factorlab.discovery --config config/discovery_v4.json evolve --policy config/evolution_v4.json --output runs/my-evolve --mode evolve --initial-checkpoint runs/common-initial/initial-model
+  ./.venv/Scripts/python.exe -m factorlab.discovery compare-evolution --candidate runs/my-evolve --reference runs/my-fixed --output outputs/my-evolve-vs-fixed.json
+
+另外比较refit对fixed、evolve对refit。共同任务/资料/起点/完整输出/结算资格必须一致；
+不同模式的实际耗时不能声称相等。比较包含全部现用版本的顺序输出，不能只挑升级后的
+好时段。--initial-run可加载已有完整研究bundle中的权重；初始模型或accepted选择过程
+晚于新的回放起点会被拒绝。此入口载入原始任务头权重，不沿用原研究的概率校准器；
+新顺序试验以实际记录的原始分布评分，不把它们称为已经校准的概率。
+
+多源数据与实际采集
+--cross-assets增加当时已可用的标的间收益、波动、差值和关系特征。
+--funding及--open-interest接收显式symbol/observed_at/available_at/value表；
+--context-max-age-hours规定资料过期时间。缺失通过值+可观测mask表达。
+获取接口、来源语义及诊断API详见docs/DISCOVERY_DATA_V4.txt。
+
+实时采集必须使用新的feed目录，不能覆盖历史归档：
+  ./.venv/Scripts/python.exe -m factorlab.discovery feed-init --seed data/discovery/2025-hourly/bars.parquet --output data/feeds/my-feed
+  ./.venv/Scripts/python.exe -m factorlab.discovery feed-refresh --feed data/feeds/my-feed --symbols BTCUSDT ETHUSDT SOLUSDT
+
+使用覆盖实际当前时间的新协议，再将--data指向feed目录，evolve追加
+--watch --refresh-feed --watch-seconds 3600。旧2025示例协议不会预测2026年的行情。
+历史种子的可用时刻仍是明确假设；新REST数据记录实际接收时间。每批补齐的历史只作为
+历史输入，只有每标的当次最新已收盘K线成为新预测时点；标签需等完整未来资料实际收到。
+掉线导致缺口时，原特征窗口会重新预热，不填造连续历史。首次运行需充分的连续历史。
+资金费率与OI采集是另外的显式入口，当前小时K线watch不自动订阅所有数据源。
+
+边界
+模块冻结置零贡献/相关冗余/按因果状态分组诊断是解释线索，不是因果发现或保证专家分工。
+当前以加密永续小时资料完成适配；传统期货换月、交易日历仍需相应来源适配和真实验证。
+源码更改属于新的算法版本；旧运行保留核验与报告，新算法应开新实验，不能静默改写旧状态。
+多父竞争发生在一轮population搜索内。下一周期从现用模型开始，过往提案结果可被检索，
+但不会自动复活全部历史旁支；merge是同一模型内部的模块合并，不是不同模型权重交叉。
+默认diagnostic提案器是简单局部规则，当前贡献/冗余/状态诊断可单独输出，尚未全部接入
+提案选择策略。第一次事件时间分箱在实验开始前固定；可从分布读取不同期限概率，不能
+在看到结果后任意改评价期限。没有卡尔曼滤波器；权重采用成熟样本上的梯度训练更新。
+长期大规模运行还会受历史哈希、数据窗口和重复搜索成本限制。所有训练都有预算，
+数值健康不保证数学全局收敛；能搜索、能恢复与能持续找到有效因子是三个不同主张。

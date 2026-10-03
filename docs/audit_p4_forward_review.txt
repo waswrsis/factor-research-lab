@@ -1,0 +1,96 @@
+Independent P4 forward adapter semantic and code audit
+Reviewer: independent Codex subagent; reviewed 2026-10-03
+Scope: factorlab/forward.py, scripts/observe_shadow.py,
+docs/forward_contract.txt, tests/test_forward.py, tests/test_forward_audit.py;
+cross-checked shadow.py, features.py, data.py and FittedModel.predict/load.
+
+Disposition: no unresolved blocking defect after the crash-publication repairs.
+The adapter is suitable for an explicit bounded public-data observation attempt.
+Live public endpoint connectivity and real matured forward forecast evidence are
+separate required execution evidence; neither is established by this audit.
+
+Semantics verified
+1. load_frozen_model verifies the full bundle tree before deserialization, compares
+   its hash with the independently supplied trusted hash, checks protocol metadata,
+   restricts the model directory to the verified bundle and enforces supported
+   causal features, lookback and frozen prediction clip.
+2. The production network client uses fixed-host GET-only public clock/kline
+   endpoints, bounded timeouts/limits and rejects redirects. No credentials,
+   order endpoint or automatic background task exists. Regional restrictions
+   and provider failures propagate without a hidden alternate host.
+3. Closed feature candles require the frozen close delay and are filtered using
+   the conservative exchange/receipt clock. Future opens, stale/skewed clocks,
+   missing latest eligible candle, duplicate/order/price problems and gaps fail.
+   All accepted historical rows are assigned their actual response receipt time,
+   rather than a claimed historical live publication time.
+4. inference_dataset uses finite trailing causal features and trailing volatility
+   only. It does not call historical make_dataset, require outcome prices or fit
+   a model; y=zeros is a shape placeholder that predict never consumes as labels.
+   It bypasses the historical training calendar appropriately. All symbols share
+   a conservative availability time after the final source response; the ledger
+   requires actual forward submission before the next hourly entry.
+5. Deterministic decision IDs bind frozen bundle, symbol and feature candle close.
+   An exact repeated observation preserves original availability, entry and end.
+   Both committed retry and prepared-before-commit retry require matching input
+   tensor hash, predicted value, symbol, protocol/model/mode and provenance digest.
+   Revised closed history is rejected even if the model forecast remains identical.
+6. Exact float32 window/scale NPZ evidence is retained without pickle, with file
+   and semantic tensor hashes in immutable provenance. It is prepared before the
+   SQLite prediction. Model predictions can therefore be reproduced from the
+   recorded used tensor even if remote source history later changes.
+7. --settle selects at most 20 genuinely pending mature ledger predictions. It
+   requests the 13 exact hourly opens from the original entry through label end,
+   checks positivity/finiteness and time completeness, and uses only endpoint
+   opens for simple return. The final candle's future close is not consumed.
+   Frozen label maturity is end+delay; actual outcome collection/commit time is
+   recorded later. These timestamps have different, correctly declared meanings.
+8. One-shot summaries remain forecast-error measurements. A forecast submission,
+   synthetic clock test or historical replay cannot establish elapsed forward
+   performance, continuous service, portfolio profitability or live deployment.
+
+Concrete finding and verified repair
+F1. Initially NPZ and JSON evidence were written directly to their deterministic
+    final filenames. A process interruption mid-write could leave partial final
+    evidence, safely rejecting but permanently blocking an otherwise valid retry.
+    Independent review requested atomic staged publication. Repair inspected:
+    _durable_publish creates a temporary file on the same D directory, flushes and
+    fsyncs it, then renames under the adapter lock. Partial stages are ignored;
+    existing committed evidence is not overwritten. The adapter's interruption
+    regression simulates a partial NPZ writer, confirms no final NPZ appears, and
+    verifies the next attempt can commit successfully.
+F2. The initial prepared-before-SQLite recovery compared new receipt timestamps
+    with existing prepared provenance and rejected a matching retry. Repair:
+    verify and reuse the original prepared availability/entry/end, then let the
+    forward ledger enforce the original input freshness and future-entry deadline.
+    Its regression verifies original first receipt with actual later commit time.
+    The independent deadline counterexample confirms this cannot retime a forecast
+    after its original entry has passed.
+
+Execution evidence
+Environment: scripts/Enter-Research.ps1; D-drive project .venv Python.
+Final focused command: pytest tests/test_forward_audit.py tests/test_forward.py -q
+Result: 14 passed in 6.52 seconds (11 adapter cases plus 3 independent cases).
+Independent tests/test_forward_audit.py passes Ruff formatting/checks.
+Independent cases: identical-prediction source revision rejection; durable tensor
+tamper rejection; and no retiming after a prepared forecast's original deadline.
+Adapter cases include frozen hash-before-load, forming-candle exclusion, delay/
+gap/future boundaries, exact settlement maturity, open-price-only outcomes,
+pre/post-SQLite crash retry and interrupted tensor publication.
+All checks are offline/synthetic; this reviewer made no public network call.
+
+Remaining operational conditions and nonblocking limits
+- Root must explicitly run and record the real public observation attempt, report
+  regional/network/provider errors honestly, and distinguish submitted forecasts
+  from matured forward labels. Prior historical replay is not forward evidence.
+- There is no scheduler. Continued collection and later settlement require
+  explicit further invocations; a bounded one-shot adapter does not promise a
+  continuously operating paper service.
+- Full public response bodies are not retained. Their hashes/receipts are source
+  provenance assertions, not independently authenticated source truth or enough
+  to reconstruct every raw candle. Exact used model tensors are retained.
+- Sequential source requests crossing an hourly boundary may safely reject due
+  to the earlier sampled exchange clock or produce conservative delayed inputs.
+  This is a freshness/availability cost, not future-information leakage.
+- SHA hashes, locks and SQLite transactions establish application integrity;
+  administrator replacement, hostile filesystem races and provider clock/data
+  truthfulness remain outside the expressly stated offline prototype boundary.

@@ -1,0 +1,9 @@
+{
+  "bundle": "D:/FactorResearch/models/frozen/p1-baseline-v1",
+  "expected_hash": "4cdb5fc03c276ca69765170f4e6f91b57f638880e83ff0f8f84f220d8121bc11",
+  "ledger": "D:/FactorResearch/runs/shadow-forward-v1",
+  "protocol": "D:/FactorResearch/config/protocol.json",
+  "mode": "forward_forecast_error_only",
+  "automatic_scheduler_enabled": false,
+  "live_orders_enabled": false
+}

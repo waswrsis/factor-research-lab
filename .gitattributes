@@ -1,0 +1,6 @@
+# Preserve exact artifact/source bytes used by SHA-256 audit manifests.
+* -text
+*.pdf binary
+*.png binary
+*.npz binary
+*.parquet binary

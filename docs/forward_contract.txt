@@ -1,0 +1,87 @@
+P4 one-shot forward observation adapter
+
+Entrypoint: scripts/observe_shadow.py --bundle <frozen D path>
+  --expected-hash <independently retained bundle SHA256> --ledger <new D path>
+  [--protocol config/protocol.json] [--once] [--settle]
+One invocation observes once; --once is optional and has the same behavior.
+There is no scheduler, task installation, daemon, credential reader or order API.
+Network failures and regional restrictions stop the run; there is no fallback host.
+Root must run live explicitly. Mock tests do not establish live connectivity.
+
+The exact bundle tree/digest and expected external hash are checked before
+FittedModel.load. Metadata protocol_hash must equal Protocol.digest. Metadata
+model_directory optionally selects a relative directory inside the snapshot;
+default '.' loads model.json/arrays.npz at the bundle root. Supported features
+are the existing causal FEATURE_COLUMNS, with frozen lookback and prediction clip.
+All outputs, locks, caches and ledgers remain inside D:/FactorResearch.
+
+The GET-only public client uses https://fapi.binance.com/fapi/v1/time and
+/fapi/v1/klines with interval=1h, bounded limit and timeouts; redirects fail.
+Official current documentation verified October 3, 2026:
+https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data
+It documents serverTime milliseconds, hourly klines, twelve source fields,
+open/high/low/close/volume, inclusive source close times and max limit 1500.
+
+Require at least max(200, lookback+49) closed hours per frozen symbol. Exclude
+forming bars and candles within the frozen close delay at the conservative
+minimum of exchange time and actual receipt. Reject future candle opens,
+future receipt, stale/skewed server time, missing latest eligible closed candle,
+gaps, duplicate/out-of-order bars and invalid OHLCV. Canonical close is exclusive
+open+1h. Canonical availability is max(close+delay, actual UTC receipt), which
+equals receipt for all accepted past bars. Existing feature validation checks
+monotone availability, and rolling features use only past observed bars.
+
+Inference uses each symbol's latest lookback finite causal windows and trailing
+24h volatility * sqrt(12), floored by the frozen volatility floor. It does not
+apply the historical training calendar, require future prices, or construct
+observed labels. Dataset.y zeros are shape-only placeholders for predict.
+All prediction metadata uses a common actual timestamp after all responses.
+Entry is the next strictly future whole UTC hour; horizon is 12h. The forward
+ledger validates the actual submission clock and entry has not passed.
+
+Decision ID hashes bundle_hash, symbol and latest feature candle close. Repeating
+the same candle at a later receipt skips only an existing exact known symbol,
+prediction and causal window/scale hash in durable prewritten decision provenance.
+Retry also verifies the provenance SHA256, mode/model/protocol references and
+original ledger availability/entry/end. An unknown ID collision or changed
+inference input fails closed. A crash immediately after the prediction commit
+recovers as an idempotent retry using the already flushed provenance record.
+An interruption after provenance preparation but before prediction commit can
+reuse that verified prepared attempt and its original actual receipt. The forward
+ledger still requires a fresh input timestamp and future entry at submission.
+Each exact used float32 x window and scalar scale is durably stored first in
+inputs/<decision_id>.npz without pickle. Provenance binds its relative path,
+file SHA256 and semantic tensor hash. Retry verifies stored tensor integrity
+and equality with the currently fetched causal inference window. This preserves
+the originally used model input even if public historical candles later revise.
+The first forecast retains its original availability, entry and horizon.
+Local adapter calls serialize with a file lock; other ledger writers cannot
+silently turn a duplicate into an idempotent success.
+
+Immutable provenance JSON with a SHA256 digest is written before each attempted commit,
+with model/protocol hashes, decision IDs, actual receipts, exchange server clock,
+response fingerprints, feature close and input hash. It records prepared input
+evidence; the SQLite prediction/outcome rows establish successful commitment.
+Prediction provenance files are addressed by deterministic decision ID; outcome
+evidence files use their content SHA256. Existing evidence is never overwritten.
+Tensor and JSON files are flushed/fsynced in temporary files under their target
+D directory, then atomically renamed under the adapter lock. Interrupted staging
+files are ignored; partial writes never occupy the committed deterministic path.
+Full response bodies are not retained, so response hashes do not make remote data
+independently reconstructable or authenticated; the exact used tensor is retained.
+This is application-level
+integrity, not protection against administrator replacement or source revisions.
+
+Optional --settle handles at most 20 prior pending predictions whose exact
+label_end+delay has matured. Separate public requests obtain the 13 exact hourly
+opens from entry through label_end, rejecting gaps/nonpositive/nonfinite prices.
+Only entry and end opens determine simple return. The label_end candle can still
+be forming because its open price is already observed; its later close is unused.
+Exchange/local maturity precedes collection. Provenance captures actual later
+measurement receipt; label_available_at remains the frozen label_end+delay rule,
+and recorded_at is actual wall time. Settlement does not claim measurement then.
+The result explicitly reports the limit and remaining mature pending count.
+
+Metrics are forecast MAE/MSE only, not portfolio PnL or profitability. A one-shot
+forecast does not establish elapsed forward performance, continuous operation,
+or general asset-universe validity. There are no secrets, OpenAI requests or orders.

@@ -1,0 +1,2059 @@
+{
+  "run": "D:\\FactorResearch\\runs\\operator-v5-tuning-20261003-202817",
+  "scope": "development_only",
+  "independent_confirmation": false,
+  "primary_metric": "future_12h_volatility_logMSE_lower_is_better",
+  "method": "Root/GPT predeclared bounded coordinate tuning of two frozen architectures: A original network and B previously GPT-generated indicator program; internal parameters fitted normally, no new GPT calls or new structure evolution.",
+  "baseline_config": {
+    "architecture": "A",
+    "epochs": 8,
+    "learning_rate": 0.001,
+    "l2": 0.001,
+    "patience": 3
+  },
+  "baseline_development_loss": 0.2150651750028849,
+  "baseline_reserved_loss": 0.18538463097732275,
+  "rounds": [
+    {
+      "round": 1,
+      "config": {
+        "architecture": "B",
+        "epochs": 4,
+        "learning_rate": 0.001,
+        "l2": 0.001,
+        "patience": 3
+      },
+      "development_loss": 0.21142687552691009,
+      "development_relative_improvement": 0.01691719487325649,
+      "reserved_loss": 0.1970221823589328,
+      "reserved_relative_improvement": -0.0627751681477502,
+      "reserved_comparison": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 2193,
+        "total_rows": 2232,
+        "coverage": 0.9825268817204301,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.975,
+        "family_size": 3,
+        "adjusted_confidence": 0.9916666666666667,
+        "estimate": -0.011637551381610038,
+        "ci_lower": -0.02147034798591635,
+        "ci_upper": -0.002447706936407967,
+        "n_blocks": 31,
+        "n_hours": 731,
+        "status": "target_not_met",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 24,
+        "bootstrap_samples": 2000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-07-01T00:00:00+00:00",
+        "end": "2025-07-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "operational_development_improvement_supported": false,
+      "independent_predictive_claim_supported": false
+    },
+    {
+      "round": 2,
+      "config": {
+        "architecture": "B",
+        "epochs": 4,
+        "learning_rate": 0.0005,
+        "l2": 0.001,
+        "patience": 3
+      },
+      "development_loss": 0.20878060485812822,
+      "development_relative_improvement": 0.029221700559713515,
+      "reserved_loss": 0.2005392042838341,
+      "reserved_relative_improvement": -0.08174665411376592,
+      "reserved_comparison": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 2193,
+        "total_rows": 2232,
+        "coverage": 0.9825268817204301,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.975,
+        "family_size": 3,
+        "adjusted_confidence": 0.9916666666666667,
+        "estimate": -0.015154573306511376,
+        "ci_lower": -0.030867604723148104,
+        "ci_upper": -0.0014205588718903838,
+        "n_blocks": 31,
+        "n_hours": 731,
+        "status": "target_not_met",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 24,
+        "bootstrap_samples": 2000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-07-01T00:00:00+00:00",
+        "end": "2025-07-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "operational_development_improvement_supported": false,
+      "independent_predictive_claim_supported": false
+    },
+    {
+      "round": 3,
+      "config": {
+        "architecture": "B",
+        "epochs": 4,
+        "learning_rate": 0.0005,
+        "l2": 0.0003,
+        "patience": 3
+      },
+      "development_loss": 0.2082767737743178,
+      "development_relative_improvement": 0.031564390787471974,
+      "reserved_loss": 0.200272881352183,
+      "reserved_relative_improvement": -0.08031005750784947,
+      "reserved_comparison": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 2193,
+        "total_rows": 2232,
+        "coverage": 0.9825268817204301,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.975,
+        "family_size": 3,
+        "adjusted_confidence": 0.9916666666666667,
+        "estimate": -0.014888250374860253,
+        "ci_lower": -0.030391311929819118,
+        "ci_upper": -0.0013141753145582869,
+        "n_blocks": 31,
+        "n_hours": 731,
+        "status": "target_not_met",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 24,
+        "bootstrap_samples": 2000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-07-01T00:00:00+00:00",
+        "end": "2025-07-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "operational_development_improvement_supported": false,
+      "independent_predictive_claim_supported": false
+    }
+  ],
+  "selected_by_development_only": {
+    "architecture": "B",
+    "epochs": 4,
+    "learning_rate": 0.0005,
+    "l2": 0.0003,
+    "patience": 3
+  },
+  "production_default_changed": false,
+  "retain_baseline": true,
+  "unique_development_configs": 14,
+  "fit_count": 64,
+  "fit_errors": [],
+  "stop_reasons": {
+    "development_patience": 4,
+    "epoch_budget": 60
+  },
+  "partial_epoch_models": 0,
+  "elapsed_seconds": 239.34299999999348,
+  "max_seed_elapsed_seconds_including_artifacts": 13.062999999994645,
+  "source_unchanged": true,
+  "source_digest": "65e31d7cf4c64ce60b8d116f08ccff5c246f61c77908edd6948816832485f94d",
+  "audit": {
+    "run": "runs\\operator-v5-tuning-20261003-202817",
+    "status": "pass",
+    "scope": "development_only",
+    "independent_confirmation": false,
+    "issues": [],
+    "checks": {
+      "frozen_protocol_hash": 1,
+      "frozen_driver_hash": 1,
+      "current_driver_hash": 1,
+      "copied_config_hash": 1,
+      "product_config_hash": 1,
+      "development_snapshot_hash": 1,
+      "frozen_source_snapshot_hash": 45,
+      "unchanged_product_source_hash": 45,
+      "source_B_hash": 1,
+      "scope": 1,
+      "selected_alias_not_fourth_test": 1,
+      "whole_config_no_failure": 18,
+      "frozen_architecture_identity": 18,
+      "train_early_disjoint": 32,
+      "80_20_split": 32,
+      "model_digest": 64,
+      "saved_diagnostics_equal_checkpoint": 64,
+      "seed_resource_setting": 64,
+      "cold_fit_no_weight_transfer": 64,
+      "cold_scalers": 64,
+      "frozen_hyperparameters": 256,
+      "fit_features_before_early_boundary": 64,
+      "purged_fit_labels_before_early_boundary": 64,
+      "early_features_before_fit_cutoff": 64,
+      "early_labels_mature_by_fit_cutoff": 64,
+      "seed_sample_alignment": 32,
+      "origin_scope": 32,
+      "finite_predictions_all_rows": 96,
+      "masked_targets_cleared": 96,
+      "score_labels_mature_by_cutoff": 96,
+      "equal_seed_decoded_ensemble": 96,
+      "independent_per_sample_loss": 96,
+      "hour_symbol_macro_score": 32,
+      "equal_fold_macro_score": 18,
+      "development_unique_14": 1,
+      "reserved_only_baseline_plus_champions": 1,
+      "round_frozen_hash": 3,
+      "previous_champion_chain": 3,
+      "round_winner_recomputed": 3,
+      "round_grid_recomputed": 3,
+      "cache_record_matches_one_persisted_config": 18,
+      "selected_frozen_identity": 1,
+      "frozen_all_round_champions": 1,
+      "reserved_artifact_created_after_freeze": 1,
+      "paired_sample_mask_alignment": 3,
+      "independent_paired_estimate_and_CI": 3,
+      "frozen_comparison_policy": 3,
+      "reserved_target_not_met_and_negative_interval": 3,
+      "no_fit_or_run_errors": 1,
+      "all_seed_labels_masks_maturity_and_loss_reverified": 962
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "winner": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "score": 0.21142687552691009,
+        "improvement_from_incumbent": 0.0036382994759748266
+      },
+      {
+        "round": 2,
+        "winner": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "score": 0.20878060485812822,
+        "improvement_from_incumbent": 0.0026462706687818693
+      },
+      {
+        "round": 3,
+        "winner": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "score": 0.2082767737743178,
+        "improvement_from_incumbent": 0.0005038310838104132
+      }
+    ],
+    "counts": {
+      "development_configs": 14,
+      "reserved_configs": 4,
+      "seed_fits": 64,
+      "prediction_rows": 37152
+    },
+    "training_stop_reasons": {
+      "epoch_budget": 60,
+      "development_patience": 4
+    },
+    "time_budget_stops": 0,
+    "partial_epoch_checkpoints": 0,
+    "training_details": [
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 16,
+        "best_epoch": 14,
+        "partial_epochs": 0,
+        "elapsed_seconds": 12.96899999998277,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 16,
+        "best_epoch": 14,
+        "partial_epochs": 0,
+        "elapsed_seconds": 12.827999999979511,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 14,
+        "best_epoch": 10,
+        "partial_epochs": 0,
+        "elapsed_seconds": 11.359000000025844,
+        "stop_reason": "development_patience"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 14,
+        "best_epoch": 10,
+        "partial_epochs": 0,
+        "elapsed_seconds": 11.46799999999348,
+        "stop_reason": "development_patience"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.2969999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.312999999994645,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.3280000000086147,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.422000000020489,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.312999999994645,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.2809999999881256,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.437999999994645,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.3280000000086147,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.6570000000065193,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.5469999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.4070000000065193,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.5320000000065193,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 16,
+        "best_epoch": 14,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.139999999984866,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 16,
+        "best_epoch": 14,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.047000000020489,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 14,
+        "best_epoch": 10,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.9070000000065193,
+        "stop_reason": "development_patience"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 16,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 13,
+        "best_epoch": 9,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.9059999999881256,
+        "stop_reason": "development_patience"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6410000000032596,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6719999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6410000000032596,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6720000000204891,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6879999999946449,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.7340000000258442,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.7039999999979045,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6410000000032596,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6559999999881256,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6720000000204891,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.639999999984866,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6400000000139698,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.2810000000172295,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.3910000000032596,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.2809999999881256,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.002,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.389999999984866,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6870000000053551,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6559999999881256,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6719999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6560000000172295,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 3.375,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 5.64000000001397,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 5.421999999991385,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 5.0,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 8,
+        "best_epoch": 6,
+        "partial_epochs": 0,
+        "elapsed_seconds": 10.51600000000326,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 7.032000000006519,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 8,
+        "best_epoch": 6,
+        "partial_epochs": 0,
+        "elapsed_seconds": 6.937999999994645,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "B",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 7.952999999979511,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.389999999984866,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.2820000000065193,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.110000000015134,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.1719999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.7029999999795109,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "may",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6410000000032596,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.6870000000053551,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "development",
+        "config": {
+          "architecture": "A",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "june",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.7030000000086147,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.5940000000118744,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.5939999999827705,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.6570000000065193,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.0005,
+          "l2": 0.0003,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.51500000001397,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 17,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.6559999999881256,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "B",
+          "epochs": 4,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 29,
+        "epochs_completed": 4,
+        "best_epoch": 3,
+        "partial_epochs": 0,
+        "elapsed_seconds": 2.6719999999913853,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 17,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 0.889999999984866,
+        "stop_reason": "epoch_budget"
+      },
+      {
+        "phase": "reserved",
+        "config": {
+          "architecture": "A",
+          "epochs": 8,
+          "learning_rate": 0.001,
+          "l2": 0.001,
+          "patience": 3
+        },
+        "fold": "reserved_july",
+        "seed": 29,
+        "epochs_completed": 8,
+        "best_epoch": 7,
+        "partial_epochs": 0,
+        "elapsed_seconds": 1.0,
+        "stop_reason": "epoch_budget"
+      }
+    ],
+    "reserved_comparisons": [
+      {
+        "round": 1,
+        "estimate": -0.011637551381610038,
+        "ci_lower": -0.02147034798591635,
+        "ci_upper": -0.002447706936407967,
+        "status": "target_not_met",
+        "n_hours": 731,
+        "n_blocks": 31
+      },
+      {
+        "round": 2,
+        "estimate": -0.015154573306511376,
+        "ci_lower": -0.030867604723148104,
+        "ci_upper": -0.0014205588718903838,
+        "status": "target_not_met",
+        "n_hours": 731,
+        "n_blocks": 31
+      },
+      {
+        "round": 3,
+        "estimate": -0.014888250374860253,
+        "ci_lower": -0.030391311929819118,
+        "ci_upper": -0.0013141753145582869,
+        "status": "target_not_met",
+        "n_hours": 731,
+        "n_blocks": 31
+      }
+    ],
+    "effect_summary": {
+      "baseline_development_logMSE": 0.2150651750028849,
+      "selected_development_logMSE": 0.2082767737743178,
+      "development_relative_reduction": 0.031564390787471974,
+      "baseline_reserved_logMSE": 0.18538463097732275,
+      "selected_reserved_logMSE": 0.200272881352183,
+      "reserved_relative_increase": 0.08031005750784949
+    },
+    "interpretation": "Two-fold tuning improved the reused development benchmark; every frozen round champion was worse than fixed A on reserved July. All adjusted intervals are negative and the frozen absolute 0.005 increment was not met. No independent predictive benefit is established. Nested predictive indicates future-target task type only; predictive_claim_supported is false for all actual comparisons. Even if true it would only mean a development comparison threshold passed, not independent confirmation.",
+    "limitations": [
+      "All 2025 periods were already exposed; July is development evidence",
+      "Two fixed seeds describe one ensemble, not random-seed generalization",
+      "24h calendar-block bootstrap with 2000 resamples is approximate and can miss longer dependence",
+      "CI refers to absolute logMSE differences; relative percentages are descriptive"
+    ],
+    "audit_actions": "Read-only artifacts and product source; no training, no GPT calls, wrote only work/operator_v5_tuning/result_audit.json",
+    "source_market_data_unchanged_verified": true,
+    "interpretation_artifact_reviewed": {
+      "scope": "development_only",
+      "independent_confirmation": false,
+      "statement": "Three frozen coordinate rounds improved the selected May/June benchmark, but the final July reserved development evaluation worsened. This run does not support promotion or independent predictive benefit.",
+      "selected": {
+        "architecture": "B",
+        "epochs": 4,
+        "learning_rate": 0.0005,
+        "l2": 0.0003,
+        "patience": 3
+      },
+      "development_rounds": [
+        {
+          "round": 1,
+          "loss": 0.21142687552691009,
+          "improvement_from_fixed_baseline": 0.0036382994759748266
+        },
+        {
+          "round": 2,
+          "loss": 0.20878060485812822,
+          "improvement_from_fixed_baseline": 0.006284570144756696
+        },
+        {
+          "round": 3,
+          "loss": 0.2082767737743178,
+          "improvement_from_fixed_baseline": 0.006788401228567109
+        }
+      ],
+      "development_relative_loss_reduction": 0.031564390787471974,
+      "reserved_baseline_loss": 0.18538463097732275,
+      "reserved_selected_loss": 0.200272881352183,
+      "reserved_relative_loss_increase": 0.08031005750784947,
+      "paired_primary": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 2193,
+        "total_rows": 2232,
+        "coverage": 0.9825268817204301,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.975,
+        "family_size": 3,
+        "adjusted_confidence": 0.9916666666666667,
+        "estimate": -0.014888250374860253,
+        "ci_lower": -0.030391311929819118,
+        "ci_upper": -0.0013141753145582869,
+        "n_blocks": 31,
+        "n_hours": 731,
+        "status": "target_not_met",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 24,
+        "bootstrap_samples": 2000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-07-01T00:00:00+00:00",
+        "end": "2025-07-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "raw_predictive_claim_supported_semantics": "The inherited paired_comparison field means the conditional bootstrap interval clears the predefined numerical threshold. Even if true, it would not override previously exposed development scope or establish independent confirmation.",
+      "independent_predictive_evidence_supported": false,
+      "promotion_recommendation": "retain_original_A_baseline; preserve_B_candidate_for_future_independent_data",
+      "selected_alias_has_no_fourth_hypothesis": true,
+      "original_frozen_results_unchanged": true
+    }
+  },
+  "posthoc_diagnosis": {
+    "scope": "posthoc_description_only",
+    "selection_changed": false,
+    "training_executed": false,
+    "gpt_executed": false,
+    "run": "runs\\operator-v5-tuning-20261003-202817",
+    "baseline": {
+      "architecture": "A",
+      "epochs": 8,
+      "learning_rate": 0.001,
+      "l2": 0.001,
+      "patience": 3
+    },
+    "selected_final_round3": {
+      "architecture": "B",
+      "epochs": 4,
+      "learning_rate": 0.0005,
+      "l2": 0.0003,
+      "patience": 3
+    },
+    "identity_resolution": "Exact configuration.json config equality against parameters_frozen.json; no heldout-score selection",
+    "baseline_configuration_path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-f9b7bb9606e5738b\\configuration.json",
+    "selected_configuration_path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-2c0a4b62d498d333\\configuration.json",
+    "baseline_prediction_path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-f9b7bb9606e5738b\\reserved_july\\ensemble\\predictions.parquet",
+    "selected_prediction_path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-2c0a4b62d498d333\\reserved_july\\ensemble\\predictions.parquet",
+    "alignment_checks": {
+      "sample_ids_identical": true,
+      "symbols_times_targets_masks_maturity_identical": true,
+      "all_rows": 2232
+    },
+    "aggregation": "Equal symbols within UTC prediction-origin hour, then equal hours; by-symbol single symbol; UTC calendar weeks Monday 00:00 inclusive to next Monday exclusive; first/final partial weeks kept",
+    "all_tasks": {
+      "volatility": {
+        "support": 2193,
+        "hours": 731,
+        "baseline_loss": 0.18538463097732283,
+        "selected_loss": 0.20027288135218296,
+        "absolute_improvement": -0.014888250374860135,
+        "relative_improvement": -0.08031005750784885
+      },
+      "first_event": {
+        "support": 2169,
+        "hours": 723,
+        "baseline_loss": 2.3266699304107954,
+        "selected_loss": 3.041351817867721,
+        "absolute_improvement": -0.7146818874569254,
+        "relative_improvement": -0.3071694347855957
+      },
+      "state": {
+        "support": 2232,
+        "hours": 744,
+        "baseline_loss": 4.006911751593284e-05,
+        "selected_loss": 0.000144267366549238,
+        "absolute_improvement": -0.00010419824903330515,
+        "relative_improvement": -2.6004627876287114
+      }
+    },
+    "by_symbol": {
+      "volatility": {
+        "BTCUSDT": {
+          "support": 731,
+          "hours": 731,
+          "baseline_loss": 0.26839812006212044,
+          "selected_loss": 0.30079666524385473,
+          "absolute_improvement": -0.032398545181734295,
+          "relative_improvement": -0.12071077537441652
+        },
+        "ETHUSDT": {
+          "support": 731,
+          "hours": 731,
+          "baseline_loss": 0.17232127527081648,
+          "selected_loss": 0.17381033533971743,
+          "absolute_improvement": -0.0014890600689009548,
+          "relative_improvement": -0.008641185289284677
+        },
+        "SOLUSDT": {
+          "support": 731,
+          "hours": 731,
+          "baseline_loss": 0.11543449759903124,
+          "selected_loss": 0.12621164347297648,
+          "absolute_improvement": -0.010777145873945237,
+          "relative_improvement": -0.09336156953166903
+        }
+      },
+      "first_event": {
+        "BTCUSDT": {
+          "support": 723,
+          "hours": 723,
+          "baseline_loss": 2.2421141684159163,
+          "selected_loss": 3.0046051919205823,
+          "absolute_improvement": -0.762491023504666,
+          "relative_improvement": -0.34007680529639406
+        },
+        "ETHUSDT": {
+          "support": 723,
+          "hours": 723,
+          "baseline_loss": 2.366590272579791,
+          "selected_loss": 2.96972092485356,
+          "absolute_improvement": -0.6031306522737689,
+          "relative_improvement": -0.2548521640023068
+        },
+        "SOLUSDT": {
+          "support": 723,
+          "hours": 723,
+          "baseline_loss": 2.371305350236674,
+          "selected_loss": 3.149729336829012,
+          "absolute_improvement": -0.7784239865923381,
+          "relative_improvement": -0.3282681357399399
+        }
+      },
+      "state": {
+        "BTCUSDT": {
+          "support": 744,
+          "hours": 744,
+          "baseline_loss": 1.345598883339013e-05,
+          "selected_loss": 4.4912603283204045e-05,
+          "absolute_improvement": -3.145661444981392e-05,
+          "relative_improvement": -2.337740825984966
+        },
+        "ETHUSDT": {
+          "support": 744,
+          "hours": 744,
+          "baseline_loss": 5.294835158060262e-05,
+          "selected_loss": 0.00018416394859921715,
+          "absolute_improvement": -0.00013121559701861454,
+          "relative_improvement": -2.4781809650649214
+        },
+        "SOLUSDT": {
+          "support": 744,
+          "hours": 744,
+          "baseline_loss": 5.380301213380597e-05,
+          "selected_loss": 0.00020372554776529277,
+          "absolute_improvement": -0.0001499225356314868,
+          "relative_improvement": -2.7865082211128875
+        }
+      }
+    },
+    "by_utc_week": {
+      "volatility": {
+        "2025-06-30": {
+          "support": 432,
+          "hours": 144,
+          "baseline_loss": 0.26591493611763223,
+          "selected_loss": 0.2852087717649815,
+          "absolute_improvement": -0.019293835647349267,
+          "relative_improvement": -0.07255641946646538
+        },
+        "2025-07-07": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 0.24966584196545075,
+          "selected_loss": 0.2516902413901596,
+          "absolute_improvement": -0.0020243994247088615,
+          "relative_improvement": -0.00810843569457532
+        },
+        "2025-07-14": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 0.13859289420223694,
+          "selected_loss": 0.14768707496578098,
+          "absolute_improvement": -0.00909418076354404,
+          "relative_improvement": -0.06561794394937498
+        },
+        "2025-07-21": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 0.13651404995596353,
+          "selected_loss": 0.17386240421767982,
+          "absolute_improvement": -0.03734835426171629,
+          "relative_improvement": -0.2735861566905682
+        },
+        "2025-07-28": {
+          "support": 249,
+          "hours": 83,
+          "baseline_loss": 0.10918778764711384,
+          "selected_loss": 0.10873662744482156,
+          "absolute_improvement": 0.00045116020229228615,
+          "relative_improvement": 0.00413196578128682
+        }
+      },
+      "first_event": {
+        "2025-06-30": {
+          "support": 432,
+          "hours": 144,
+          "baseline_loss": 2.3291308417419674,
+          "selected_loss": 3.0489362738952184,
+          "absolute_improvement": -0.719805432153251,
+          "relative_improvement": -0.30904465273187715
+        },
+        "2025-07-07": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 2.294681952075913,
+          "selected_loss": 3.0745291891137136,
+          "absolute_improvement": -0.7798472370378007,
+          "relative_improvement": -0.3398498150614302
+        },
+        "2025-07-14": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 2.3832114844361394,
+          "selected_loss": 3.0273218818613024,
+          "absolute_improvement": -0.644110397425163,
+          "relative_improvement": -0.2702699284690454
+        },
+        "2025-07-21": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 2.2041534728486276,
+          "selected_loss": 3.0538802265785456,
+          "absolute_improvement": -0.849726753729918,
+          "relative_improvement": -0.3855116098752139
+        },
+        "2025-07-28": {
+          "support": 225,
+          "hours": 75,
+          "baseline_loss": 2.54138183604756,
+          "selected_loss": 2.9558357718459987,
+          "absolute_improvement": -0.4144539357984387,
+          "relative_improvement": -0.16308211930994634
+        }
+      },
+      "state": {
+        "2025-06-30": {
+          "support": 432,
+          "hours": 144,
+          "baseline_loss": 3.127652114205405e-05,
+          "selected_loss": 0.00011183873619004845,
+          "absolute_improvement": -8.05622150479944e-05,
+          "relative_improvement": -2.5758048563678453
+        },
+        "2025-07-07": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 3.3356481127966566e-05,
+          "selected_loss": 8.749422405943759e-05,
+          "absolute_improvement": -5.413774293147102e-05,
+          "relative_improvement": -1.623005218199744
+        },
+        "2025-07-14": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 4.7963032255671897e-05,
+          "selected_loss": 0.00016862942331646866,
+          "absolute_improvement": -0.00012066639106079677,
+          "relative_improvement": -2.5158207349688007
+        },
+        "2025-07-21": {
+          "support": 504,
+          "hours": 168,
+          "baseline_loss": 5.288659340330721e-05,
+          "selected_loss": 0.00021895499410861738,
+          "absolute_improvement": -0.00016606840070531017,
+          "relative_improvement": -3.140085038922648
+        },
+        "2025-07-28": {
+          "support": 288,
+          "hours": 96,
+          "baseline_loss": 2.8760192158243845e-05,
+          "selected_loss": 0.00011892636387360454,
+          "absolute_improvement": -9.01661717153607e-05,
+          "relative_improvement": -3.1351032433736847
+        }
+      }
+    },
+    "saved_loss_recalculation_max_abs_differences": {
+      "volatility_baseline_max_loss_difference": 0.0,
+      "volatility_selected_max_loss_difference": 0.0,
+      "first_event_baseline_max_loss_difference": 4.440892098500626e-16,
+      "first_event_selected_max_loss_difference": 8.881784197001252e-16,
+      "state_baseline_max_loss_difference": 0.0,
+      "state_selected_max_loss_difference": 0.0
+    },
+    "selected_program_parameter_updates": [
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\development\\config-2c0a4b62d498d333\\june\\seed-17\\diagnostics.json",
+        "phase": "development",
+        "fold": "june",
+        "seed": "seed-17",
+        "best_epoch": 3,
+        "optimizer_steps": 108,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.04748604933801857,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.07931168377399445,
+              "alpha_recent": 0.4041457772254944
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.07931168377399445,
+            "delta": -0.0006883162260055559
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.4041457772254944,
+            "delta": 0.0041457772254943626
+          }
+        ]
+      },
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\development\\config-2c0a4b62d498d333\\june\\seed-29\\diagnostics.json",
+        "phase": "development",
+        "fold": "june",
+        "seed": "seed-29",
+        "best_epoch": 3,
+        "optimizer_steps": 108,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.026548206670822687,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.08002624660730362,
+              "alpha_recent": 0.4026649296283722
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.08002624660730362,
+            "delta": 2.624660730361772e-05
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.4026649296283722,
+            "delta": 0.00266492962837217
+          }
+        ]
+      },
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\development\\config-2c0a4b62d498d333\\may\\seed-17\\diagnostics.json",
+        "phase": "development",
+        "fold": "may",
+        "seed": "seed-17",
+        "best_epoch": 3,
+        "optimizer_steps": 108,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.05239618788488083,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.0793030634522438,
+              "alpha_recent": 0.40469616651535034
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.0793030634522438,
+            "delta": -0.0006969365477561967
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.40469616651535034,
+            "delta": 0.00469616651535032
+          }
+        ]
+      },
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\development\\config-2c0a4b62d498d333\\may\\seed-29\\diagnostics.json",
+        "phase": "development",
+        "fold": "may",
+        "seed": "seed-29",
+        "best_epoch": 3,
+        "optimizer_steps": 108,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.025765286552422644,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.079735167324543,
+              "alpha_recent": 0.4024205803871155
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.079735167324543,
+            "delta": -0.0002648326754570024
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.4024205803871155,
+            "delta": 0.0024205803871154563
+          }
+        ]
+      },
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-2c0a4b62d498d333\\reserved_july\\seed-17\\diagnostics.json",
+        "phase": "reserved",
+        "fold": "reserved_july",
+        "seed": "seed-17",
+        "best_epoch": 3,
+        "optimizer_steps": 84,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.03514007465569652,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.07966937124729156,
+              "alpha_recent": 0.4033440053462982
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.07966937124729156,
+            "delta": -0.0003306287527084367
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.4033440053462982,
+            "delta": 0.0033440053462981956
+          }
+        ]
+      },
+      {
+        "path": "runs\\operator-v5-tuning-20261003-202817\\reserved\\config-2c0a4b62d498d333\\reserved_july\\seed-29\\diagnostics.json",
+        "phase": "reserved",
+        "fold": "reserved_july",
+        "seed": "seed-29",
+        "best_epoch": 3,
+        "optimizer_steps": 84,
+        "programs": {
+          "operator_0": {
+            "program_digest": "27c89c6788d89024e5326e2b5faf7e8506f48c70c5c72d18330c05fdb21c475b",
+            "trainable_parameters": 2,
+            "input_semantics": "training_standardized_selected_features",
+            "selected_features": [
+              "return_1h",
+              "volatility_24h",
+              "range_1h",
+              "volume_z_24h"
+            ],
+            "effective_scale": 48,
+            "selected_raw_update_norm": 0.01976349502158973,
+            "selected_parameter_values": {
+              "alpha_baseline": 0.07964103668928146,
+              "alpha_recent": 0.4015493392944336
+            }
+          }
+        },
+        "effective_parameter_changes": [
+          {
+            "module": "operator_0",
+            "name": "alpha_baseline",
+            "initial": 0.08,
+            "selected": 0.07964103668928146,
+            "delta": -0.00035896331071853804
+          },
+          {
+            "module": "operator_0",
+            "name": "alpha_recent",
+            "initial": 0.4,
+            "selected": 0.4015493392944336,
+            "delta": 0.0015493392944335715
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Subgroups chosen after results are descriptive, not predeclared significance tests or new selection gates.",
+      "July was reserved from the three-round tuning choice but already historically exposed development data; not independent confirmation.",
+      "Changed architecture, training length, LR and L2 together: this comparison does not isolate new formula value, internal parameter value or noise-overfitting mechanism.",
+      "A worsened reserved score after dev selection is compatible with sample variability, regime differences, objective tradeoffs and selection effects; these data do not identify which caused it.",
+      "Nonzero alpha update proves fitted parameters changed, not that their updates improved predictions."
+    ],
+    "source_sha256": {
+      "baseline_configuration_path": "d0afd84ac17f18857264dcb9c7df5dd8a7dadd3b7d1c3e1181f83e29e2850a60",
+      "selected_configuration_path": "51956ec5fdfbc1d8a294e74b3a0e99d9600b8e94d87ff9928893d09ebb03396c",
+      "baseline_prediction_path": "c2d8e4400e1d853ffbf605cfe286c72da39b6f39baa46e5afe66a9c8dd096fc2",
+      "selected_prediction_path": "369bc629478db8294fb5d06c074a78aebc7359605b9db201dd941a2149ad3421"
+    },
+    "five_key_findings": [
+      "July主任务loss从0.185384631升到0.200272881，恶化8.031%；同一2193个有标签样本、731个UTC小时。",
+      "三币主任务均恶化：BTC12.071%、ETH0.864%、SOL9.336%，差异不是只由一个币种方向反转。",
+      "五个UTC Monday周段中四个恶化，最大为7月21日周27.359%；7月28日仅83小时部分周改善0.413%。这是事后分组描述，无额外显著性结论。",
+      "辅助first_event NLL从2.326670升到3.041352，恶化30.717%；2169个有标签样本、723小时，三个币种均恶化。辅助指标未进入选择门槛。",
+      "B程序参数确实更新：July seed17/29 alpha_baseline从0.08到0.079669/0.079641、alpha_recent从0.4到0.403344/0.401549；这不证明这些更新有收益。"
+    ],
+    "interpretation": "开发选优后留存期变差，是跨时期改善没有延续的证据。单凭这种症状，不能断言是噪声过拟合、辅助任务冲突或内部alpha训练造成；架构、训练时长、学习率和L2一起改变，缺少单因素消融和足够独立时期来识别机制。不得根据这些事后分组改变参数选择或评价门槛。"
+  },
+  "verification_record": "D:\\FactorResearch\\runs\\operator-v5-tuning-20261003-202817\\verification.json",
+  "artifact_files": {
+    "frozen_parameters": "D:\\FactorResearch\\runs\\operator-v5-tuning-20261003-202817\\parameters_frozen.json",
+    "protocol": "D:\\FactorResearch\\runs\\operator-v5-tuning-20261003-202817\\protocol.json",
+    "raw_result": "D:\\FactorResearch\\runs\\operator-v5-tuning-20261003-202817\\result.json"
+  }
+}

@@ -1,0 +1,128 @@
+第三版因子研究平台使用说明
+
+一、用途和结构
+
+工作区为D:/FactorResearch。当前入口factorlab.discovery专注因子发现和研究评分，
+不调用持仓或交易执行。旧版说明保存在docs/LEGACY_START_HERE.txt。
+
+资料与任务 → 表示训练与组合 → 有预算结构搜索 → 冻结完整版本
+          → 校准与冻结探针 → 一次独立确认 → 质量档案。
+另一条路径是逐小时回放：成熟结算 → 保存预测 → 定期重训 → 后续时点使用新版。
+
+模块支持固定摘要、小型MLP、可学习时间权重；组合支持拼接和门控。
+外层可增删模块、合并、改维数、替换方法和调整学习率。内部连续权重使用梯度训练。
+搜索只执行注册JSON动作，不能由agent运行任意Python代码。
+潜在维度可能随重训改变，长期身份绑定完整生成器，不把同一列当作恒定因子。
+
+二、默认研究问题
+
+数据是Binance USDT本位永续合约小时K线：BTCUSDT、ETHUSDT、SOLUSDT。
+2025年1–6月训练，7–8月开发，9月校准，10–12月确认。另取此前96小时预热。
+公开归档来源、校验值及文件哈希保存；不把历史下载时间当作真实历史到达时间。
+币种是固定幸存样本，不代表历史全市场或传统商品期货。后者还需接入数据、
+换月和交易日历约定；本轮实现不宣称传统期货已经验证。
+
+主任务是未来12个完整小时的波动sqrt(sum(log return squared))。
+评分为(log(prediction+1e-8)-log(target+1e-8))²，要求预测和目标非负。
+辅助事件任务预测12小时内首次触及冻结上下边界，时间段为(0,4]、(4,12]。
+五列概率依次：完整无事件、第一段向上、第一段向下、第二段向上、第二段向下。
+这是分箱概率质量，不是连续密度。state描述过去24小时，不登记为预测发现。
+框架还支持return目标，但默认主张不使用其成绩。
+
+历史可用时间假设为收盘加5秒。预测窗口从可用时点之后第一个完整UTC小时开始，
+跳过已经开始的一小时，避免把预测前触碰误作未来事件。
+未来窗口前的收盘仅作标签基准，不进入当时输入。
+事件边界用当时已知收盘及过去24小时波动冻结；开盘已越界则方向已知，
+开盘在界内但同根高低同时触边则标歧义。缺口、歧义、未成熟与完整无事件分开。
+所有预测任务保守地等整个期限结束后才成熟。
+
+三、训练、评分和结论
+
+默认种子17、29等权平均；每种子最多8轮、120秒、20万参数；每搜索方法4次、900秒。
+保存监督数量、事件各时间段支持度、梯度、实际更新、停止原因及最佳检查点。
+线性基准/探针对系数和偏置加L2；事件线性头用L-BFGS-B。
+预算结束或早停不等于达到数学最优。数值失败拒绝候选，回放更新失败保留旧模型。
+多任务早停使用规范化任务损失平均；结构选择使用开发区主任务损失。
+
+冻结比较包括完整体系对基准、加入冻结表示的增量和同维数随机投影容量对照；
+单模块、多模块、搜索方法及agent对随机搜索的比较也在运行前声明。
+所有确认比较共同校正；某方法失败不缩小比较家族。
+容量对照只匹配下游维数，未保证有效秩完全相同，也不证明新外部信息或因果关系。
+不同搜索匹配次数和资源上限，实际耗时与FLOPs不完全相等。
+
+增量=参照损失−候选损失，正数较好；主任务最小改善delta=0.005。
+先按小时聚合同时币种，再按48小时时间块重抽样1000次，至少20块。
+区间下界超过delta记supported；上界不超过delta记target_not_met；跨越则证据不足。
+这是时间依赖假设下的有限样本估计，不是精确保证。漂移、分辨率和覆盖仍限制结论。
+辅助任务仅提供诊断，不能借主任务的确认宣称方向预测成功。
+概率集中度不等于可信度；自适应期限从同一完整分布导出，不事后改变评分目标。
+
+四、操作入口
+
+先在PowerShell进入D:/FactorResearch，运行 . ./scripts/Enter-Research.ps1。
+所有Python命令使用 ./.venv/Scripts/python.exe。
+
+准备数据：
+  ./.venv/Scripts/python.exe -m factorlab.discovery prepare
+
+开发研究：
+  ./.venv/Scripts/python.exe -m factorlab.discovery run --output runs/new-study --search random diagnostic
+diagnostic是本地诊断规则，不是LLM。完成后生成report.html并自动登记质量档案。
+
+真实agent提案：
+  ./.venv/Scripts/python.exe -m factorlab.discovery run --output runs/new-agent --search random external --exchange runs/new-agent/agent-exchange
+程序写request-N.json，agent只读此开发包，从actions选一个动作，写proposal-N.json。
+回复包含协议/父结构/信息截止身份、动作、假设、证伪条件和来源。非法或超时提案记失败。
+每请求最多等待300秒，同时受方法总预算限制。
+当前实际接入方式是Codex会话中的GPT-6.1 Sol / High子代理，没有独立收费API调用。
+独立命令不会自动启动Codex子代理，必须有文件消费者回答，或选random/diagnostic。
+LLM预训练知识可能影响历史提案，不能声称严格纯历史信息隔离。
+
+独立确认：run追加 --confirm。默认2025第四季度确认后不能重复使用。
+已用资料可转为开发，下一次确认要有真正保留或新增且成熟的资料。
+复制config/discovery.json形成新协议，在开跑前冻结。全局参数放在子命令前：
+  --config config/新协议.json --data data/discovery/新数据目录
+同一缓存目录拒绝不同数据需求，实验目录不得覆盖。
+失败也保存failure.json，并保留已用资料身份。更换目标不恢复未见身份。
+
+顺序回放：
+  ./.venv/Scripts/python.exe -m factorlab.discovery replay --output runs/new-fixed --update fixed
+  ./.venv/Scripts/python.exe -m factorlab.discovery replay --output runs/new-refit --update refit --update-every-hours 168
+初始模型只使用回放前历史。输出、成熟误差和版本写入只追加日志；结尾未成熟保持pending。
+默认回放区间是开发资料，结果仍是开发诊断。load_replay检查日志和版本完整性。
+
+配对比较同条件回放：
+  ./.venv/Scripts/python.exe -m factorlab.discovery compare-replay --candidate runs/new-refit --reference runs/new-fixed --output outputs/新回放比较.json
+要求相同数据、评分源码、初始模型参数和训练程序；全部预测/结算对应，不挑选成功样本。
+结果明确标为development_only；不会把开发区回放提升为独立确认。
+
+评分导出：
+  ./.venv/Scripts/python.exe -m factorlab.discovery score --run runs/研究目录 --output outputs/新评分
+默认accepted只在完整体系确认支持时使用candidate，否则选择baseline。
+显式 --model candidate可研究未经支持的候选，但不会改变其质量状态。
+scores.parquet为任务输出，representations.npy为相同行顺序的表示，manifest记录身份和哈希。
+训练期评分可能样本内，不能充当历史回放证据；旧模型也不保证在新时期有效。
+
+档案：
+  ./.venv/Scripts/python.exe -m factorlab.discovery catalog
+  ./.venv/Scripts/python.exe -m factorlab.discovery catalog --verify 档案ID
+  ./.venv/Scripts/python.exe -m factorlab.discovery catalog --export outputs/档案.json
+已完成旧运行可以 --register runs/目录，重复登记拒绝覆盖。
+档案把系统改善和表示改善分开，不设跨任务万能总分。哈希是完整性检查，不是外部公证。
+
+受控检查：
+  ./.venv/Scripts/python.exe -m factorlab.discovery controls --output outputs/受控检查.json
+使用独立AR通道构造信号与噪声，未打乱市场标签；仅检查流程，不是市场证据。
+
+五、文件和限制
+
+contracts.py冻结协议；tasks.py负责数据/标签；learning.py负责训练和模型；
+search.py处理动作与agent；scoring.py负责损失/校准/比较；experiment.py组织完整实验；
+replay.py回放；evidence.py登记资料使用；catalog.py保存质量；report.py生成本地结果页。
+模型、预处理、校准、探针、比较列表、资料和源码哈希绑定于frozen_claim.json。
+data/discovery_evidence.sqlite和data/discovery_catalog.sqlite是持久档案，不能删除来重置证据。
+所有新文件在D盘；C盘备份不参与新运行。
+
+验证：python -m pytest -q；python -m ruff check factorlab tests（使用项目Python）。
+测试发现范围是tests；external下Qlib/RD-Agent是第三方参考源码，不是本项目测试集。
+本平台不保证持续找到有效因子，不保证模块增加就改善，也没有自动交易功能。

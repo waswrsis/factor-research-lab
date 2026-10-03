@@ -1,0 +1,102 @@
+P1 independent execution, portfolio and statistics audit
+Review date: 2026-10-03
+Reviewer: delegated GPT-6.1 Sol execution reviewer; independent of implementation.
+Scope: factorlab/backtest.py, portfolio.py, statistics.py, evaluation.py;
+supporting inspection of dataset.py, protocol.py, splits.py, experiment.py and
+execution_contract.txt. Reviewer changed only this report and
+tests/test_execution_audit.py. All work and test caches stayed on D.
+
+Outcome
+No unresolved material implementation defect was established within this scope.
+Seven new synthetic regression tests and existing backtest/portfolio/statistics
+tests passed together: 23 passed in 1.74 seconds. The test invocation dot-sourced
+scripts/Enter-Research.ps1 before using .venv/Scripts/python.exe.
+Ruff passed for tests/test_execution_audit.py; its seven tests passed again after
+the import-style cleanup (7 passed in 1.54 seconds).
+
+Root's P1 phase evidence, inspected after the independent synthetic audit
+File: runs/p1-market-v1/results.json; status completed; fold-0 only.
+Results SHA256:
+ed1aa46bf311312fc24d2b0186defe2ee713fbaba7204b86af840ed84dc1fbca
+Frozen protocol SHA256:
+2a64d526345e6e9e42bbecae464881af0fc154425a3552967fc4a50d5426838f
+Nominal April 2025 test total return: A_ridge -0.054668099354056365;
+B_fixed -0.018567387237826694. Both confirmation decisions retain_baseline with
+insufficient_sample. These bounded historical losses are phase execution evidence;
+relative improvement establishes no profitability or prospective performance.
+No cost, protocol or promotion criterion was changed by this reviewer.
+
+Accounting and causality evidence
+1. Derivative principal does not leave cash. Existing quantity times mark change
+   is recognized once; new delta quantity times mark-minus-fill enters cash at
+   execution. Fees use absolute filled notional; adverse slippage has the correct
+   sign for buys, sells, reversals and closures. Synthetic reconciliation verifies
+   NAV change = price PnL + execution basis PnL + funding - fees - slippage.
+2. Forecast funding estimates use only events whose available_at is strictly
+   before execution minus one hour. They extrapolate a historical event-rate mean
+   with historical median event spacing, rather than using future actual rates.
+   Changing a not-yet-available event leaves the first two allocator forecasts
+   unchanged while changing the ledger's actual payment at the event boundary.
+3. Payments use actual supplied funding_time/rate events and the pre-rebalance
+   position. Positive rates charge longs. Boundary events precede rebalancing;
+   intrahour events use the latest observed hourly mark as an explicit proxy.
+   No periodic funding schedule is invented. Missing source events remain a
+   source completeness concern, not something this ledger can infer.
+4. Evaluator mark prices are the mark-kline open at the hourly boundary; current
+   or future hourly close/high/low is not used as that boundary's mark. This is
+   an assumed observable boundary proxy, not a historical feed-arrival proof.
+5. Covariance uses strictly earlier hourly open-price returns. Perturbing all
+   current/future execution opens leaves the initial covariance unchanged.
+   Frozen 12-hour prediction and covariance inputs match PortfolioConfig's
+   declared 12-hour objective horizon. Covariance shrinkage and PSD projection
+   are disclosed; horizon scaling assumes linear mean and variance scaling.
+6. Optimizer turnover compares target exposures with actual quantity/execution
+   price/current NAV weights after previous mark PnL and funding. Gross and
+   single-name constraints govern pre-trade targets. Execution costs, market
+   drift and mark/execution basis can increase actual exposure ratios beyond
+   those targets; this is disclosed, not a strict realized exposure guarantee.
+7. The bare ledger intentionally leaves final positions open. The evaluator
+   explicitly sets a zero target at its final observed boundary and pays closing
+   fees/slippage. In P1 no lot/minimum-notional restrictions are passed, so final
+   quantities are zero. Generic ledger minimum-notional rules may retain dust,
+   as documented in execution_contract.txt.
+8. Solver errors/invalid solutions yield cash_fallback, with zero targets.
+   Evaluator records the count and confirmation vetoes promotion when candidate
+   solver failures occur. A new proof checks that failure after opening closes
+   actual existing quantity, pays costs and still pays funding held at the
+   failure boundary. No phantom reset to cash occurs.
+9. Hourly execution bars are continuous, including bars with no signal. Missing
+   signals go flat; they are not deleted from the return timeline. Missing hourly
+   market prices cause a fail-closed error. Synthetic tests verify both behaviors.
+10. Risk statistics use consecutive marked portfolio NAV changes, not prediction
+    labels, asset rows or overlapping 12-hour outcomes. Initial execution costs
+    remain in the return path and drawdown baseline. Total return compounds to
+    final NAV / initial NAV - 1. Paired bootstrap resamples identical contiguous
+    disjoint time blocks for candidate and reference; trailing incomplete blocks
+    and minimum-block insufficiency are explicit.
+
+Semantic limits for the P1 report
+- Prediction labels are 12-hour entry-to-exit open-price simple returns.
+  The policy reoptimizes hourly and evaluates marked hourly NAV returns. Label
+  horizon is not a fixed holding-period guarantee; cashflows, costs, and mark
+  basis separate actual strategy NAV from forecast label accuracy.
+- Segment masks require label_end before the segment endpoint. Thus signal
+  coverage ends approximately 12 hours before each segment ends. The evaluator
+  then moves to cash and preserves every remaining hourly bar through its final
+  boundary. This is deterministic endpoint handling and should be reported.
+- risk_metrics counts the first boundary return (instant initial execution costs
+  or zero) as one observation alongside subsequent hourly returns. The annualized
+  metrics therefore use an observation convention rather than exact elapsed time
+  between first and last timestamp. This is a small boundary effect for monthly
+  segments and should not be interpreted as exact clock-time annualization.
+- Stable historical funding extrapolation and open-mark observability are
+  research assumptions. The ledger is not a full exchange liquidation, margin,
+  intrahour mark, liquidity, delisting or order-book model. Maintenance breaches
+  raise an error rather than fabricate a completed liquidation path.
+- Seven-day confirmation has fewer than the frozen 20 required 48-hour blocks;
+  promotion remains insufficient_sample. Exploratory aggregate paired intervals
+  do not correct repeated architecture searches or establish prospective evidence.
+
+These are synthetic accounting and semantic proofs. This reviewer ran no market
+training or historical profitability assessment, and these tests establish no
+market profitability, universe generality, live execution or future performance.

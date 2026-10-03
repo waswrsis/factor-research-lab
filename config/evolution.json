@@ -1,0 +1,13 @@
+{
+  "mode": "evolve",
+  "search_mode": "diagnostic",
+  "update_every_hours": 168,
+  "shadow_hours": 1008,
+  "max_cycles": 6,
+  "population_size": 3,
+  "inherit_weights": true,
+  "trigger": "scheduled",
+  "drift_window_hours": 48,
+  "drift_ratio": 1.5,
+  "memory_limit": 30
+}

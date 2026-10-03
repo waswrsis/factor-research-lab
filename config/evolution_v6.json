@@ -1,0 +1,7 @@
+{
+  "mode": "evolve", "search_mode": "external",
+  "update_every_hours": 336, "shadow_hours": 336,
+  "max_cycles": 3, "population_size": 3, "inherit_weights": false,
+  "trigger": "scheduled", "drift_window_hours": 48, "drift_ratio": 1.5,
+  "memory_limit": 30, "program_search": true, "revived_parents": 1
+}

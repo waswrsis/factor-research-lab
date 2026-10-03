@@ -1,0 +1,53 @@
+P0 independent review of protocol / splits / dataset (2026-10-03)
+Reviewer: data_pipeline_sol, separate owner from root-authored reviewed files.
+Reviewed: factorlab/protocol.py, factorlab/splits.py, factorlab/dataset.py,
+tests/test_protocol.py. No reviewed implementation file changed by reviewer.
+
+Confirmed design semantics:
+* Completed hourly candle available at exclusive close+5 seconds cannot execute
+  at that printed close; dataset entry uses ceil(available_at, hour), hence an
+  open_time=00:00 candle first enters at 02:00, after arrival at 01:00:05.
+* Label is simple return between execution open and execution+12h open.
+  Label maturity is exit open+declared delay; this assumes live opening prices
+  arrive after that delay, independently from full archived candle receipt.
+* Feature windows and outcome intervals reject hourly gaps; build_features
+  resets causal rolling history. Current dataset discards incomplete features,
+  so warmup/undefined feature masks cannot silently become zero model inputs.
+* Chronological splits purge labels using strict maturity before boundaries.
+  OOF trains only before the next validation decision and with earlier labels.
+* The fixed surviving BTC/ETH/SOL sample is engineering demonstration evidence,
+  not a reconstructed historical tradable universe.
+
+Concrete initial findings (reported to root for resolution):
+F1 [P1] make_dataset ignores protocol.symbols and protocol.start/end. Repro:
+  source with XRPUSDT and default frozen protocol returns XRPUSDT samples.
+  Data outside protocol calendar can also enter training. Require rejection
+  of unexpected symbols and enforce the calendar; independently supplied
+  single expected symbols may remain useful for tests.
+F2 [P1] Protocol.__post_init__ accepts negative fees/slippage and invalid finite
+  risk/resources: Protocol(fee_bps=-5), risk_aversion=NaN, max_parameters=-1.
+  A frozen invalid protocol can create credits or invalid optimizers/budgets.
+  Validate finite economic parameters and positive bounded integer resources.
+F3 [P2] dataset uses canonical available_at for entry but protocol.delay for
+  label maturity without verifying canonical delay equals the frozen protocol.
+  An input with delay10 seconds under delay5 protocol is silently accepted.
+  Validate the declared candle availability assumption before building samples.
+
+Independent tests added tests/test_dataset.py covering hand-checked entry,
+12h return, label maturity, complete chronology, prefix invariance, future
+target/feature separation, gaps, OOF purging and all split maturity boundaries.
+Root fixed F1/F2/F3 during review. Re-inspected code now rejects unexpected
+symbols, slices candle calendar to protocol.start <= open_time < protocol.end,
+requires canonical availability to match the declared delay, and validates
+economic values as finite/nonnegative, risk floors positive, and resources as
+positive integers. All three independent regression cases now pass.
+Final independent verification: tests/test_dataset.py, 9 passed (1.61s).
+Integration verification: tests/test_data.py, test_features.py, test_dataset.py,
+test_protocol.py: 32 passed (2.17s). Ruff on reviewer-owned data/features/test
+modules: all checks passed. No market data downloaded or model trained by this
+reviewer; root's bounded market audit supplies separate execution evidence.
+
+Remaining scope limitations: assumed historical availability/open receipt,
+archive revision hindsight, surviving asset selection, no live execution;
+none is eliminated by synthetic correctness tests. The sample calendar itself
+does not supply broader-market or future-performance evidence.

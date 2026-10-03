@@ -1,0 +1,169 @@
+Independent final acceptance review — 2026-10-03
+Reviewer: separate GPT-6.1 Sol / High acceptance subagent
+Workspace: D:/FactorResearch
+Reviewed implementation: factorlab graph/models/training/research_agent/experiment,
+protocol/splits/evaluation and forward adapter; supporting phase reviews,
+market manifests, stored model artifacts, lineages, predictions, account paths,
+frozen model and forward/historical SQLite journals.
+Reviewer changed no implementation or market results and performed no new fit,
+market download, exchange action, model selection or protocol adjustment.
+
+Judgment
+ENGINEERING COMPLETE for the explicitly bounded local research prototype in
+docs/IMPLEMENTATION_PLAN.txt: causal public-data research, trainable experts and
+gate, bounded architecture/method proposals, chronological policy replay,
+independent accounting, frozen artifact integrity, and one-shot forecast journal.
+No unresolved blocking defect was established in this declared default scope.
+Economic validation and elapsed forward research are INCOMPLETE. All tested raw
+arms lost money; no confirmed alpha or promotion is supported. A continuously
+running paper portfolio and an independently API-hosted unattended LLM service
+are not implemented and must not be implied by this engineering disposition.
+
+Requirement / disposition / evidence matrix
+P0 frozen 12h task, causal availability and purged chronology: COMPLETE.
+  Frozen protocol digest verified; independent data/feature/dataset tests and
+  docs/audit_p0_data_review.txt review units, entry, label maturity and gaps.
+P0 public versioned market data: COMPLETE within fixed surviving BTC/ETH/SOL.
+  All 54 archived ZIP hashes and three prepared Parquet hashes independently
+  recomputed; no mismatches. Historical availability is assumed, not observed.
+P1 multiple learnable expert matrices and relative meta gate: COMPLETE.
+  Temporal convolutions and nonlinear expert heads have fitted parameters;
+  dynamic/static softmax gates and joint gradient training are implemented.
+  Graph/model/training reviews distinguish allocations from calibrated confidence.
+P1 economically compatible forecasts and independent portfolio accounting:
+  COMPLETE for the disclosed hourly-open/mark research model. Model output is
+  volatility-restored simple return over 12h. Portfolio mean/covariance horizon
+  is 12h; realized performance is hourly marked NAV after costs and funding.
+  Independent manual-ledger and causal covariance/funding tests are recorded in
+  docs/audit_p1_execution_review.txt. This is not an exchange microstructure model.
+P2 agent-adjustable structure, methods and dimensions: COMPLETE as bounded DSL.
+  Supported edits physically change features/derived inputs, experts, widths,
+  depths, temporal scales, gate, loss, optimizer or learning rate. All 24 actual
+  replay candidates were evaluated; budgets, parentage and failed-attempt handling
+  exist. Arbitrary code invention/new market-data sources are outside the DSL.
+  Direct agent edits to learned tensor weights are not a proposal primitive;
+  weights are learned by the configured training method. Compatible inheritance
+  is an independently checked optional initialization utility; this replay
+  trains each candidate afresh and does not claim inheritance was exercised.
+P3 diagnosis -> hypothesis -> experiment -> evidence memory: COMPLETE locally.
+  Twelve external native-agent JSON responses have concrete hypotheses and
+  falsification rules. All request histories, parent IDs, response hashes and
+  resulting child graphs were independently matched to stored lineages.
+  Source labels plus root's native-agent invocation record identify GPT-6.1 Sol
+  / High; a self-declared JSON source string alone is not model authentication.
+  Rule-agent CLI and external file bridge are implemented. No independent
+  API-hosted unattended LLM loop or active RD-Agent runtime is claimed.
+P3 A/B/C/D chronological policy evaluation and confirmation fallback: COMPLETE.
+  Three folds, four arms, stored account/prediction paths and cost stress metrics
+  exist. Search is before confirmation/test; all 12 deployed-policy paths match
+  Ridge after rejected confirmations. Budget matching means attempts/epochs/
+  seeds, not equal GPU seconds, parameter count, FLOPs or information capacity.
+P4 frozen model, append-only predictions, maturity and duplicate integrity:
+  COMPLETE. Trusted bundle verifies; historical replay has 216 outcomes.
+  Actual forward mode has three committed forecasts, zero outcomes, and three
+  exact duplicate skips. Used tensors and model reproduce all three forecasts.
+P4 forward performance / continuous paper portfolio: INCOMPLETE / NOT CLAIMED.
+  First labels are available no earlier than 2026-10-03 06:00:05 UTC. Reports are
+  tied to the recorded 2026-10-02 17:42/17:44 UTC attempts; no future labels were
+  fabricated. Further explicit invocations are required to collect/settle.
+  The forward journal measures forecast error, not forward portfolio PnL.
+Stage-end semantic checks and code audits: COMPLETE for declared phases.
+  P0/P1/P2/P3/P4 JSON summaries and seven independent audit TXT files exist.
+  P2 was initially stale/in-progress; root corrected it to completed with the
+  full replay link, and supplied P3/P4 separate engineering/research statuses.
+
+Independent real-artifact checks
+Frozen protocol SHA256:
+  2a64d526345e6e9e42bbecae464881af0fc154425a3552967fc4a50d5426838f
+Completed replay results.json SHA256:
+  32e70bc3db299dfc5e4dc37af9a65915e51d815980ccc18c67a97f7ad0631988
+Trusted baseline bundle hash, independently verified:
+  4cdb5fc03c276ca69765170f4e6f91b57f638880e83ff0f8f84f220d8121bc11
+Start-time hashes match all 16 stored source-module snapshots. Later current
+source changes are not retroactively substituted into that execution evidence.
+All three prepared market hashes and all 54 archive hashes match. Real data:
+  klines 13,032 rows; marks 13,032 rows; funding 1,629 events.
+  Each price series has 4,344 hourly observations for each of three symbols.
+  Constructed feature tensor: [12,705 samples, 48 hours, 12 raw features].
+Replay account paths: 720/744/720 portfolio-hour rows for April/May/June,
+  2,184 total; labels have 2,121/2,193/2,121 asset rows, 6,435 per arm.
+  Asset-row labels are not independent portfolio-hour observations.
+  Every label interval is exactly 12h; stored predictions have unique asset/entry
+  keys, and their labels mature before the respective outer-test endpoint.
+  Stored compounded hourly returns reconcile with each reported total return.
+Replay fitting: 54 neural model fits (two seeds for fixed and 24 search graphs),
+  three Ridge fits, 78 saved model copies including selected-model copies.
+  Saved copies are not counted as new independent fits.
+C and D each have four evaluated attempts in each of three folds. D operations:
+  width, gate, loss, add_interaction; scales, width, add_interaction, loss;
+  drop_expert, add_expert, learning_rate, drop_feature.
+  Each stored parameter count agrees with the actual typed graph definition.
+  Each proposal's file SHA and request/history-to-trial mapping agrees exactly.
+Forward SQLite: three predictions, zero outcomes, two summary observations.
+Historical SQLite: 216 predictions, 216 outcomes, one summary observation.
+  Historical scores do not count toward elapsed forward evidence.
+  All three retained forward NPZ file hashes match provenance; inference from
+  those tensors through the trusted frozen model matches each forecast.
+  Forward entry 2026-10-02 18:00 UTC follows actual receipt/submission, with
+  label end 2026-10-03 06:00 UTC and frozen five-second outcome delay.
+  Frozen model fit-label cutoff is 2025-03-03 23:00:05 UTC. Its use on October
+  2026 data is an integrity/observer demonstration, not validated recent alpha.
+
+Mathematical and economic disposition
+Raw test total returns: Ridge -22.863%; fixed experts -16.538%; random search
+  -25.460%; diagnostic agent -23.752%. All three candidate-vs-Ridge aggregate
+  95% paired utility intervals include zero. These are exploratory pairwise
+  block intervals and do not correct repeated search/family-wide selection.
+Seven-day confirmation contains three complete 48-hour blocks, versus a frozen
+  minimum of 20. This protocol cannot approve a candidate on confirmation.
+  Retaining Ridge is correct protocol behavior, not an assertion that Ridge is
+  profitable or acceptable for trading. A future protocol would need a newly
+  preregistered, adequate confirmation design; criteria were not relaxed here.
+Simple A-vs-B comparison does not isolate neural residual benefit: A uses full
+  training history; B reserves a chronological 20% for held-out amplitude
+  calibration and fits its baseline on the earlier prefix. Root's subsequent
+  alpha=0 matched fitted-baseline ablation is correctly marked post hoc, performs
+  no fitting and changes no selection/promotion decision. This reviewer exactly
+  reproduced its risk metrics and paired interval from stored paths. The interval
+  includes zero; the diagnostic does not establish residual alpha.
+Forecast accuracy, search utility, raw exploratory arm performance, approved
+  policy performance and prospective profitability are different claims. Reports
+  preserve those distinctions. A learnable architecture is not evidence that
+  its learned structure or agent proposals improve out-of-sample economics.
+
+Resolved review items and practical limits
+Earlier phase findings were recorded and resolved: universe/calendar and finite
+  protocol validation, availability consistency, prediction clipping and training
+  shape/budget checks, explicit memory provenance/NaT rejection, empty predictions,
+  reserved expert names, external JSON failure recording/concrete arguments,
+  retained-baseline policy paths and source snapshots, atomic forward evidence
+  publication and original-deadline crash recovery.
+The small-lookback starter-graph issue was fixed after the recorded replay:
+  bounded/deduplicated scales now support 1/4/12/48/168. Default 48 semantics are
+  unchanged; the frozen v1 source and results remain preserved.
+Fixed surviving assets, six months, archived revision hindsight, assumed
+  historical feed delay, hour-open fills, hourly mark proxy, approximate funding
+  forecasts and incomplete liquidation/liquidity mechanics constrain inference.
+Gross/single-name limits constrain pre-trade target weights, not every realized
+  exposure after costs/mark basis/drift. A safe fallback is not an economic cure.
+External historical LLM proposals may contain pretraining hindsight even when
+  requests correctly omit future/test scores. No clean historical information
+  isolation or causal agent advantage is established.
+Forward response bodies are not retained; exact used tensors and source hashes/
+  receipts are retained. Hashes establish integrity relative to trusted values,
+  not provider truth, OS access control or administrator-resistant authentication.
+No scheduler, order endpoint, credentials or exchange execution is present.
+
+Verification disposition
+This reviewer used project Python only after scripts/Enter-Research.ps1 and kept
+  every operation on D. The artifact acceptance checks above are actual read-only
+  checks against stored results, not synthetic profitability evidence.
+Independent phase reports document their targeted synthetic counterexamples.
+The final application whole-suite log records 158 passing tests in 12.36s and
+  successful lint, after the starter fix and all forward audit cases. Root
+  confirms later changes are reports, metadata and a thin PowerShell wrapper;
+  its syntax and D-drive working-directory behavior were inspected separately.
+User-facing outputs/IMPLEMENTATION_REPORT.txt and implementation_summary.json
+  match the audited results and explicitly distinguish prototype engineering
+  from statistical/economic and continuous-operation claims. P0 through P4
+  evidence exists. Engineering sign-off is granted within the scope above.

@@ -1,0 +1,145 @@
+{
+  "archive": "D:\\FactorResearch\\work\\migration_export\\factorresearch-portable-20261003-v1.zip",
+  "archive_bytes": 237295877,
+  "archive_sha256": "ea2b5a4dc795b480059d4747dbb0e56b6a8a3aec8bc8bcb562f5f66ccae4b453",
+  "portable_files": 14343,
+  "uncompressed_bytes": 653024876,
+  "required_files_verified": [
+    "AGENTS.md",
+    "pyproject.toml",
+    "uv.lock",
+    ".python-version",
+    "factorlab/discovery/__main__.py",
+    "config/discovery_v6.json",
+    "data/discovery_evidence.sqlite",
+    "data/discovery/2025-hourly/bars.parquet",
+    "outputs/DOT_DEPLOYMENT_MANUAL.md"
+  ],
+  "by_top_file_count": {
+    ".gitattributes": 1,
+    ".gitignore": 1,
+    ".python-version": 1,
+    "AGENTS.md": 1,
+    "ENVIRONMENT.txt": 1,
+    "START_HERE.txt": 1,
+    "config": 12,
+    "data": 309,
+    "docs": 23,
+    "external": 1534,
+    "factorlab": 46,
+    "models": 3,
+    "outputs": 50,
+    "pyproject.toml": 1,
+    "requirements.lock.txt": 1,
+    "runs": 4240,
+    "scripts": 17,
+    "tests": 53,
+    "uv.lock": 1,
+    "work": 8047
+  },
+  "restored": {
+    "destination": "\\\\?\\D:\\FactorResearch\\work\\migration_export\\restore-check-longpaths-20261003-v1",
+    "files": 14343,
+    "sha256": "ea2b5a4dc795b480059d4747dbb0e56b6a8a3aec8bc8bcb562f5f66ccae4b453"
+  },
+  "all_payload_crc_and_sha256": "passed",
+  "production_database_checks": [
+    {
+      "path": "data/discovery_catalog.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "data/discovery_evidence.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-182807/evolve/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-182807/evolve-memory.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-182807/fixed/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-182807/refit/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-185444/evolve/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-185444/evolve-memory.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-185444/fixed/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/evolution-v4-acceptance-20261003-185444/refit/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-acceptance-20261003-193050/evolve/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-acceptance-20261003-193050/evolve-memory.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-acceptance-20261003-193050/fixed/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-acceptance-20261003-193050/refit/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-validation-20261003-195354/evolve/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-validation-20261003-195354/evolve-memory.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-validation-20261003-195354/fixed/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/operator-v5-validation-20261003-195354/refit/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/v6-autonomy-20261003-212509/evolve/state.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/v6-autonomy-20261003-212509/memory.sqlite",
+      "status": "ok"
+    },
+    {
+      "path": "runs/shadow-forward-v1/shadow.sqlite3",
+      "status": "ok"
+    },
+    {
+      "path": "runs/shadow-replay-v1/shadow.sqlite3",
+      "status": "ok"
+    }
+  ],
+  "database_failures": [],
+  "canonical_hourly_bars_rows": 26568,
+  "excluded_artificial_junctions": [
+    "work/shadow-tests-tmp4/test_real_windows_junction_rej0/source/junction",
+    "work/v6_improvement/pytest_full/test_real_windows_junction_rej0/source/junction"
+  ],
+  "source_product_modified": false,
+  "cloud_deployed": false,
+  "scope": "Full local package restore, checksums and production SQLite integrity; not Linux acceptance."
+}

@@ -1,0 +1,132 @@
+{
+  "reviewer": "full_migration_payload_audit",
+  "status": "passed_archive_scope_and_sample_integrity",
+  "archive": "factorresearch-portable-20261003-v1.zip",
+  "archive_sha256_reported_by_packager": "ea2b5a4dc795b480059d4747dbb0e56b6a8a3aec8bc8bcb562f5f66ccae4b453",
+  "scope": "Independent read-only source inventory comparison and ZIP manifest/content sampling. No training, network access, source edits, or full extraction by reviewer. Only this review file written inside excluded migration_export.",
+  "file_count": 14343,
+  "logical_bytes": 653024876,
+  "groups": {
+    "[root]": {
+      "files": 9,
+      "bytes": 242470
+    },
+    "config": {
+      "files": 12,
+      "bytes": 9052
+    },
+    "data": {
+      "files": 309,
+      "bytes": 4732673
+    },
+    "docs": {
+      "files": 23,
+      "bytes": 138290
+    },
+    "external": {
+      "files": 1534,
+      "bytes": 20048099
+    },
+    "factorlab": {
+      "files": 46,
+      "bytes": 635479
+    },
+    "models": {
+      "files": 3,
+      "bytes": 2484
+    },
+    "outputs": {
+      "files": 50,
+      "bytes": 37525910
+    },
+    "runs": {
+      "files": 4240,
+      "bytes": 434813186
+    },
+    "scripts": {
+      "files": 17,
+      "bytes": 60139
+    },
+    "tests": {
+      "files": 53,
+      "bytes": 396272
+    },
+    "work": {
+      "files": 8047,
+      "bytes": 154420822
+    }
+  },
+  "archive_members_equal_manifest": true,
+  "missing_source_scan_files": [],
+  "extra_archive_files": [],
+  "missing_required_files": [],
+  "critical_file_checks": [
+    "factorlab/discovery/__main__.py",
+    "factorlab/protocol.py",
+    "pyproject.toml",
+    "uv.lock",
+    ".python-version",
+    "AGENTS.md",
+    "START_HERE.txt",
+    "requirements.lock.txt",
+    "data/discovery/2025-hourly/bars.parquet",
+    "data/discovery/2025-hourly/bars_manifest.json",
+    "data/discovery_catalog.sqlite",
+    "data/discovery_evidence.sqlite",
+    "runs/v6-autonomy-20261003-212509/memory.sqlite",
+    "runs/v6-autonomy-20261003-212509/evolve/state.sqlite",
+    "runs/v6-autonomy-20261003-212509/evolve/state.sqlite-wal",
+    "runs/v6-autonomy-20261003-212509/evolve/state.sqlite-shm",
+    "outputs/ROBUST_V6_IMPROVEMENT_REPORT.txt",
+    "outputs/OPERATOR_V5_ACCEPTANCE.txt",
+    "outputs/OPERATOR_V5_TEST_REPORT.txt",
+    "outputs/OPERATOR_V5_TUNING_REPORT.txt",
+    "outputs/DOT_DEPLOYMENT_MANUAL.md",
+    "outputs/dot-deployment-kit/transfer.py"
+  ],
+  "sample_sha256_checked": 24,
+  "sample_sha256_failures": [],
+  "run_model_counts": {
+    ".npz": 239,
+    ".pt": 291
+  },
+  "run_memory_files": [
+    "runs/evolution-v4-acceptance-20261003-182807/evolve-memory.sqlite",
+    "runs/evolution-v4-acceptance-20261003-185444/evolve-memory.sqlite",
+    "runs/operator-v5-acceptance-20261003-193050/evolve-memory.sqlite",
+    "runs/operator-v5-validation-20261003-195354/evolve-memory.sqlite",
+    "runs/v6-autonomy-20261003-212509/memory.sqlite"
+  ],
+  "audit_and_data_prefix_counts": {
+    "work/v6_improvement/": 6508,
+    "work/operator_v5/": 8,
+    "work/operator_v5_tuning/": 6,
+    "work/operator_v5_validation_20261003/": 32,
+    "work/evolution_audit/": 963,
+    "work/migration/": 1,
+    "work/evolution_audit/live-feed-20261003-184257/": 9,
+    "data/binance_um/": 300,
+    "data/prepared/": 5
+  },
+  "explicit_junction_exclusions": [
+    "work/shadow-tests-tmp4/test_real_windows_junction_rej0/source/junction",
+    "work/v6_improvement/pytest_full/test_real_windows_junction_rej0/source/junction"
+  ],
+  "source_database_readonly_review": {
+    "total_database_files": 441,
+    "without_wal_integrity_ok": 440,
+    "by_group": {
+      "data": 2,
+      "runs": 19,
+      "work": 419
+    },
+    "method": "SQLite mode=ro&immutable=1 only for databases without WAL sidecars",
+    "wal_database_deferred_to_packager_restored_copy": "runs/v6-autonomy-20261003-212509/evolve/state.sqlite",
+    "wal_and_shm_present_in_archive": true
+  },
+  "limitations": [
+    "Full ZIP SHA256, all-file extraction/hash/CRC checks and restored WAL-aware integrity checks are being performed separately by the packager.",
+    "Known filename-based credential exclusions do not establish arbitrary text secret scanning. Third-party external/rd-agent/.env.example excluded by existing rule; not a main runtime dependency.",
+    "Windows environments and caches are deliberately excluded; Linux adaptation, dependencies and target runtime acceptance remain necessary. Historical runs preserve Windows identities and are not promised seamless Linux resume."
+  ]
+}

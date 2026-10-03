@@ -1,0 +1,148 @@
+{
+  "passed": true,
+  "source": "synthetic_ar_process_seed_7231",
+  "hypothesis": "A fixed linear probe recovers an available known signal but does not promote independent AR noise.",
+  "dependence": "Independent AR(1) channels with persistence 0.65; no shuffled market labels.",
+  "scope": "pipeline and probe check, not market efficacy or universal false-positive control",
+  "comparisons": {
+    "known_signal": {
+      "task": "volatility",
+      "predictive": true,
+      "support": 1189,
+      "total_rows": 1200,
+      "coverage": 0.9908333333333333,
+      "coverage_scope": "provided_dataset_observed_task_labels",
+      "conditional_scope_only": true,
+      "minimum_increment": 0.02,
+      "confidence": 0.95,
+      "family_size": 2,
+      "adjusted_confidence": 0.975,
+      "estimate": 0.4772713738104972,
+      "ci_lower": 0.40596984732890323,
+      "ci_upper": 0.5560448607306685,
+      "n_blocks": 50,
+      "n_hours": 1189,
+      "status": "supported",
+      "predictive_claim_supported": true,
+      "aggregation": "equal_symbol_within_hour_then_equal_hour",
+      "bootstrap": "nonoverlapping_calendar_time_blocks",
+      "block_hours": 24,
+      "bootstrap_samples": 2000,
+      "symbols": [
+        "CONTROL"
+      ],
+      "start": "2023-05-31T00:00:00+00:00",
+      "end": "2023-07-19T12:00:00+00:00",
+      "reason": "interval_relative_to_frozen_minimum_increment"
+    },
+    "independent_noise": {
+      "task": "volatility",
+      "predictive": true,
+      "support": 1189,
+      "total_rows": 1200,
+      "coverage": 0.9908333333333333,
+      "coverage_scope": "provided_dataset_observed_task_labels",
+      "conditional_scope_only": true,
+      "minimum_increment": 0.02,
+      "confidence": 0.95,
+      "family_size": 2,
+      "adjusted_confidence": 0.975,
+      "estimate": -0.0003561970752395169,
+      "ci_lower": -0.0014563810003673568,
+      "ci_upper": 0.0007209621427805552,
+      "n_blocks": 50,
+      "n_hours": 1189,
+      "status": "target_not_met",
+      "predictive_claim_supported": false,
+      "aggregation": "equal_symbol_within_hour_then_equal_hour",
+      "bootstrap": "nonoverlapping_calendar_time_blocks",
+      "block_hours": 24,
+      "bootstrap_samples": 2000,
+      "symbols": [
+        "CONTROL"
+      ],
+      "start": "2023-05-31T00:00:00+00:00",
+      "end": "2023-07-19T12:00:00+00:00",
+      "reason": "interval_relative_to_frozen_minimum_increment"
+    },
+    "identical_predictions": {
+      "task": "volatility",
+      "predictive": true,
+      "support": 1189,
+      "total_rows": 1200,
+      "coverage": 0.9908333333333333,
+      "coverage_scope": "provided_dataset_observed_task_labels",
+      "conditional_scope_only": true,
+      "minimum_increment": 0.0,
+      "confidence": 0.95,
+      "family_size": 1,
+      "adjusted_confidence": 0.95,
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "n_blocks": 50,
+      "n_hours": 1189,
+      "status": "target_not_met",
+      "predictive_claim_supported": false,
+      "aggregation": "equal_symbol_within_hour_then_equal_hour",
+      "bootstrap": "nonoverlapping_calendar_time_blocks",
+      "block_hours": 24,
+      "bootstrap_samples": 2000,
+      "symbols": [
+        "CONTROL"
+      ],
+      "start": "2023-05-31T00:00:00+00:00",
+      "end": "2023-07-19T12:00:00+00:00",
+      "reason": "interval_relative_to_frozen_minimum_increment"
+    }
+  },
+  "protocol": {
+    "version": "discovery-v3",
+    "tasks": [
+      {
+        "name": "volatility",
+        "kind": "volatility",
+        "horizon_hours": 12,
+        "event_bins": [
+          4,
+          12
+        ],
+        "barrier_multiplier": 1.0
+      }
+    ],
+    "primary_task": "volatility",
+    "lookback": 1,
+    "symbols": [
+      "CONTROL"
+    ],
+    "start": "2023-01-01T00:00:00+00:00",
+    "train_end": "2023-04-11T00:00:00+00:00",
+    "dev_end": "2023-05-06T00:00:00+00:00",
+    "calibration_end": "2023-05-31T00:00:00+00:00",
+    "end": "2023-07-20T00:00:00+00:00",
+    "training": {
+      "epochs": 8,
+      "batch_size": 256,
+      "learning_rate": 0.001,
+      "l2": 0.001,
+      "patience": 3,
+      "min_delta": 0.0001,
+      "clip_norm": 5.0,
+      "seed": 17,
+      "max_parameters": 200000,
+      "max_seconds": 120
+    },
+    "training_seeds": [
+      17
+    ],
+    "candidates": 4,
+    "search_seconds": 900,
+    "bootstrap_block_hours": 24,
+    "bootstrap_samples": 2000,
+    "min_blocks": 20,
+    "minimum_increment": 0.02,
+    "confidence": 0.95,
+    "seed": 17,
+    "availability_delay_seconds": 5
+  }
+}

@@ -1,0 +1,57 @@
+Model graph and network contract
+
+GraphSpec is a frozen structure configuration, separate from trainable parameters.
+Input X is finite floating point [batch, lookback, len(raw features)], ordered from
+oldest observation to the endpoint. All upstream observations must be available
+at that endpoint; the network cannot audit upstream feature timestamps. There is
+no recurrence or bidirectional stream access. A caller evaluating an endpoint
+must slice a trailing window and never insert observations after that endpoint.
+
+Raw feature names form a unique ordered schema. FeatureOp appends an elementwise
+product, difference, square, or tanh, referencing raw or preceding derived features.
+Raw feature additions must come from the caller's observed feature pool. Invalid
+references, dependent feature removal, cycles, no-op proposals, protocol fields,
+unsupported types and graphs over 1,000,000 trainable parameters are rejected.
+
+Each temporal expert owns independent trainable Conv1d filters for its time scales.
+Each filter reads only that trailing scale and emits an endpoint vector. Concatenated
+filter outputs feed a trainable tanh MLP. MLP experts consume endpoint and window
+mean features. Width, depth, scales, number of experts and derived dimensions
+change the actual module structure; loss/optimizer/rate are training configuration.
+
+Static gating learns constant logits; dynamic gating learns a linear function of
+the last raw feature vector. Optional dynamic gate state is [batch, raw feature
+count], with the same device/dtype and finite values. Supplying state to a static
+gate is rejected. Gate softmax weights are relative allocations among experts,
+not calibrated confidence, uncertainty or probabilities of prediction accuracy.
+No feature/model standardization statistics are fitted inside the network.
+External gate state must also be available at the endpoint; callers must enforce
+its timestamp provenance. Shape checks alone cannot prove state causality.
+
+The network outputs one normalized residual per batch member, with unit
+vol_scaled_simple_return and fixed 12-hour horizon. External training supplies
+the residual target (simple_return minus causal baseline) divided by causal
+volatility; external inference multiplies by that same causal scale and adds the
+simple-return baseline. The GraphSpec target_unit describes the final economic
+target, not the normalized tensor loss target. No network output should be used
+as an absolute return before this rescaling and baseline addition.
+
+build_model(spec, seed) constructs deterministic CPU modules without modifying
+the caller's CPU random stream. parameter_count matches actual trainable tensors.
+External training uses the configured loss/optimizer/rate and records fit windows,
+budgets and seeds. Fresh initialization comparisons should use identical budgets;
+inherited warm-start results must be labeled separately.
+
+inherit_compatible copies complete matching tensors only. Raw/derived feature
+order and lookback must agree. An expert must have an identical expert spec;
+gate tensors also require equal gate type and expert order. Its copied/skipped
+name lists document exactly which tensors were inherited. This is deliberately
+conservative; wider/deeper/changed-scale experts receive fresh initialization.
+Even copied tensors do not imply preservation of the complete model function
+when other experts, weights or the gate layout have changed.
+
+Synthetic tests verify counts, gradients, bounded training-loss reduction,
+independent temporal filter storage, structural mutations, endpoint slicing,
+batch independence, allocations, schema checks and semantic inheritance. These
+are software/contract checks and provide no evidence of market profitability,
+uncertainty calibration, generalization or future performance.

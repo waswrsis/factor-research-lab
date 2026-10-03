@@ -1,0 +1,6 @@
+{
+  "subagent_model": "gpt-6.1-sol",
+  "subagent_reasoning_effort": "high",
+  "project_root": "D:/FactorResearch",
+  "authorization": "User explicitly requested this configuration"
+}

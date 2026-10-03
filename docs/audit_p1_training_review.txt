@@ -1,0 +1,78 @@
+Independent P1/P2 training and research-agent review
+Reviewer: model/graph implementation agent (reviewing root-owned training/agent code).
+Scope: factorlab/training.py, factorlab/research_agent.py, tests/test_research_agent.py,
+plus supporting Dataset/Protocol/split contracts. Synthetic checks are software
+evidence only; no market effectiveness or confidence calibration is inferred.
+
+Positive findings from inspected implementation:
+- Ridge fits y/causal_scale; residual targets subtract that normalized Ridge
+  prediction. Inference sums normalized baseline + alpha*normalized residual
+  before multiplying by each sample's causal scale. Units are consistent.
+- Neural parameter fit precedes chronological calibration. Fit labels must mature
+  strictly before the split time, and parameter/scaler/Ridge fitting excludes
+  the calibration block. Alpha is fitted on held-out normalized errors/deltas,
+  clipped to [0,1]; the base/network are not refitted afterward.
+- Gate is jointly trained with experts, while final amplitude uses held-out
+  calibration. This is a chronological holdout stack, not hidden-layer OOF or
+  a calibrated predictive confidence claim.
+- Saved artifacts serialize numeric arrays and typed graph, plus a weights-only
+  PyTorch load. Graph constructor rejects unknown task/operation fields. Proposal
+  validation binds protocol hash, parent, target unit/horizon and evidence cutoff.
+- Outer segment_masks checks strict label maturity before the research cutoff.
+  fit_model currently trusts its caller's train mask for the external as-of date;
+  this is a caller obligation unless fit_model is extended to take an as-of date.
+
+Findings reported to root for correction:
+F1: training predict()/diagnostics hard-code prediction_clip=0.1 rather than use
+    Protocol.prediction_clip. A frozen custom clipping rule would be ignored.
+    Required: persist actual configured clip and use it for all predictions.
+F2: diagnostic_proposal accepts history entries with no evidence_cutoff and
+    partition=None, then consumes alpha/status from them. Thus search-only and
+    maturity claims are bypassable by an untagged scored memory entry.
+    Required: require explicit search partition and cutoff on consumed evidence,
+    or strictly distinguish unscored failure metadata with enforced schema.
+F3: fit_model does not independently reject a graph above Protocol.max_parameters
+    (the graph validator enforces only the global 1M cap), nor check protocol/spec
+    lookback equality. Required: enforce actual frozen budget/schema at fit entry.
+F4: caller-supplied Dataset scales are not checked finite/strictly positive before
+    normalization. Internal generated datasets use a positive floor, but reusable
+    fit/predict API should reject malformed scales and nonfinite samples explicitly.
+
+Regression coverage added in tests/test_training.py:
+- Scaler means/std and fit label maturity at the calibration boundary.
+- Perturbation of excluded/calibration rows leaves all fitted parameters intact.
+- Fitted save/load predictions and feature schema reordering agree exactly.
+- Baseline and residual normalization combine into the expected economic return.
+- Frozen custom parameter limit and prediction clip are respected.
+
+Resolution verification (2026-10-03):
+F1 resolved: predict reads the saved diagnostics prediction_clip, populated from
+    the frozen Protocol. Custom 0.0001 clip regression passes.
+F2 resolved: every consumed history item requires search partition and cutoff.
+    Six independent provenance tests reject missing tags, confirmation/future
+    evidence and accept valid mature search history.
+F3 resolved: fit checks spec/protocol lookback and actual parameter_count against
+    Protocol.max_parameters. Custom ten-parameter cap rejects the neural graph.
+F4 resolved: fit rejects nonfinite float32 inputs/targets or nonpositive scales;
+    predict rejects inconsistent shape, duplicate feature names, nonfinite inputs
+    and nonpositive/nonfinite causal scales. Empty predictions return an empty
+    float32 vector. Regression exercises zero/negative/NaN/infinite scales and
+    NaN/infinite prediction inputs, including a baseline without a neural branch.
+F5 subsequently identified and resolved: evidence_cutoff='NaT' formerly bypassed
+    the greater-than date comparison. utc() now rejects nonconcrete timestamps.
+    Regressions cover both proposal and consumed-history cutoffs.
+
+Executed check command under scripts/Enter-Research.ps1 -Quiet:
+  .venv/Scripts/python.exe -m pytest tests/test_graph.py tests/test_models.py
+      tests/test_training.py tests/test_research_agent.py -q
+Result: 47 passed in 6.33 seconds. Ruff checks on graph/models and their owned
+tests plus test_training.py passed. Graph/model suite additionally rejects
+PyTorch ModuleDict reserved expert names before constructing a model.
+
+No unresolved findings in the inspected contract/implementation scope after
+these repairs. Remaining limitations: external callers supply training masks
+and endpoint-available features/scales/gate state; internal checks cannot prove
+timestamp provenance of arbitrary arrays. Model load itself is not an integrity
+signature; the external frozen-artifact hash validation must guard deployment
+or shadow replay. Synthetic tests do not replace real-data end-to-end checks or
+statistical policy comparisons, and no profitability claim follows from them.

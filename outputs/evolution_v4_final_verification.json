@@ -1,0 +1,225 @@
+{
+  "recorded_at": "2026-10-03T10:00:06.935889+00:00",
+  "scope": "bounded_v4_implementation_acceptance",
+  "market_evidence_stage": "previously_seen_development_only",
+  "independent_confirmation": false,
+  "run": "D:\\FactorResearch\\runs\\evolution-v4-acceptance-20261003-185444",
+  "run_sha256": "258ac5115ff175aee21ba16eb6e52a990df6efe4f4a6ae6bc594c9433d9a685e",
+  "tests": {
+    "tests": "452",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "102.529"
+  },
+  "lint": "passed",
+  "times": {
+    "fixed": 50.062999999994645,
+    "refit": 60.79700000002049,
+    "evolve": 184.59299999999348
+  },
+  "comparisons": {
+    "refit_vs_fixed": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "status": "target_not_met",
+      "n_blocks": 21,
+      "n_hours": 491,
+      "predictive_claim_supported": false,
+      "operational_development_improvement_supported": false
+    },
+    "evolve_vs_fixed": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "status": "target_not_met",
+      "n_blocks": 21,
+      "n_hours": 491,
+      "predictive_claim_supported": false,
+      "operational_development_improvement_supported": false
+    },
+    "evolve_vs_refit": {
+      "estimate": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "status": "target_not_met",
+      "n_blocks": 21,
+      "n_hours": 491,
+      "predictive_claim_supported": false,
+      "operational_development_improvement_supported": false
+    }
+  },
+  "modes": {
+    "fixed": {
+      "ticks": 504,
+      "cycles": [],
+      "promotions": 0,
+      "tasks": {
+        "volatility": {
+          "support": 1473,
+          "loss": 0.23389362783420406,
+          "pending": 39
+        },
+        "first_event": {
+          "support": 1449,
+          "loss": 3.3667443724268256,
+          "pending": 63
+        },
+        "state": {
+          "support": 1512,
+          "loss": 0.0005292629315801266,
+          "pending": 0
+        }
+      },
+      "incumbent": "1825defc359a4f204bcc3c7d6e9494cf806cd931ccc1f3eb00e25d17cb1674ff",
+      "source_evidence": {
+        "mode": "factorlab_python_and_locked_dependencies",
+        "archive_verified": true,
+        "files": 43,
+        "digest": "098e41097efc8906dafbc79cd650b7c30426c61c22bcc838e6128f7f143bc99a",
+        "path": "source",
+        "runtime_binary_snapshot_claimed": false
+      },
+      "event_head": "0f8c8b642d811d000bc81ade4ae239229b382441bc313947560a3bbcd553a589"
+    },
+    "refit": {
+      "ticks": 504,
+      "cycles": [
+        "retained",
+        "retained"
+      ],
+      "promotions": 0,
+      "tasks": {
+        "volatility": {
+          "support": 1473,
+          "loss": 0.23389362783420406,
+          "pending": 39
+        },
+        "first_event": {
+          "support": 1449,
+          "loss": 3.3667443724268256,
+          "pending": 63
+        },
+        "state": {
+          "support": 1512,
+          "loss": 0.0005292629315801266,
+          "pending": 0
+        }
+      },
+      "incumbent": "1825defc359a4f204bcc3c7d6e9494cf806cd931ccc1f3eb00e25d17cb1674ff",
+      "source_evidence": {
+        "mode": "factorlab_python_and_locked_dependencies",
+        "archive_verified": true,
+        "files": 43,
+        "digest": "098e41097efc8906dafbc79cd650b7c30426c61c22bcc838e6128f7f143bc99a",
+        "path": "source",
+        "runtime_binary_snapshot_claimed": false
+      },
+      "event_head": "3e02cc993206488848d5a2a27e8b1034c3029fcf3cca2406f67d3e9a43243f96"
+    },
+    "evolve": {
+      "ticks": 504,
+      "cycles": [
+        "retained",
+        "unchanged_retained"
+      ],
+      "promotions": 0,
+      "tasks": {
+        "volatility": {
+          "support": 1473,
+          "loss": 0.23389362783420406,
+          "pending": 39
+        },
+        "first_event": {
+          "support": 1449,
+          "loss": 3.3667443724268256,
+          "pending": 63
+        },
+        "state": {
+          "support": 1512,
+          "loss": 0.0005292629315801266,
+          "pending": 0
+        }
+      },
+      "incumbent": "1825defc359a4f204bcc3c7d6e9494cf806cd931ccc1f3eb00e25d17cb1674ff",
+      "source_evidence": {
+        "mode": "factorlab_python_and_locked_dependencies",
+        "archive_verified": true,
+        "files": 43,
+        "digest": "098e41097efc8906dafbc79cd650b7c30426c61c22bcc838e6128f7f143bc99a",
+        "path": "source",
+        "runtime_binary_snapshot_claimed": false
+      },
+      "event_head": "37b32b47ad5fbd3ea35531ca18f7137c940f3e12434152833a8ccf0cc65d5ec2"
+    }
+  },
+  "actual_external_proposals": [
+    {
+      "file": "evolve\\research\\cycle-0001\\exchange\\proposal-1.json",
+      "sha256": "47fc306917377e84a4a74848c2da3e16faba8c03c873e6908839f5b427fe284b",
+      "source": "codex_cli_llm_worker",
+      "operation": "scale"
+    },
+    {
+      "file": "evolve\\research\\cycle-0001\\exchange\\proposal-2.json",
+      "sha256": "219d247b43d80ff545bbc803f44b77198da708633e3b4d7a74de7eb16f6af42a",
+      "source": "codex_cli_llm_worker",
+      "operation": "width"
+    },
+    {
+      "file": "evolve\\research\\cycle-0001\\exchange\\proposal-3.json",
+      "sha256": "49d283078af8b01af3eb30f87a91dc6c63701fe8009c0772ce5ba51eda6e49f6",
+      "source": "codex_cli_llm_worker",
+      "operation": "width"
+    },
+    {
+      "file": "evolve\\research\\cycle-0001\\exchange\\proposal-4.json",
+      "sha256": "66a8de79ed55ac62bc82c70f48de2600947003c73b7d4902b1df0bdee4cc17a6",
+      "source": "codex_cli_llm_worker",
+      "operation": "features"
+    },
+    {
+      "file": "evolve\\research\\cycle-0002\\exchange\\proposal-5.json",
+      "sha256": "d40143a8de2fa292d019c901675cac6c44b111d7451ca3cc01a52b81a290960b",
+      "source": "codex_cli_llm_worker",
+      "operation": "scale"
+    },
+    {
+      "file": "evolve\\research\\cycle-0002\\exchange\\proposal-6.json",
+      "sha256": "8a536604549fee351806a0b48ebf723998750b44fe792b07bfdfa1678fd35b5e",
+      "source": "codex_cli_llm_worker",
+      "operation": "scale"
+    },
+    {
+      "file": "evolve\\research\\cycle-0002\\exchange\\proposal-7.json",
+      "sha256": "fb825f70b04cc60c6e3a639066ac1c5e13e5ad0da5fd397d2e80598cf66c071f",
+      "source": "codex_cli_llm_worker",
+      "operation": "features"
+    },
+    {
+      "file": "evolve\\research\\cycle-0002\\exchange\\proposal-8.json",
+      "sha256": "63681f8d36b332f2b98eb333ca0fb772f398b04b0e8580ef4b744e829ca8ac03",
+      "source": "codex_cli_llm_worker",
+      "operation": "scale"
+    }
+  ],
+  "worker_stop": {
+    "stopped": "requested",
+    "returncode": 0,
+    "stop_file": "D:\\FactorResearch\\runs\\evolution-v4-acceptance-20261003-185444\\worker\\stop-5c6495aa5dc84236bc963ffa9ecb0f50.json",
+    "source": "evolution_cli"
+  },
+  "live_feed_smoke": "work/evolution_audit/live-feed-20261003-184257/smoke.json",
+  "report": "D:\\FactorResearch\\runs\\evolution-v4-acceptance-20261003-185444\\evolve-report\\report.html",
+  "limitations": [
+    "No independent or future predictive improvement has been established.",
+    "Search uses bounded registered edits and model families; no autonomous arbitrary code or algorithm invention.",
+    "Multiple competing parents are supported within a search; historical branches are not automatically revived across cycles.",
+    "Diagnostics are available, but not all module/state diagnostics feed the proposal-selection policy.",
+    "Candle live smoke covers one successful public request; long-duration unattended performance is unverified.",
+    "Funding and open-interest point-in-time inputs require separate collection orchestration.",
+    "Event bins and task definitions are frozen within a run; optimizer updates are not a Kalman filter.",
+    "No trading or position-management module is included."
+  ]
+}

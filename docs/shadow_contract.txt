@@ -1,0 +1,55 @@
+P4 frozen artifact and shadow observation contract
+
+freeze_bundle(source, destination, metadata) snapshots all files and empty
+directories into an atomic, distinct D:/FactorResearch destination. The manifest
+contains per-file SHA256/size, metadata and a canonical bundle_hash. It is
+idempotent only for an identical tree and metadata. Existing destinations are
+never replaced. Links and junctions are rejected, including ancestors; source
+and destination must be disjoint. verify_bundle checks the exact tree, extra
+files/directories, missing entries and manifest digest. Always verify immediately
+before model loading, and compare bundle_hash against an independently retained
+trusted hash. SHA256 detects alterations; it is not a signature or OS access
+control. Editing both artifacts and their manifest requires that external hash
+comparison to detect a coordinated replacement. Changing the source after a
+snapshot never changes the frozen copy.
+
+ShadowLedger(directory, protocol_hash, model_hash, observation_mode=...,
+             availability_delay_seconds=5)
+requires explicit historical_replay or forward mode. SHA256 references, mode,
+12-hour simple-return units, entry rule and label delay are immutable for each
+ledger. Use the frozen bundle_hash as model_hash and the Protocol.digest as
+protocol_hash. The caller must pass the frozen protocol's availability delay;
+the ledger cannot reconstruct a protocol from its hash alone.
+
+append_prediction(decision_id, symbol, available_at, entry_time, label_end,
+                  prediction, now)
+requires timezone-aware times, finite predictions >= -1, available_at <= now,
+entry_time = floor_hour(available_at) + 1 hour and label_end = entry_time + 12h.
+Decision IDs and (symbol, available_at) are unique. Forward supplied now must be
+within the past 60 seconds of the actual UTC wall clock; forward inputs must be
+less than one hour old at the actual clock, and the hourly entry must still be
+in the future at submission. Historical replay permits older artificial observation
+clocks, always <= actual UTC now. Mode cannot be changed on reopening a ledger.
+The mode is present in every returned prediction and summary.
+
+append_outcome(decision_id, realized_return, label_available_at, now)
+requires a prior prediction, finite simple return >= -1, exact label availability
+at label_end plus frozen delay and label_available_at <= now. One outcome is
+allowed per prediction. Calls cannot move the observation clock backward,
+including summary/score calls (each records its as-of clock in an immutable
+observation row). SQLite
+transactions serialize concurrent writes, FULL synchronous mode commits each
+append durably, and database triggers reject updates/deletes of existing rows.
+This is application-level append-only storage, not protection from a database
+administrator replacing the file or removing triggers. Input data provenance
+and claimed availability remain caller responsibilities.
+
+summary(now) and score(now) return total predictions, mature scored outcomes,
+unmature predictions, mature predictions missing outcomes and invalid records.
+Only valid mature outcomes enter MAE/MSE. Rejected writes do not become ledger
+records. No outcomes produce null metrics. Forecast error is not portfolio PnL;
+these methods make no profitability claim and expose no exchange/API/order path.
+This primitive does not fetch fresh data, schedule a wall-clock service or prove
+that a model's input features were causally constructed. A forward collector must
+verify its frozen model and protocol and causal data before appending predictions.
+No historical replay duration counts as elapsed forward observation.

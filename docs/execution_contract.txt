@@ -1,0 +1,59 @@
+Offline execution, portfolio and uncertainty contract
+
+Inputs to run_backtest are sorted, unique UTC whole-hour execution prices. Missing
+prices, missing hourly bars, nonpositive prices and delistings are fail-closed.
+The caller must schedule only available predictions at the next eligible whole
+hour; the ledger does not invent signal timestamps or enforce unavailable metadata.
+Sparse targets mean hold unchanged between target timestamps. Optional weight_policy
+receives timestamp, actual quantity*execution_price/current_NAV weights and current
+NAV after hourly price PnL/funding; returns the target Series. A supplied target
+index gates callback times, or omitted targets call the policy each hourly bar.
+
+Linear perpetual accounting: derivative principal remains cash. Existing quantities
+earn quantity*(current_mark-previous_mark) exactly once per hourly bar. Funding uses
+only actual supplied symbol/funding_time/rate events; positive rates charge longs
+and credit shorts. Events at a bar timestamp occur before that bar's rebalance.
+Intrahour funding uses the latest earlier hourly boundary mark (explicit approximation,
+not future interpolation). Event rates/timestamps must be complete in the source;
+the ledger cannot infer missing funding events. Outside-interval events are excluded.
+Explicit marks must match the execution index/symbols, and be observable at their
+timestamp. Omitted marks use execution prices as a declared proxy. Do not supply
+an hourly close labelled by its opening timestamp.
+
+Targets are NAV notional weights sized using pre-trade NAV/execution price. Existing
+holdings drift naturally; trading is target quantity minus actual quantity. Buys
+fill at execution*(1+slippage_bps/10000), sells at execution*(1-slippage_bps/10000).
+Fee is absolute filled turnover times fee_bps/10000; immediate new-quantity mark/fill
+basis also enters cash. Costs may slightly raise exposure/NAV above target caps.
+execution_basis_pnl reports delta_quantity*(mark-execution_price), separately from
+adverse fill slippage, to reconcile cash change as hourly price_pnl plus basis PnL
+plus funding minus fees minus slippage.
+Optional lot sizes round target quantities toward zero. Minimum notionals filter
+trade deltas, including closing deltas; residual positions may remain. No final
+liquidation is assumed. Turnover/fees/funding/PnL are currency amounts, exposure
+columns are NAV fractions; return is consecutive NAV change, first bar vs initial NAV.
+Maintenance stress compares NAV with maintenance_rate*gross_mark_notional. Breaches
+raise; this threshold is not a full exchange margin, liquidation or insolvency model.
+
+optimize_portfolio maximizes horizon mean minus risk_aversion/2 times horizon
+variance minus one-time L1 turnover penalty against actual drifted weights.
+Expected means/covariance are scaled linearly to objective_horizon_hours; this
+scaling is an explicit assumption and should be avoided by matching input horizons.
+Covariance is shrunk toward its diagonal then projected to positive semidefinite.
+Gross leverage <= config.gross_limit <= 1, absolute single weight <= .3 by default,
+optional liquidity caps in NAV fractions; cash/shorts allowed. Solver failure or
+invalid solver result returns zero target weights with cash_fallback status.
+drift_weights models derivative notional drift including cash; explicit total
+portfolio_return can include fees/funding. Ledger callback avoids approximating drift.
+
+paired_block_bootstrap requires one aligned portfolio return per time observation,
+resamples the same non-overlapping contiguous time blocks for both paths, and drops
+only the documented incomplete tail. No independent asset or overlapping-window
+resampling. Minimum block count is explicit; insufficient paths return an
+insufficient_sample status with no interval. Statistic is per-observation mean less
+risk_aversion/2 times population variance, candidate minus reference. Interval is
+for one paired comparison; it does not correct repeated candidate searches.
+
+All module tests use synthetic inputs; they demonstrate accounting and causal
+mechanics, not historical profitability or future economic validity. No live order
+connections are implemented.

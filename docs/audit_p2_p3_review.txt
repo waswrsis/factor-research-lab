@@ -1,0 +1,92 @@
+Independent P2/P3 semantic and code audit
+Reviewer: independent Codex subagent; reviewed 2026-10-03
+Scope: factorlab/experiment.py, research_agent.py, evaluation.py, splits.py,
+protocol.py and their dataset/training/graph/portfolio/backtest/statistics callers.
+Reference: AGENTS.md and docs/IMPLEMENTATION_PLAN.txt.
+
+Disposition: no unresolved blocking defect in the reviewed default-protocol
+controller after the repairs below. Market replay, genuine external-agent runs
+and their output inspection remain execution evidence to be supplied by the
+root run; these synthetic tests are not historical performance evidence.
+
+Semantic conclusions
+1. Training masks require labels strictly mature before each search starts.
+   Search, confirmation and outer test decisions are chronological and purged
+   by label availability. Subsequent folds may legitimately learn from earlier
+   outer-test months once that information is historical.
+2. Search requests and rule-agent histories are assembled before any confirmation
+   or test evaluation. They contain only search records with explicit cutoffs.
+   Candidate selection happens on search utility; no fit/mutation is performed
+   after confirmation starts. The bounded controller test asserts this sequence.
+3. Confirmation compares paired portfolio-hour paths, not overlapping asset
+   labels. Seven days produce three complete 48-hour blocks, below the frozen
+   20-block minimum. Confirmation must retain the baseline under this protocol,
+   even for a strongly favorable synthetic candidate.
+4. Candidate tests remain visible as exploratory research evidence. The repaired
+   controller additionally emits the confirmation-selected baseline/candidate
+   policy path and metrics, so rejected candidates cannot be interpreted as the
+   approved shadow policy. Default gates reject all candidates by sample size.
+5. C and D share a starter, attempt count, epochs, training seeds and parameter
+   cap. Invalid/duplicate attempts consume budget. Parameter count and compute
+   seconds differ across candidates; this is an attempt/training-budget control,
+   not evidence of equal FLOPs or equal information capacity. B has no search;
+   A is deterministic Ridge. Comparisons should retain these distinctions.
+6. Means and risk are in the same 12-hour simple-return horizon: hourly covariance
+   is multiplied by 12; expected historical funding is scaled by 12 divided by
+   the observed funding interval. Covariance excludes the execution boundary;
+   funding forecasts use earlier available events. Fee/slippage penalties enter
+   allocation and actual ledger fills, including final-boundary closing trades.
+7. Native/external proposals are JSON data, never arbitrary Python or URL code.
+   Bounded structural arguments now permit explicit requested expert/width/
+   feature edits. A historical proposal cutoff is a provenance assertion, not
+   proof that an external model's pretraining excluded future market knowledge.
+
+Concrete findings and repairs verified
+F1. External malformed/unknown-field JSON previously raised TypeError, and invalid
+    text fields could raise AttributeError outside the failed-trial recorder.
+    Repair: normalize schema errors to ValueError, validate string/JSON/int-seed
+    fields, and catch bounded mutation schema failures in the controller.
+    Regression: unknown field, null hypothesis, string seed and fractional seed
+    all produce recordable ValueError; current tests pass.
+F2. The original bridge exposed only operation class and random seed, preventing
+    a concrete external edit. Repair: validated structural arguments are passed
+    to graph.mutate. Regression: external JSON requests width=32 for expert time,
+    and the resulting graph changes that width while preserving task units.
+F3. Original reporting did not emit a policy path after confirmation fallback.
+    Repair: deployed_policy_equity, per-fold deployed_policy metrics and aggregate
+    deployed_policy_risk are recorded separately. Controller regression verifies
+    every rejected candidate retains the synthetic baseline's policy utility.
+F4. Invalid mutation attempts lost their attempted operation/proposal because
+    these were recorded after mutation. Repair inspected: proposal or random
+    operation/seed is recorded before mutation; file transport path/SHA256 is
+    independently recorded from the proposal's self-declared source.
+F5. Original source manifest contained hashes only. Repair inspected: a source
+    snapshot is also saved in the experiment, alongside the start-time hashes,
+    immutable protocol and checksum-verified input-manifest reference.
+
+Execution evidence (bounded local checks only)
+Command environment: dot-source scripts/Enter-Research.ps1; project .venv Python.
+Independent added tests: tests/test_evaluation.py and tests/test_experiment.py.
+Focused final command: pytest tests/test_evaluation.py tests/test_experiment.py
+  tests/test_protocol.py tests/test_research_agent.py tests/test_statistics.py
+  tests/test_shadow.py -q
+Result: 44 passed in 6.89 seconds. Ruff on both independent test files passed.
+No neural training, fresh market download or live exchange action in this audit.
+Controller tests replace fitting/data/evaluation with auditable bounded stubs;
+the covariance/funding test runs the actual evaluator/ledger with synthetic data.
+
+Remaining limitations / nonblocking observations
+- starter_graph currently assumes default lookback=48; scales (4,12,lookback)
+  are invalid for otherwise permitted lookback=4 or12. Default frozen protocol
+  is unaffected. Broader configurable lookbacks need bounded/deduplicated scales.
+- The local rule agent is a transparent minimal failure/alpha/iteration policy;
+  successful bridge tests do not establish an actual LLM reasoning run. Genuine
+  native agent run provenance and completed request/response evidence are needed.
+- The 300-second per-request external wait is bounded and fails without hidden
+  rule fallback when external mode is required. Native-agent wall time is extra
+  research cost and should be disclosed separately from candidate training.
+- Aggregate candidate intervals are exploratory pairwise comparisons, without
+  family-wise selection correction. Fixed surviving assets, six months and
+  short confirmation cannot establish strategy-wide or future validity.
+- The later full-suite market run may reveal failures absent from bounded tests;
+  its status and evidence must be audited before any phase-completion claim.

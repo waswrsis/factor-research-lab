@@ -1,0 +1,34 @@
+公开小时行情刷新（可选，研究用途）
+
+先把已有 canonical bars.parquet 复制到新的 feed 目录：
+  initialize_feed(new_feed_directory, seed_bars_path)
+随后每次调用 refresh_feed(directory, symbols) 只执行一次有界刷新。
+生产调用不传 now；该参数仅为测试时钟注入。没有后台进程、密钥或交易接口。
+
+接口采用 Binance 官方 USD-M GET /fapi/v1/klines、interval=1h。
+官方说明：https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data
+默认每标的一页 96 根（最多三个标的），每页最多两次请求；max_pages 限 1..4。
+HTTP 429/418 等客户端错误不立即重试。请求和响应都有大小、时间及次数界限。
+
+seed/bars.parquet 保存原始种子副本及 SHA-256 身份；其历史 available_at 仍是假设，
+明确标为 historical_assumed_seed，received_at=NaT。现在复制历史资料不证明过去曾实时收到。
+新 REST 行标为 actual_rest_receipt，received_at 是完整响应接收时刻；available_at
+至少为整批接收完成时刻。只接纳已闭合的小时线，旧 OHLCV 修订导致整批拒绝。
+
+每批每标的仅最新追加小时线 prediction_origin=True；更早补齐行仅供历史特征使用，
+不能被回放成当时的实时预测。最大分页范围之外、及已有历史内部的缺口保留，不插值。
+tasks 的 observed_rest_feed 模式负责实际时刻预测窗口和未来标签成熟时间。
+
+feed_manifest.json + feed.json 声明身份。snapshots/ 中的版本快照与 journal.jsonl
+哈希链构成提交边界；bars.parquet 是原子替换的镜像。使用 load_feed 校验读取。
+中断若发生在日志提交后、镜像更新前，下一次校验会从已提交快照修复旧镜像；任意外部
+改写、旧快照或种子改写均拒绝。不会修改 data/discovery/2025-hourly 历史缓存。
+
+本轮仅采集小时 OHLCV。资金费率/OI 可通过已有 context_data 独立入口编排，仍需真实
+接收时间与追加记录，不能把历史事件时间当作当时已知信息。
+测试使用小型人工 HTTP 响应，不是历史盈利、生产实时稳定性或未来收益证据。
+
+另外已执行一次实际公开接口检查：work/evolution_audit/live-feed-20261003-184257/smoke.json。
+一次请求追加96根BTC闭合小时线，记录真实接收时间，仅最新一根为预测时点；历史种子
+与本次数据之间的缺口明确保留。首次实际检查发现实时时钟精度与历史时间列不一致，
+已统一为纳秒UTC并增加回归测试。此结果只验证单次采集和追加，不代表持续运行验收。

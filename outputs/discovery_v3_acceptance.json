@@ -1,0 +1,1130 @@
+{
+  "status": "verified",
+  "run": "D:\\FactorResearch\\runs\\discovery-v3-agent-confirm-001",
+  "tests": {
+    "passed": 297,
+    "seconds": 26.23,
+    "ruff": "passed"
+  },
+  "bundle_verified": true,
+  "journal_verified": true,
+  "catalog_checks": [
+    {
+      "entry_id": "86ac734e0d60e8531a7f8c694c0dd1050f621af53775ba7c19688f87104b9028",
+      "valid": true,
+      "artifact_count": 71,
+      "generator_identity": "7effef07d4442cadd3bf82be16e076ea50f16a7ced85657d0d7916d7fac26ddf"
+    },
+    {
+      "entry_id": "890cbd1fac2ffe7d9d4a292850c31a1d1bcb30e1ab56db71ee9c304d571a9751",
+      "valid": true,
+      "artifact_count": 74,
+      "generator_identity": "658c4ae499a0dd9354b68502836222ac25f8a45e46871102f75ad020da67def1"
+    }
+  ],
+  "replay_integrity": {
+    "fixed": "complete",
+    "refit": "complete"
+  },
+  "prediction_rows_each": 4464,
+  "successful_refits": 8,
+  "scores_rows": 26280,
+  "score_model": "baseline",
+  "repeated_confirmation_rejected": true,
+  "agent_proposals": 4,
+  "independent_confirmation": {
+    "comparisons": {
+      "system_vs_baseline": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": -0.010281623573864043,
+        "ci_lower": -0.036581558624466964,
+        "ci_upper": 0.009311037164121383,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "representation_addition": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": -0.00033640176453443,
+        "ci_lower": -0.010254811206886963,
+        "ci_upper": 0.008620234879206157,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "matched_dimension_control": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": -0.0006450940923356744,
+        "ci_lower": -0.010271521616413398,
+        "ci_upper": 0.007863978185234575,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "single_vs_baseline": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": -0.013999693106812134,
+        "ci_lower": -0.04415299252495348,
+        "ci_upper": 0.007589309248371011,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "fixed_vs_single": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": -0.004818744920645994,
+        "ci_lower": -0.010236458416129546,
+        "ci_upper": 0.00044636239747427155,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "target_not_met",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "random_vs_fixed": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": 0.005339517987553034,
+        "ci_lower": -0.0020041696191543416,
+        "ci_upper": 0.010921275902566424,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "external_vs_fixed": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": 0.008536814453594086,
+        "ci_lower": -0.002388617407191761,
+        "ci_upper": 0.018547751472461786,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      },
+      "external_vs_random": {
+        "task": "volatility",
+        "predictive": true,
+        "support": 6585,
+        "total_rows": 6624,
+        "coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "conditional_scope_only": true,
+        "minimum_increment": 0.005,
+        "confidence": 0.95,
+        "family_size": 8,
+        "adjusted_confidence": 0.99375,
+        "estimate": 0.003197296466041052,
+        "ci_lower": -0.00785005454234154,
+        "ci_upper": 0.013292309460282642,
+        "n_blocks": 46,
+        "n_hours": 2195,
+        "status": "insufficient_evidence",
+        "predictive_claim_supported": false,
+        "aggregation": "equal_symbol_within_hour_then_equal_hour",
+        "bootstrap": "nonoverlapping_calendar_time_blocks",
+        "block_hours": 48,
+        "bootstrap_samples": 1000,
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ],
+        "start": "2025-10-01T00:00:00+00:00",
+        "end": "2025-12-31T10:00:00+00:00",
+        "reason": "interval_relative_to_frozen_minimum_increment"
+      }
+    },
+    "method_metrics": {
+      "baseline": {
+        "volatility": {
+          "kind": "volatility",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6585,
+          "support": 6585,
+          "loss": 0.23419727777784,
+          "coverage": 0.9941123188405797,
+          "label_coverage": 0.9941123188405797,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        },
+        "first_event": {
+          "kind": "first_event",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6560,
+          "support": 6560,
+          "loss": 1.4775942601557603,
+          "coverage": 0.9903381642512077,
+          "label_coverage": 0.9903381642512077,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok",
+          "brier": 0.7355258781426104,
+          "calibration_kind": "top_label",
+          "calibration_bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "support": 1281,
+              "mean_probability": 0.2665620569800224,
+              "observed_frequency": 0.22560499609679938
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "support": 1556,
+              "mean_probability": 0.34766373097659237,
+              "observed_frequency": 0.3226221079691517
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "support": 1331,
+              "mean_probability": 0.4489802832955777,
+              "observed_frequency": 0.39669421487603307
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "support": 1153,
+              "mean_probability": 0.5479683330599744,
+              "observed_frequency": 0.48482220294882916
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "support": 749,
+              "mean_probability": 0.6444566491497373,
+              "observed_frequency": 0.540720961281709
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "support": 379,
+              "mean_probability": 0.7424202493387742,
+              "observed_frequency": 0.6174142480211082
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "support": 110,
+              "mean_probability": 0.8334234988620467,
+              "observed_frequency": 0.7363636363636363
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "support": 1,
+              "mean_probability": 0.9204834610370025,
+              "observed_frequency": 0.0
+            }
+          ],
+          "expected_calibration_error": 0.05647917355548193,
+          "calibration_is_diagnostic_only": true
+        },
+        "state": {
+          "kind": "state",
+          "predictive": false,
+          "interpretation": "descriptive_only",
+          "eligible_support": 6624,
+          "support": 6624,
+          "loss": 8.541204413218259e-08,
+          "coverage": 1.0,
+          "label_coverage": 1.0,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        }
+      },
+      "single": {
+        "volatility": {
+          "kind": "volatility",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6585,
+          "support": 6585,
+          "loss": 0.24819697088465212,
+          "coverage": 0.9941123188405797,
+          "label_coverage": 0.9941123188405797,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        },
+        "first_event": {
+          "kind": "first_event",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6560,
+          "support": 6560,
+          "loss": 1.4758542427119004,
+          "coverage": 0.9903381642512077,
+          "label_coverage": 0.9903381642512077,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok",
+          "brier": 0.7346974023075683,
+          "calibration_kind": "top_label",
+          "calibration_bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "support": 931,
+              "mean_probability": 0.27453939815712985,
+              "observed_frequency": 0.20515574650912996
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "support": 1777,
+              "mean_probability": 0.34873907602877297,
+              "observed_frequency": 0.28024760832864376
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "support": 1661,
+              "mean_probability": 0.4504720288603077,
+              "observed_frequency": 0.3666465984346779
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "support": 1257,
+              "mean_probability": 0.5465095567540835,
+              "observed_frequency": 0.49801113762927607
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "support": 757,
+              "mean_probability": 0.6428959040281944,
+              "observed_frequency": 0.5865257595772787
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "support": 172,
+              "mean_probability": 0.7334024680686798,
+              "observed_frequency": 0.8313953488372093
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "support": 5,
+              "mean_probability": 0.8106027124068506,
+              "observed_frequency": 0.6
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            }
+          ],
+          "expected_calibration_error": 0.06815275289143842,
+          "calibration_is_diagnostic_only": true
+        },
+        "state": {
+          "kind": "state",
+          "predictive": false,
+          "interpretation": "descriptive_only",
+          "eligible_support": 6624,
+          "support": 6624,
+          "loss": 2.686174705656732e-05,
+          "coverage": 1.0,
+          "label_coverage": 1.0,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        }
+      },
+      "fixed_experts": {
+        "volatility": {
+          "kind": "volatility",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6585,
+          "support": 6585,
+          "loss": 0.25301571580529814,
+          "coverage": 0.9941123188405797,
+          "label_coverage": 0.9941123188405797,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        },
+        "first_event": {
+          "kind": "first_event",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6560,
+          "support": 6560,
+          "loss": 1.489080199928552,
+          "coverage": 0.9903381642512077,
+          "label_coverage": 0.9903381642512077,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok",
+          "brier": 0.7402992414691819,
+          "calibration_kind": "top_label",
+          "calibration_bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "support": 879,
+              "mean_probability": 0.27546667923422863,
+              "observed_frequency": 0.2229806598407281
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "support": 1684,
+              "mean_probability": 0.34790901082362363,
+              "observed_frequency": 0.28800475059382424
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "support": 1390,
+              "mean_probability": 0.44908338710793,
+              "observed_frequency": 0.3402877697841727
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "support": 1268,
+              "mean_probability": 0.5471915390009522,
+              "observed_frequency": 0.44242902208201895
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "support": 940,
+              "mean_probability": 0.6461610278129445,
+              "observed_frequency": 0.5670212765957446
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "support": 373,
+              "mean_probability": 0.7351654924393874,
+              "observed_frequency": 0.6916890080428955
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "support": 26,
+              "mean_probability": 0.8175604963833124,
+              "observed_frequency": 0.8461538461538461
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            }
+          ],
+          "expected_calibration_error": 0.07963876322030372,
+          "calibration_is_diagnostic_only": true
+        },
+        "state": {
+          "kind": "state",
+          "predictive": false,
+          "interpretation": "descriptive_only",
+          "eligible_support": 6624,
+          "support": 6624,
+          "loss": 2.7916757680890266e-05,
+          "coverage": 1.0,
+          "label_coverage": 1.0,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        }
+      },
+      "search_random": {
+        "volatility": {
+          "kind": "volatility",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6585,
+          "support": 6585,
+          "loss": 0.24767619781774514,
+          "coverage": 0.9941123188405797,
+          "label_coverage": 0.9941123188405797,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        },
+        "first_event": {
+          "kind": "first_event",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6560,
+          "support": 6560,
+          "loss": 1.4857243656171504,
+          "coverage": 0.9903381642512077,
+          "label_coverage": 0.9903381642512077,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok",
+          "brier": 0.737256103526858,
+          "calibration_kind": "top_label",
+          "calibration_bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "support": 1283,
+              "mean_probability": 0.26742860343049607,
+              "observed_frequency": 0.23928293063133282
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "support": 1710,
+              "mean_probability": 0.34488589839787537,
+              "observed_frequency": 0.27251461988304093
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "support": 1061,
+              "mean_probability": 0.4478066258305066,
+              "observed_frequency": 0.3590951932139491
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "support": 946,
+              "mean_probability": 0.5484381032766924,
+              "observed_frequency": 0.46723044397463004
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "support": 868,
+              "mean_probability": 0.6483127086235689,
+              "observed_frequency": 0.5599078341013825
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "support": 579,
+              "mean_probability": 0.745529525041434,
+              "observed_frequency": 0.6200345423143351
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "support": 113,
+              "mean_probability": 0.8245410026575208,
+              "observed_frequency": 0.7876106194690266
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            }
+          ],
+          "expected_calibration_error": 0.07383860054148778,
+          "calibration_is_diagnostic_only": true
+        },
+        "state": {
+          "kind": "state",
+          "predictive": false,
+          "interpretation": "descriptive_only",
+          "eligible_support": 6624,
+          "support": 6624,
+          "loss": 1.6121457411944442e-05,
+          "coverage": 1.0,
+          "label_coverage": 1.0,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        }
+      },
+      "search_external": {
+        "volatility": {
+          "kind": "volatility",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6585,
+          "support": 6585,
+          "loss": 0.2444789013517041,
+          "coverage": 0.9941123188405797,
+          "label_coverage": 0.9941123188405797,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        },
+        "first_event": {
+          "kind": "first_event",
+          "predictive": true,
+          "interpretation": "future_target",
+          "eligible_support": 6560,
+          "support": 6560,
+          "loss": 1.4731745863314856,
+          "coverage": 0.9903381642512077,
+          "label_coverage": 0.9903381642512077,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok",
+          "brier": 0.7364459255385613,
+          "calibration_kind": "top_label",
+          "calibration_bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.1,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.1,
+              "upper": 0.2,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.3,
+              "support": 747,
+              "mean_probability": 0.2788707319161382,
+              "observed_frequency": 0.24096385542168675
+            },
+            {
+              "lower": 0.3,
+              "upper": 0.4,
+              "support": 1644,
+              "mean_probability": 0.3492719130065134,
+              "observed_frequency": 0.28102189781021897
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.5,
+              "support": 1731,
+              "mean_probability": 0.4508526693740634,
+              "observed_frequency": 0.3755054881571346
+            },
+            {
+              "lower": 0.5,
+              "upper": 0.6,
+              "support": 1652,
+              "mean_probability": 0.546530218762815,
+              "observed_frequency": 0.4582324455205811
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.7,
+              "support": 773,
+              "mean_probability": 0.6365046642848287,
+              "observed_frequency": 0.648124191461837
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.8,
+              "support": 13,
+              "mean_probability": 0.7099316370737113,
+              "observed_frequency": 1.0
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.9,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            },
+            {
+              "lower": 0.9,
+              "upper": 1.0,
+              "support": 0,
+              "mean_probability": null,
+              "observed_frequency": null
+            }
+          ],
+          "expected_calibration_error": 0.06548264284033638,
+          "calibration_is_diagnostic_only": true
+        },
+        "state": {
+          "kind": "state",
+          "predictive": false,
+          "interpretation": "descriptive_only",
+          "eligible_support": 6624,
+          "support": 6624,
+          "loss": 2.7210256167953595e-05,
+          "coverage": 1.0,
+          "label_coverage": 1.0,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "total_rows": 6624,
+          "status": "ok"
+        }
+      }
+    },
+    "candidate_metrics": {
+      "volatility": {
+        "kind": "volatility",
+        "predictive": true,
+        "interpretation": "future_target",
+        "eligible_support": 6585,
+        "support": 6585,
+        "loss": 0.2444789013517041,
+        "coverage": 0.9941123188405797,
+        "label_coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok"
+      },
+      "first_event": {
+        "kind": "first_event",
+        "predictive": true,
+        "interpretation": "future_target",
+        "eligible_support": 6560,
+        "support": 6560,
+        "loss": 1.4731745863314856,
+        "coverage": 0.9903381642512077,
+        "label_coverage": 0.9903381642512077,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok",
+        "brier": 0.7364459255385613,
+        "calibration_kind": "top_label",
+        "calibration_bins": [
+          {
+            "lower": 0.0,
+            "upper": 0.1,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          },
+          {
+            "lower": 0.1,
+            "upper": 0.2,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.3,
+            "support": 747,
+            "mean_probability": 0.2788707319161382,
+            "observed_frequency": 0.24096385542168675
+          },
+          {
+            "lower": 0.3,
+            "upper": 0.4,
+            "support": 1644,
+            "mean_probability": 0.3492719130065134,
+            "observed_frequency": 0.28102189781021897
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.5,
+            "support": 1731,
+            "mean_probability": 0.4508526693740634,
+            "observed_frequency": 0.3755054881571346
+          },
+          {
+            "lower": 0.5,
+            "upper": 0.6,
+            "support": 1652,
+            "mean_probability": 0.546530218762815,
+            "observed_frequency": 0.4582324455205811
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.7,
+            "support": 773,
+            "mean_probability": 0.6365046642848287,
+            "observed_frequency": 0.648124191461837
+          },
+          {
+            "lower": 0.7,
+            "upper": 0.8,
+            "support": 13,
+            "mean_probability": 0.7099316370737113,
+            "observed_frequency": 1.0
+          },
+          {
+            "lower": 0.8,
+            "upper": 0.9,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          },
+          {
+            "lower": 0.9,
+            "upper": 1.0,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          }
+        ],
+        "expected_calibration_error": 0.06548264284033638,
+        "calibration_is_diagnostic_only": true
+      },
+      "state": {
+        "kind": "state",
+        "predictive": false,
+        "interpretation": "descriptive_only",
+        "eligible_support": 6624,
+        "support": 6624,
+        "loss": 2.7210256167953595e-05,
+        "coverage": 1.0,
+        "label_coverage": 1.0,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok"
+      }
+    },
+    "baseline_metrics": {
+      "volatility": {
+        "kind": "volatility",
+        "predictive": true,
+        "interpretation": "future_target",
+        "eligible_support": 6585,
+        "support": 6585,
+        "loss": 0.23419727777784,
+        "coverage": 0.9941123188405797,
+        "label_coverage": 0.9941123188405797,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok"
+      },
+      "first_event": {
+        "kind": "first_event",
+        "predictive": true,
+        "interpretation": "future_target",
+        "eligible_support": 6560,
+        "support": 6560,
+        "loss": 1.4775942601557603,
+        "coverage": 0.9903381642512077,
+        "label_coverage": 0.9903381642512077,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok",
+        "brier": 0.7355258781426104,
+        "calibration_kind": "top_label",
+        "calibration_bins": [
+          {
+            "lower": 0.0,
+            "upper": 0.1,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          },
+          {
+            "lower": 0.1,
+            "upper": 0.2,
+            "support": 0,
+            "mean_probability": null,
+            "observed_frequency": null
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.3,
+            "support": 1281,
+            "mean_probability": 0.2665620569800224,
+            "observed_frequency": 0.22560499609679938
+          },
+          {
+            "lower": 0.3,
+            "upper": 0.4,
+            "support": 1556,
+            "mean_probability": 0.34766373097659237,
+            "observed_frequency": 0.3226221079691517
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.5,
+            "support": 1331,
+            "mean_probability": 0.4489802832955777,
+            "observed_frequency": 0.39669421487603307
+          },
+          {
+            "lower": 0.5,
+            "upper": 0.6,
+            "support": 1153,
+            "mean_probability": 0.5479683330599744,
+            "observed_frequency": 0.48482220294882916
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.7,
+            "support": 749,
+            "mean_probability": 0.6444566491497373,
+            "observed_frequency": 0.540720961281709
+          },
+          {
+            "lower": 0.7,
+            "upper": 0.8,
+            "support": 379,
+            "mean_probability": 0.7424202493387742,
+            "observed_frequency": 0.6174142480211082
+          },
+          {
+            "lower": 0.8,
+            "upper": 0.9,
+            "support": 110,
+            "mean_probability": 0.8334234988620467,
+            "observed_frequency": 0.7363636363636363
+          },
+          {
+            "lower": 0.9,
+            "upper": 1.0,
+            "support": 1,
+            "mean_probability": 0.9204834610370025,
+            "observed_frequency": 0.0
+          }
+        ],
+        "expected_calibration_error": 0.05647917355548193,
+        "calibration_is_diagnostic_only": true
+      },
+      "state": {
+        "kind": "state",
+        "predictive": false,
+        "interpretation": "descriptive_only",
+        "eligible_support": 6624,
+        "support": 6624,
+        "loss": 8.541204413218259e-08,
+        "coverage": 1.0,
+        "label_coverage": 1.0,
+        "coverage_scope": "provided_dataset_observed_task_labels",
+        "total_rows": 6624,
+        "status": "ok"
+      }
+    },
+    "auxiliary_metrics_status": "descriptive_only_not_additional_confirmed_claims",
+    "candidate_predictions": {
+      "path": "D:\\FactorResearch\\runs\\discovery-v3-agent-confirm-001\\confirmation_scores.parquet",
+      "sha256": "f1f70563c97acc77fcdd039163f81531f8feca86d9a7ffe52a7409097af9215b",
+      "rows": 6624
+    },
+    "baseline_predictions": {
+      "path": "D:\\FactorResearch\\runs\\discovery-v3-agent-confirm-001\\confirmation_reference.parquet",
+      "sha256": "636712f9f6b0012f89e4bcae65f526e16203dbc68492ec0fe212f3d7904707aa",
+      "rows": 6624
+    },
+    "accepted_system": false,
+    "supported_representation": false
+  },
+  "scope": "Implementation acceptance; efficacy is independently recorded and not implied by passing tests."
+}

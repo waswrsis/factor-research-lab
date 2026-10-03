@@ -1,0 +1,64 @@
+自演化因子研究平台（本地研究原型）
+
+全部项目文件：D:/FactorResearch
+子代理偏好：GPT-6.1 Sol，High；已写入 AGENTS.md / config/agent_preferences.json。
+
+先打开 PowerShell，执行：
+  Set-Location D:/FactorResearch
+  . ./scripts/Enter-Research.ps1
+
+查看和验证
+  ./.venv/Scripts/python.exe -m pytest tests -q
+  ./.venv/Scripts/python.exe -m ruff check factorlab tests
+  ./scripts/Start-Research.ps1 -Mode Check
+
+按已封存协议准备公开数据（复用经过校验的缓存）
+  ./.venv/Scripts/python.exe scripts/prepare_data.py
+
+从头进行一次离线研究（必须使用新的输出目录，保留旧证据）
+  ./.venv/Scripts/python.exe scripts/run_research.py --output runs/my-new-research
+默认 D 路线是本地诊断规则 agent，不能称为大语言模型实验。
+C 和 D 的候选次数、训练轮数、随机种子相同；参数量/耗时不同，非严格等 FLOPs。
+
+本次实际 GPT-6.1 Sol / High 研究
+  运行目录：runs/policy-replay-v1
+  每次输入：fold-N/D_diagnostic_agent/request-T.json
+  每次回复：runs/agent-proposals-v1/fold-N/proposal-T.json
+  启动使用 --external-proposals runs/agent-proposals-v1 --require-external
+外部提案是结构化数据，不运行任意 Python；子代理不能改评价协议。
+本次由当前 Codex 会话中的研究子代理提供提案，没有调用独立收费 API。
+独立使用时，需要一个持续回答请求文件的 agent；没有收到回复会超时并记为失败。
+历史 LLM 提案仍可能受到预训练知识影响，不能声称严格历史信息隔离。
+
+主要文件
+  config/protocol.json：评价规则及哈希。
+  docs/IMPLEMENTATION_PLAN.txt：阶段验收计划。
+  docs/audit_*.txt：独立语义和代码审查，含缺陷及修复。
+  outputs/phase_audits：数据、阶段状态和最终验收记录。
+  factorlab/：数据、模型、结构搜索、组合、回测、影子观察实现。
+  runs/*/source：运行时源码快照。
+  runs/*/fold-N/results.json：该时间截点的训练/选择/确认/测试证据。
+  runs/*/results.json：完整研究报告和限制。
+
+如何理解结果
+  12 小时是预测期限；组合逐小时再平衡，净值逐小时记账一次。
+  手续费和不利滑点计入成交，资金费按实际事件记账，结束时平仓收费。
+  每段最后约 12 小时停止新信号，保留空仓小时，避免不完整标签混入比较。
+  test 表示未见时段的候选研究成绩；deployed_policy 表示确认后实际选择的路径。
+  当前确认只有 7 天，少于预先要求的 20 个 48 小时时间块，必定保留基线。
+  这是有意保守的工程验收协议，不足以批准收益策略上线。
+  初始 BTC/ETH/SOL 是固定幸存样本，不是历史全市场资产选择证据。
+  小时开盘价、标记价和 5 秒到达延迟均有已声明的代理/假设限制。
+  doubled-cost 压力场景同时提高组合中的成本惩罚和成交成本，不是固定持仓重收费。
+  年化指标仅是短样本机械换算；不能解释为未来年收益。
+
+影子观察只记录预测和成熟后的误差，不连接交易所下单。
+需要实际未来经过 12 小时才能得到首个成熟结果；重放历史不能替代这个过程。
+
+当前前瞻观察器（每次执行一次，不会后台常驻）
+  ./scripts/Observe-Research.ps1
+成熟后补记结果并记录新预测：
+  ./scripts/Observe-Research.ps1 -Settle
+独立保留的模型哈希和路径在 config/shadow_observer.json。
+当前冻结的是用于检验流水线的旧基线，训练标签截止 2025 年 3 月；
+观察功能不是它具备当前市场盈利能力的证据。没有设置自动定时运行。

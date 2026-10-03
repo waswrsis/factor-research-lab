@@ -1,0 +1,66 @@
+P0 public-data contract
+=======================
+Network access is explicit: download_month(symbol, YYYY-MM, kind, root, refresh).
+Kinds: klines (USD-M 1h trades), mark (USD-M 1h markPriceKlines), funding
+(fundingRate events). Defaults root D:/FactorResearch/data. All writes must
+resolve under D:/FactorResearch, including temporary lock files and indexes.
+Source documentation: https://github.com/binance/binance-public-data
+
+An archive is named with the full SHA-256 and retains its source .CHECKSUM plus
+.json provenance (URL, source filename, symbol, month, kind, bytes, ingested_at,
+observed prior versions). load_archive verifies all sidecars before parsing.
+refresh=False pins a verified cached version; refresh=True checks the current
+source, retains old versions, and updates only the latest pointer. Content
+hashes detect accidental corruption, not authenticity against an adversary who
+can edit data and all sidecars. A protocol/run must additionally freeze selected
+archive hashes. HTTPS and source checksums cannot recover unseen old revisions.
+
+Canonical klines:
+symbol, open_time, close_time, available_at, open, high, low, close, volume.
+UTC-aware open_time is hourly aligned; close_time is exclusive open + 1h.
+Source USD-M timestamps are integer milliseconds; source close is inclusive
+open + 1h - 1ms, checked before normalization. Reject duplicates, nonmonotonic
+per-symbol observations, invalid OHLC ranges, nonfinite numbers, nonpositive
+prices and negative volume. Gaps are preserved and audited without filling.
+available_at = close_time + declared delay (default 5 seconds). This is an
+assumed historical live-feed availability model, not measured historical
+receipt. The monthly archive was actually ingested later; ingested_at lives in
+provenance, never overwrites assumed historical availability. Monthly source
+publication cannot be used as a live backtest feed without this assumption.
+
+Funding canonical fields:
+symbol, funding_time, funding_interval_hours, funding_rate, available_at.
+Source calc_time is the event timestamp and actual interval is retained.
+No synthetic 8h schedule or gap fill; funding can have variable event spacing.
+available_at = funding_time + declared delay is an assumed information arrival.
+Cashflow accounting must use funding_time, not information arrival time.
+Mark data uses the candle schema but is separate from traded OHLCV; its volume
+does not supply traded-volume features. Funding and mark inputs are not silently
+joined or carried forward into the baseline feature builder.
+
+build_features preserves canonical keys and columns and adds:
+return_1h, return_6h, return_12h, return_24h, return_48h:
+    close_t / close_(t-h) - 1; h+1 contiguous price observations required.
+volatility_24h, volatility_48h:
+    population standard deviation of h contiguous 1h simple returns.
+range_1h: (high-low)/close. body_1h: (close-open)/open.
+volume_log_1h: log(1+volume).
+volume_z_24h, price_z_24h:
+    current log(1+volume) / log(close) centered on trailing 24-point mean and
+    divided by population trailing standard deviation; undefined if std<=1e-12.
+state_trend_24h, state_volatility_24h, state_volume_24h duplicate the named
+24h return, volatility and volume z score for explicit gate inputs.
+All windows include the current completed observable bar and restart at hour
+gaps, independently per symbol. Warmup/undefined values remain NaN. Boolean
+mask_<column> is True exactly for finite observed feature/state values. Models
+must consume masks or an explicit training-only imputation policy. No feature
+uses a fitted full-sample statistic, future row, funding assumption or future
+price. Prefix tests verify causality and multi-symbol isolation.
+
+Audit limitations: fixed BTC/ETH/SOL survivors are an engineering sample;
+historical listings, delistings, survivor selection and market universe coverage
+are not reconstructed. SHA versions only track revisions observed after this
+local cache was created. Historical archives can contain hindsight corrections.
+Missing hours are counted inside each observed symbol span; an expected full
+calendar is needed to detect absent boundary periods or missing whole symbols.
+These assumptions limit market conclusions even if engineering tests pass.

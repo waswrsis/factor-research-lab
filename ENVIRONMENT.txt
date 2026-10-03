@@ -1,0 +1,88 @@
+因子研究环境
+工作目录：D:\FactorResearch
+
+一、已经准备的组件
+
+项目专属 Python 3.12.15 与 .venv 环境。
+PyTorch 2.11.0 + CUDA 12.8：GPU 张量运算与自动求导。
+Qlib 0.9.7：数据、模型与量化实验组件。
+Optuna 4.9.0：参数与候选搜索工具。
+MLflow 3.12.0：本地实验记录。
+NumPy / pandas / SciPy / scikit-learn / LightGBM：数值处理和基线模型。
+DuckDB / PyArrow：本地数据查询与列式存储。
+CVXPY：凸优化；Numba：数值算子编译。
+backtesting.py 0.6.6：基础回测工具。
+JupyterLab 4.6.4：研究界面，已注册项目 Python 内核。
+
+这是一套环境，不是已经实现的自演化策略平台。
+backtesting.py 和 Qlib 的默认回测不代表已具备永续合约资金费、
+多资产保证金、实际成交和下架处理；这些仍需后续实现与验证。
+
+二、进入项目环境
+
+在 PowerShell 中执行：
+
+  . D:\FactorResearch\scripts\Enter-Research.ps1
+
+该入口会定位到 D:\FactorResearch，并设置项目 Python 和缓存路径。
+后续使用 python 时应显示 D:\FactorResearch\.venv\Scripts\python.exe。
+不要只激活虚拟环境而遗漏项目缓存设置。
+
+重新检查核心环境与 Qlib：
+
+  & D:\FactorResearch\scripts\Start-Research.ps1 -Mode Check
+
+启动本地 Notebook 服务：
+
+  & D:\FactorResearch\scripts\Start-Research.ps1 -Mode Notebook
+
+Notebook 只监听 127.0.0.1，保留默认认证，按终端提示访问。
+选择 “Factor Research (D drive)” 内核。停止服务使用 Ctrl+C。
+本次环境准备未启动常驻 Notebook 服务。
+
+三、路径与版本
+
+.tools\python          项目专用 Python 解释器
+.tools\uv              项目专用包管理工具
+.venv                  安装的 Python 依赖
+.cache                 下载、编译、Notebook 与其他项目缓存
+data                   后续经过审计的研究数据；目前没有市场数据集
+models                 后续模型文件；目前没有训练好的策略
+runs                   后续实验记录
+work\environment       安装日志、验证记录、开源项目来源记录
+outputs                设计报告和后续交付物
+external\qlib          Qlib v0.9.7 对应源码
+external\rd-agent      RD-Agent 源码参考，未启用运行环境
+
+pyproject.toml 记录依赖选择，uv.lock 锁定完整版本和下载哈希。
+requirements.lock.txt 是对应导出；优先通过以下入口恢复锁定环境：
+
+  & D:\FactorResearch\scripts\Sync-Research.ps1
+
+该操作使专用 .venv 与锁文件一致；临时手动安装的额外包可能被移除。
+共享的 Codex、Git、Windows 字体和显卡驱动继续使用其原安装位置。
+没有修改系统 PATH、用户 PowerShell 启动配置或全局 Python。
+
+四、验证边界
+
+核心检查报告：work\environment\verification.json
+Qlib 组件检查：work\environment\qlib-verification.json
+额外数值检查：work\environment\additional-verification.json
+整体状态记录：work\environment\environment-status.json
+
+环境检查只使用极小的人造数组、一个标量凸优化问题和小型本地记录。
+没有下载市场行情、拟合策略、执行策略回测或连接交易账户。
+Qlib 检查关闭了与组件可用性无关的源码快照和环境变量自动记录，
+不能把检查通过理解为完整生产研究流程已验证。
+
+RD-Agent 官方运行环境目前要求 Linux，本机未配置 WSL/Docker 引擎。
+其源码已保存在 D 盘；没有把源码克隆误当作 agent 已可运行。
+大模型服务、API 凭证、自动研究调度和交易执行尚未配置。
+
+官方来源
+https://docs.astral.sh/uv/
+https://pytorch.org/get-started/previous-versions/
+https://github.com/microsoft/qlib
+https://github.com/microsoft/RD-Agent
+https://optuna.org/
+https://kernc.github.io/backtesting.py/

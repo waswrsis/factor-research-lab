@@ -1,0 +1,240 @@
+{
+  "format": "operator-v5-final-verification-v1",
+  "run": "D:\\FactorResearch\\runs\\operator-v5-acceptance-20261003-193050",
+  "tests": {
+    "tests": 488,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "all_tests_passed": true,
+    "real_codex": true,
+    "novel_programs": true,
+    "internal_parameters_trained": true,
+    "operator_library_saved": true,
+    "past_structure_revived": true,
+    "worker_stopped": true,
+    "sources_verified": true,
+    "sequential_coverage": true
+  },
+  "worker": {
+    "backend": "codex",
+    "llm_backend": true,
+    "attempts": 7,
+    "completed": 7,
+    "errors": 0,
+    "elapsed_seconds": 687.4690000000119,
+    "stopped": "requested",
+    "max_requests": 30,
+    "max_seconds": 1800.0
+  },
+  "worker_stop": {
+    "stopped": "requested",
+    "returncode": 0,
+    "stop_file": "D:\\FactorResearch\\runs\\operator-v5-acceptance-20261003-193050\\worker\\stop-ca501267acd140a98567a4573b681b5d.json",
+    "source": "evolution_cli"
+  },
+  "functionality": {
+    "proposals": 7,
+    "program_proposals": 6,
+    "sources": [
+      "codex_cli_llm_worker"
+    ],
+    "operator_files": 7,
+    "library_definitions": 6,
+    "revived_per_cycle": [
+      0,
+      1
+    ],
+    "program_updates": [
+      0.06604868001814447,
+      0.07608566985833756,
+      0.07751797590440551,
+      0.07706072012020032,
+      0.09998274675027657,
+      0.1008190289860029,
+      0.10060512892684714
+    ]
+  },
+  "operator_examples": [
+    {
+      "path": "evolve\\research\\cycle-0001\\candidate-1-8a21107feda7\\operators.json",
+      "module": "temporal",
+      "digest": "c1fc0aba05045e86a0f22716847ece3b2d5b0175216f8b1f8ff6f1099e811611",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_fast": {
+          "initial": 0.4,
+          "fitted": [
+            0.4037655293941498,
+            0.4038160443305969
+          ]
+        },
+        "alpha_slow": {
+          "initial": 0.08,
+          "fitted": [
+            0.07932111620903015,
+            0.0796099305152893
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(ema(feature['volatility_24h'], parameter['alpha_slow']))\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 24)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_fast']))\nfactor_5 = sub(last(feature['range_1h']), last(ema(feature['range_1h'], parameter['alpha_slow'])))\nfactor_6 = mul(tanh(last(feature['volume_z_24h'])), tanh(sub(last(feature['range_1h']), last(ema(feature['range_1h'], parameter['alpha_slow'])))))\nfactor_7 = sub(last(ema(feature['volatility_24h'], parameter['alpha_fast'])), last(ema(feature['volatility_24h'], parameter['alpha_slow'])))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0001\\candidate-2-e34a5c7cd158\\operators.json",
+      "module": "temporal",
+      "digest": "4cd761d4e03ceb1abd7c4ee0140277337820826f86f402305c3c7509bd50740c",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_confirmation": {
+          "initial": 0.18,
+          "fitted": [
+            0.18152585625648499,
+            0.18152594566345215
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.3522029519081116,
+            0.35264861583709717
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = sub(last(feature['range_1h']), last(ema(feature['range_1h'], parameter['alpha_range'])))\nfactor_6 = last(ema(mul(tanh(feature['volume_z_24h']), tanh(sub(feature['range_1h'], ema(feature['range_1h'], parameter['alpha_range'])))), parameter['alpha_confirmation']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0001\\candidate-3-a0c84a2ba85d\\operators.json",
+      "module": "temporal",
+      "digest": "90465138dea204a7a238983701ea1aa6a15e1a802fd46029e2427b892fa745cc",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_confirmation": {
+          "initial": 0.18,
+          "fitted": [
+            0.18152573704719543,
+            0.18152716755867004
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.3524063229560852,
+            0.3526480197906494
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = sub(last(feature['range_1h']), last(ema(feature['range_1h'], parameter['alpha_range'])))\nfactor_6 = last(ema(mul(mul(0.5, add(1.0, tanh(feature['volume_z_24h']))), tanh(sub(feature['range_1h'], ema(feature['range_1h'], parameter['alpha_range'])))), parameter['alpha_confirmation']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0001\\candidate-4-0be5d2edd0a6\\operators.json",
+      "module": "temporal",
+      "digest": "7711f42e496f118be037d7df8cca3d60513373de823a7e90bb02215e41a43ab6",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_confirmation": {
+          "initial": 0.18,
+          "fitted": [
+            0.18152394890785217,
+            0.1815275251865387
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.35242265462875366,
+            0.3525737524032593
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = last(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)))\nfactor_6 = last(ema(mul(mul(0.5, add(1.0, tanh(feature['volume_z_24h']))), tanh(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)))), parameter['alpha_confirmation']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0002\\candidate-5-1228bf0918de\\operators.json",
+      "module": "temporal",
+      "digest": "7711f42e496f118be037d7df8cca3d60513373de823a7e90bb02215e41a43ab6",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_confirmation": {
+          "initial": 0.18,
+          "fitted": [
+            0.18195748329162598,
+            0.18196620047092438
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.35326460003852844,
+            0.353299081325531
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = last(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)))\nfactor_6 = last(ema(mul(mul(0.5, add(1.0, tanh(feature['volume_z_24h']))), tanh(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)))), parameter['alpha_confirmation']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0002\\candidate-6-56bfcca5e8ca\\operators.json",
+      "module": "temporal",
+      "digest": "594a9ec566822749358f2637a566fb624cea95f1853a6498897b654d2e18e4f0",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_activity": {
+          "initial": 0.18,
+          "fitted": [
+            0.18195787072181702,
+            0.18196287751197815
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.353268563747406,
+            0.3534124493598938
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = last(sub(feature['range_1h'], ema(feature['range_1h'], parameter['alpha_range'])))\nfactor_6 = last(ema(log_abs(sub(feature['return_1h'], rolling_mean(feature['return_1h'], 12))), parameter['alpha_activity']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    },
+    {
+      "path": "evolve\\research\\cycle-0002\\candidate-7-49faf3a9d41f\\operators.json",
+      "module": "temporal",
+      "digest": "5aaaf98b4adfc95b224c989022df30f0b53d2613fda7917afa66acb53bb790d7",
+      "output_count": 8,
+      "changed_parameters": {
+        "alpha_confirmation": {
+          "initial": 0.18,
+          "fitted": [
+            0.18195855617523193,
+            0.18196439743041992
+          ]
+        },
+        "alpha_range": {
+          "initial": 0.35,
+          "fitted": [
+            0.35336971282958984,
+            0.3532789945602417
+          ]
+        }
+      },
+      "source_listing": "factor_0 = last(feature['volatility_24h'])\nfactor_1 = last(feature['volatility_48h'])\nfactor_2 = last(rolling_std(feature['return_1h'], 12))\nfactor_3 = sub(last(rolling_std(feature['return_1h'], 4)), last(rolling_std(feature['return_1h'], 12)))\nfactor_4 = last(ema(feature['range_1h'], parameter['alpha_range']))\nfactor_5 = last(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)))\nfactor_6 = last(ema(mul(mul(0.5, add(1.0, tanh(feature['volume_z_24h']))), tanh(mul(0.5, add(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1)), abs(sub(feature['range_1h'], lag(ema(feature['range_1h'], parameter['alpha_range']), 1))))))), parameter['alpha_confirmation']))\nfactor_7 = last(sub(feature['volatility_24h'], lag(feature['volatility_24h'], 6)))"
+    }
+  ],
+  "source_evidence": {
+    "mode": "factorlab_python_and_locked_dependencies",
+    "archive_verified": true,
+    "files": 45,
+    "digest": "65e31d7cf4c64ce60b8d116f08ccff5c246f61c77908edd6948816832485f94d",
+    "path": "source",
+    "runtime_binary_snapshot_claimed": false
+  },
+  "audit": "work/operator_v5/audit_plan.json",
+  "evidence_files": {
+    "runs\\operator-v5-acceptance-20261003-193050\\acceptance.json": "586f57964d6ded441e474acc7119fcee011d2f827124cca41888cbd6767da436",
+    "runs\\operator-v5-acceptance-20261003-193050\\acceptance_protocol.json": "8a70c8ecb7386ef112d993316a433f2fcd604587f2f1c08c46fd0e9bd58e32e6",
+    "work\\operator_v5\\tests_final.xml": "e2ac0e8deec57ce2504fc6e9c15ab65efe3aa08eec61c088cf7a7c346ad7b34c",
+    "work\\operator_v5\\audit_plan.json": "c6e4be06e9c3a52389710077df102c1abf017a60a4320df9c4bf5d960d2e9f61"
+  },
+  "independent_confirmation": false,
+  "predictive_benefit_claimed": false
+}

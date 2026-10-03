@@ -1,0 +1,27 @@
+第四版持续因子研究验收
+
+工作区：D:/FactorResearch
+测试：452项，失败0，错误0；静态检查通过。
+真实验收使用BTC/ETH/SOL小时资料，三模式共享初始模型和评价规则。
+本次为已使用开发资料上的功能与比较验收，不构成独立确认。
+
+fixed: 504时点，无研究轮次，晋级0次，总运行50.1秒。
+refit: 504时点，retained, retained，晋级0次，总运行60.8秒。
+evolve: 504时点，retained, unchanged_retained，晋级0次，总运行184.6秒。
+
+实际外部Agent提案：8条，模型gpt-6.1-sol/high。
+refit_vs_fixed: 主任务损失改善0，区间[0, 0]，target_not_met。
+evolve_vs_fixed: 主任务损失改善0，区间[0, 0]，target_not_met。
+evolve_vs_refit: 主任务损失改善0，区间[0, 0]，target_not_met。
+
+具备：成熟反馈、受预算约束的结构搜索、兼容权重继承、独立Agent提案、
+影子比较、晋级或保留、研究记忆、恢复和源码/账本核验、多源输入接口与任务评分。
+
+仍欠缺或未验证：开放式新算子发明、跨周期完整种群维护、诊断全面驱动搜索、
+全部数据源持续编排、长期运行稳定性、未见市场的稳定预测增益。
+当前任务窗口和事件分箱事前固定，卡尔曼滤波未实现。
+
+完整运行：D:\FactorResearch\runs\evolution-v4-acceptance-20261003-185444
+可读报告：D:\FactorResearch\runs\evolution-v4-acceptance-20261003-185444\evolve-report\report.html
+逐项边界：docs/EVOLUTION_IMPLEMENTATION.md
+使用方法：docs/EVOLUTION_GUIDE.txt

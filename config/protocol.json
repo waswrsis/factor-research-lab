@@ -1,0 +1,49 @@
+{
+  "sha256": "2a64d526345e6e9e42bbecae464881af0fc154425a3552967fc4a50d5426838f",
+  "protocol": {
+    "version": "prototype-1",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "start": "2025-01-01",
+    "end": "2025-07-01",
+    "test_starts": [
+      "2025-04-01",
+      "2025-05-01",
+      "2025-06-01"
+    ],
+    "horizon_hours": 12,
+    "availability_delay_seconds": 5,
+    "lookback": 48,
+    "max_lookback": 168,
+    "epochs": 4,
+    "batch_size": 256,
+    "seeds": [
+      17,
+      29
+    ],
+    "candidates_per_search": 4,
+    "max_parameters": 1000000,
+    "fee_bps": 5.0,
+    "slippage_bps": 3.0,
+    "gross_limit": 0.9,
+    "single_name_limit": 0.3,
+    "risk_aversion": 10.0,
+    "turnover_penalty": 0.001,
+    "volatility_floor": 0.001,
+    "prediction_clip": 0.1,
+    "initial_equity": 100000.0,
+    "bootstrap_block_hours": 48,
+    "bootstrap_samples": 1000,
+    "promotion_min_blocks": 20,
+    "max_drawdown": 0.2,
+    "stress_cost_multipliers": [
+      1.0,
+      2.0
+    ],
+    "live_trading": false,
+    "universe_mode": "fixed_survivors_engineering_demo"
+  }
+}

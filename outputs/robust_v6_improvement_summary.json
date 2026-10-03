@@ -1,0 +1,650 @@
+{
+  "version": "v6-improvement-report-v1",
+  "generated_at": "2026-10-03T12:46:19.152380+00:00",
+  "scope": "engineering_and_exposed_historical_development",
+  "independent_confirmation": false,
+  "market_improvement_supported": false,
+  "market": {
+    "run": "D:\\FactorResearch\\runs\\v6-improvement-market-20261003-212159",
+    "fit_attempts": 96,
+    "errors": 0,
+    "elapsed_seconds": 456.28100000001723,
+    "protocol_sha256": "86e8d9751242d707aa2c2c0f177ac88413ecaed9bc87561a30e4c6c8f779150c",
+    "arms": [
+      {
+        "arm": "E0C0",
+        "label": "旧选模＋均值筛选",
+        "config": "A-H0-E0",
+        "august_loss": 0.18216657737900768,
+        "relative_improvement": 0.0,
+        "august_event_loss": 2.181362757153549,
+        "event_degradation": 0.0
+      },
+      {
+        "arm": "E1C0",
+        "label": "主任务选模＋均值筛选",
+        "config": "B_frozen-H0-E1",
+        "august_loss": 0.18191203690088278,
+        "relative_improvement": 0.0013972951668038691,
+        "august_event_loss": 2.189567903065178,
+        "event_degradation": 0.0037614770329790215
+      },
+      {
+        "arm": "E0C1",
+        "label": "旧选模＋稳健筛选",
+        "config": "A-H0-E0",
+        "august_loss": 0.18216657737900768,
+        "relative_improvement": 0.0,
+        "august_event_loss": 2.181362757153549,
+        "event_degradation": 0.0
+      },
+      {
+        "arm": "E1C1",
+        "label": "主任务选模＋稳健筛选",
+        "config": "A-H0-E0",
+        "august_loss": 0.18216657737900768,
+        "relative_improvement": 0.0,
+        "august_event_loss": 2.181362757153549,
+        "event_degradation": 0.0
+      }
+    ],
+    "configurations": [
+      {
+        "config": "A-H0-E0",
+        "development_loss": 0.2051716603276975,
+        "development_folds": {
+          "may": 0.18556440554630446,
+          "june": 0.24456594445946533,
+          "july": 0.18538463097732275
+        },
+        "august_loss": 0.18216657737900768,
+        "august_event_loss": 2.181362757153549,
+        "eligible": false,
+        "rank": 0.0,
+        "reasons": [
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "A-H0-E1",
+        "development_loss": 0.20958176565576533,
+        "development_folds": {
+          "may": 0.18661179522388646,
+          "june": 0.2583978880454846,
+          "july": 0.18373561369792485
+        },
+        "august_loss": 0.18126036378634086,
+        "august_event_loss": 2.207602247122303,
+        "eligible": false,
+        "rank": -0.04583121101781788,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "A-H1-E0",
+        "development_loss": 0.2239340874227129,
+        "development_folds": {
+          "may": 0.2048534317663818,
+          "june": 0.25389650703066774,
+          "july": 0.21305232347108916
+        },
+        "august_loss": 0.18325853997583078,
+        "august_event_loss": 3.1866905760598576,
+        "eligible": false,
+        "rank": -0.14272502607152504,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "primary_fold_degradation",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "A-H1-E1",
+        "development_loss": 0.23038519715767244,
+        "development_folds": {
+          "may": 0.2048534317663818,
+          "june": 0.27324983623554633,
+          "july": 0.21305232347108916
+        },
+        "august_loss": 0.18325853997583078,
+        "august_event_loss": 3.1866905760598576,
+        "eligible": false,
+        "rank": -0.1424987319846192,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "primary_fold_degradation",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B-H0-E0",
+        "development_loss": 0.20806573311233914,
+        "development_folds": {
+          "may": 0.1840670121598138,
+          "june": 0.24890880829012813,
+          "july": 0.19122137888707552
+        },
+        "august_loss": 0.18521641106189182,
+        "august_event_loss": 2.1682086977688213,
+        "eligible": false,
+        "rank": -0.0301219247234003,
+        "reasons": [
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B-H0-E1",
+        "development_loss": 0.2042982554436461,
+        "development_folds": {
+          "may": 0.1840670121598138,
+          "june": 0.23845687256954215,
+          "july": 0.19037088160158233
+        },
+        "august_loss": 0.18192870290048002,
+        "august_event_loss": 2.1897087506923474,
+        "eligible": false,
+        "rank": -0.01955107625956423,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B-H1-E0",
+        "development_loss": 0.2056088096336062,
+        "development_folds": {
+          "may": 0.18588408099308432,
+          "june": 0.23066946655555126,
+          "july": 0.200272881352183
+        },
+        "august_loss": 0.1914421404612817,
+        "august_event_loss": 3.0457855767914253,
+        "eligible": false,
+        "rank": -0.06458642883707816,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B-H1-E1",
+        "development_loss": 0.2065299906200628,
+        "development_folds": {
+          "may": 0.18588408099308432,
+          "june": 0.2334330095149211,
+          "july": 0.200272881352183
+        },
+        "august_loss": 0.1914421404612817,
+        "august_event_loss": 3.0457855767914253,
+        "eligible": false,
+        "rank": -0.0640694263004103,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B_frozen-H0-E0",
+        "development_loss": 0.20804205137775886,
+        "development_folds": {
+          "may": 0.1839799386399787,
+          "june": 0.24893224686154045,
+          "july": 0.1912139686317575
+        },
+        "august_loss": 0.18519268190949004,
+        "august_event_loss": 2.168047819795964,
+        "eligible": false,
+        "rank": -0.030185968143928002,
+        "reasons": [
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B_frozen-H0-E1",
+        "development_loss": 0.20427683993960313,
+        "development_folds": {
+          "may": 0.1839799386399787,
+          "june": 0.23846928519355337,
+          "july": 0.19038129598527734
+        },
+        "august_loss": 0.18191203690088278,
+        "august_event_loss": 2.189567903065178,
+        "eligible": false,
+        "rank": -0.01948236725647008,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B_frozen-H1-E0",
+        "development_loss": 0.20561758250317153,
+        "development_folds": {
+          "may": 0.1858891750581351,
+          "june": 0.2306834814795445,
+          "july": 0.20028009097183494
+        },
+        "august_loss": 0.19144566881683292,
+        "august_event_loss": 3.045788999884057,
+        "eligible": false,
+        "rank": -0.06462097252706044,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      },
+      {
+        "config": "B_frozen-H1-E1",
+        "development_loss": 0.2065365430622649,
+        "development_folds": {
+          "may": 0.1858891750581351,
+          "june": 0.23344036315682468,
+          "july": 0.20028009097183494
+        },
+        "august_loss": 0.19144566881683292,
+        "august_event_loss": 3.045788999884057,
+        "eligible": false,
+        "rank": -0.0641055994399339,
+        "reasons": [
+          "auxiliary_degradation:first_event",
+          "minimum_relative_improvement_not_met",
+          "winning_fold_fraction_not_met",
+          "stability_penalty_not_met"
+        ]
+      }
+    ],
+    "comparisons": {
+      "E1C1_vs_E0C0": {
+        "candidate_config": "A-H0-E0",
+        "reference_config": "A-H0-E0",
+        "result": {
+          "task": "volatility",
+          "predictive": true,
+          "support": 2193,
+          "total_rows": 2232,
+          "coverage": 0.9825268817204301,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "conditional_scope_only": true,
+          "minimum_increment": 0.005,
+          "confidence": 0.975,
+          "family_size": 4,
+          "adjusted_confidence": 0.99375,
+          "estimate": 0.0,
+          "ci_lower": 0.0,
+          "ci_upper": 0.0,
+          "n_blocks": 16,
+          "n_hours": 731,
+          "status": "target_not_met",
+          "predictive_claim_supported": false,
+          "aggregation": "equal_symbol_within_hour_then_equal_hour",
+          "bootstrap": "nonoverlapping_calendar_time_blocks",
+          "block_hours": 48,
+          "bootstrap_samples": 5000,
+          "symbols": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ],
+          "start": "2025-08-01T00:00:00+00:00",
+          "end": "2025-08-31T10:00:00+00:00",
+          "reason": "interval_relative_to_frozen_minimum_increment",
+          "raw_numerical_gate_supported": false,
+          "independent_confirmation": false,
+          "scope": "development_only",
+          "descriptive_only": false
+        }
+      },
+      "E1C0_vs_E0C0": {
+        "candidate_config": "B_frozen-H0-E1",
+        "reference_config": "A-H0-E0",
+        "result": {
+          "task": "volatility",
+          "predictive": true,
+          "support": 2193,
+          "total_rows": 2232,
+          "coverage": 0.9825268817204301,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "conditional_scope_only": true,
+          "minimum_increment": 0.005,
+          "confidence": 0.975,
+          "family_size": 4,
+          "adjusted_confidence": 0.99375,
+          "estimate": 0.00025454047812485946,
+          "ci_lower": -0.0053214455907197415,
+          "ci_upper": 0.005551924429922987,
+          "n_blocks": 16,
+          "n_hours": 731,
+          "status": "insufficient_evidence",
+          "predictive_claim_supported": false,
+          "aggregation": "equal_symbol_within_hour_then_equal_hour",
+          "bootstrap": "nonoverlapping_calendar_time_blocks",
+          "block_hours": 48,
+          "bootstrap_samples": 5000,
+          "symbols": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ],
+          "start": "2025-08-01T00:00:00+00:00",
+          "end": "2025-08-31T10:00:00+00:00",
+          "reason": "interval_relative_to_frozen_minimum_increment",
+          "raw_numerical_gate_supported": false,
+          "independent_confirmation": false,
+          "scope": "development_only",
+          "descriptive_only": false
+        }
+      },
+      "E0C1_vs_E0C0": {
+        "candidate_config": "A-H0-E0",
+        "reference_config": "A-H0-E0",
+        "result": {
+          "task": "volatility",
+          "predictive": true,
+          "support": 2193,
+          "total_rows": 2232,
+          "coverage": 0.9825268817204301,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "conditional_scope_only": true,
+          "minimum_increment": 0.005,
+          "confidence": 0.975,
+          "family_size": 4,
+          "adjusted_confidence": 0.99375,
+          "estimate": 0.0,
+          "ci_lower": 0.0,
+          "ci_upper": 0.0,
+          "n_blocks": 16,
+          "n_hours": 731,
+          "status": "target_not_met",
+          "predictive_claim_supported": false,
+          "aggregation": "equal_symbol_within_hour_then_equal_hour",
+          "bootstrap": "nonoverlapping_calendar_time_blocks",
+          "block_hours": 48,
+          "bootstrap_samples": 5000,
+          "symbols": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ],
+          "start": "2025-08-01T00:00:00+00:00",
+          "end": "2025-08-31T10:00:00+00:00",
+          "reason": "interval_relative_to_frozen_minimum_increment",
+          "raw_numerical_gate_supported": false,
+          "independent_confirmation": false,
+          "scope": "development_only",
+          "descriptive_only": false
+        }
+      },
+      "combined_vs_fixed_A_H0_E0": {
+        "candidate_config": "A-H0-E0",
+        "reference_config": "A-H0-E0",
+        "result": {
+          "task": "volatility",
+          "predictive": true,
+          "support": 2193,
+          "total_rows": 2232,
+          "coverage": 0.9825268817204301,
+          "coverage_scope": "provided_dataset_observed_task_labels",
+          "conditional_scope_only": true,
+          "minimum_increment": 0.005,
+          "confidence": 0.975,
+          "family_size": 4,
+          "adjusted_confidence": 0.99375,
+          "estimate": 0.0,
+          "ci_lower": 0.0,
+          "ci_upper": 0.0,
+          "n_blocks": 16,
+          "n_hours": 731,
+          "status": "target_not_met",
+          "predictive_claim_supported": false,
+          "aggregation": "equal_symbol_within_hour_then_equal_hour",
+          "bootstrap": "nonoverlapping_calendar_time_blocks",
+          "block_hours": 48,
+          "bootstrap_samples": 5000,
+          "symbols": [
+            "BTCUSDT",
+            "ETHUSDT",
+            "SOLUSDT"
+          ],
+          "start": "2025-08-01T00:00:00+00:00",
+          "end": "2025-08-31T10:00:00+00:00",
+          "reason": "interval_relative_to_frozen_minimum_increment",
+          "raw_numerical_gate_supported": false,
+          "independent_confirmation": false,
+          "scope": "development_only",
+          "descriptive_only": false
+        }
+      },
+      "combined_auxiliary_guard_vs_common_incumbent": {
+        "passed": true,
+        "tasks": {
+          "first_event": {
+            "passed": true,
+            "candidate_loss": 2.181362757153549,
+            "reference_loss": 2.181362757153549,
+            "relative_loss_ratio": 1.0,
+            "max_ratio": 1.1,
+            "scope": "empirical_guard_not_statistical_noninferiority"
+          }
+        }
+      },
+      "candidate_improvement_supported": false,
+      "candidate_improvement_scope": "empirical_development_evidence_not_independent_confirmation",
+      "descriptive_only": false
+    },
+    "simple_baselines": {
+      "development": {
+        "may": {
+          "training_constant": {
+            "volatility": 0.35331439664417297,
+            "first_event": 2.247865237615834,
+            "state": 0.0020459359442343977
+          },
+          "rolling_24h": {
+            "volatility": 0.18995274845189883,
+            "first_event": 2.247865237615834,
+            "state": 0.0020459359442343977
+          },
+          "calibrated_rolling_24h": {
+            "volatility": 0.18732091523744554,
+            "first_event": 2.247865237615834,
+            "state": 0.0020459359442343977
+          }
+        },
+        "june": {
+          "training_constant": {
+            "volatility": 0.39608246720112866,
+            "first_event": 2.305886319175446,
+            "state": 0.000980406363485266
+          },
+          "rolling_24h": {
+            "volatility": 0.31283928710866626,
+            "first_event": 2.305886319175446,
+            "state": 0.000980406363485266
+          },
+          "calibrated_rolling_24h": {
+            "volatility": 0.30816628376031596,
+            "first_event": 2.305886319175446,
+            "state": 0.000980406363485266
+          }
+        },
+        "july": {
+          "training_constant": {
+            "volatility": 0.3790177417327542,
+            "first_event": 2.2945655029048764,
+            "state": 0.0008098013974823436
+          },
+          "rolling_24h": {
+            "volatility": 0.21421161592250598,
+            "first_event": 2.2945655029048764,
+            "state": 0.0008098013974823436
+          },
+          "calibrated_rolling_24h": {
+            "volatility": 0.21033618614122793,
+            "first_event": 2.2945655029048764,
+            "state": 0.0008098013974823436
+          }
+        }
+      },
+      "reserved": {
+        "august": {
+          "training_constant": {
+            "volatility": 0.3619732215604038,
+            "first_event": 2.201802836648178,
+            "state": 0.0013598189641047752
+          },
+          "rolling_24h": {
+            "volatility": 0.26776745942949504,
+            "first_event": 2.201802836648178,
+            "state": 0.0013598189641047752
+          },
+          "calibrated_rolling_24h": {
+            "volatility": 0.26226748985284565,
+            "first_event": 2.201802836648178,
+            "state": 0.0013598189641047752
+          }
+        }
+      }
+    },
+    "descriptive_ablations": {
+      "arm_losses": {
+        "E0C0": 0.18216657737900768,
+        "E0C1": 0.18216657737900768,
+        "E1C0": 0.18191203690088278,
+        "E1C1": 0.18216657737900768
+      },
+      "effects": {
+        "checkpoint_gain": 0.00025454047812489833,
+        "chooser_gain": 0.0,
+        "combined_gain": 0.0,
+        "gain_interaction": -0.00025454047812489833
+      },
+      "matched_ablations": {
+        "B-H0-E0_vs_A-H0-E0": {
+          "absolute_primary_gain": -0.00304983368288414
+        },
+        "B_frozen-H0-E0_vs_A-H0-E0": {
+          "absolute_primary_gain": -0.003026104530482354
+        },
+        "B-H0-E0_vs_B_frozen-H0-E0": {
+          "absolute_primary_gain": -2.3729152401785747e-05
+        },
+        "B-H0-E1_vs_A-H0-E1": {
+          "absolute_primary_gain": -0.0006683391141391604
+        },
+        "B_frozen-H0-E1_vs_A-H0-E1": {
+          "absolute_primary_gain": -0.000651673114541923
+        },
+        "B-H0-E1_vs_B_frozen-H0-E1": {
+          "absolute_primary_gain": -1.6665999597237358e-05
+        },
+        "B-H1-E0_vs_A-H1-E0": {
+          "absolute_primary_gain": -0.008183600485450915
+        },
+        "B_frozen-H1-E0_vs_A-H1-E0": {
+          "absolute_primary_gain": -0.008187128841002145
+        },
+        "B-H1-E0_vs_B_frozen-H1-E0": {
+          "absolute_primary_gain": 3.528355551229989e-06
+        },
+        "B-H1-E1_vs_A-H1-E1": {
+          "absolute_primary_gain": -0.008183600485450915
+        },
+        "B_frozen-H1-E1_vs_A-H1-E1": {
+          "absolute_primary_gain": -0.008187128841002145
+        },
+        "B-H1-E1_vs_B_frozen-H1-E1": {
+          "absolute_primary_gain": 3.528355551229989e-06
+        }
+      },
+      "interpretation": "predeclared_descriptive_contrasts_no_additional_supported_claims"
+    }
+  },
+  "synthetic": {
+    "fit_attempts": 45,
+    "completed_datasets": 15,
+    "failed_candidates": 0,
+    "signal_supported_vs_unconditional_zero": 3,
+    "noise_oracle_interval_alerts": 0,
+    "elapsed_seconds": 40.60899999999674,
+    "run": "D:\\FactorResearch\\runs\\v6-improvement-synthetic-20261003-prepare"
+  },
+  "autonomy": {
+    "proposals": 2,
+    "program_proposals": 2,
+    "proposal_sources": [
+      "codex_cli_llm_worker"
+    ],
+    "research_seed_fit_attempts": 20,
+    "cold_forward_folds": 9,
+    "fold_artifact_count": 9,
+    "program_candidates_fitted": 2,
+    "source_verified_by_resume": true,
+    "elapsed_seconds": 298.9530000000086,
+    "worker_stop": {
+      "stopped": "requested",
+      "returncode": 0,
+      "stop_file": "D:\\FactorResearch\\runs\\v6-autonomy-20261003-212509\\worker\\stop-141f357c0b294070b7e8e308882cc343.json",
+      "source": "evolution_cli"
+    },
+    "run": "D:\\FactorResearch\\runs\\v6-autonomy-20261003-212509",
+    "initial_seed_fits": 2,
+    "final_refit_status": "ok",
+    "cycle_status": "retained",
+    "formulas": [
+      {
+        "primary_loss": 0.23749828787720983,
+        "robustness_rank": -0.016679192078624946,
+        "selection_reason": "minimum_relative_improvement_not_met",
+        "internal_parameter_update_norm": 0.07184562918018868
+      },
+      {
+        "primary_loss": 0.23807045998604134,
+        "robustness_rank": -0.020709492835713383,
+        "selection_reason": "minimum_relative_improvement_not_met",
+        "internal_parameter_update_norm": 0.06184627282541581
+      }
+    ]
+  },
+  "tests": {
+    "passed": 548,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 132.304,
+    "ruff": "passed"
+  },
+  "audit": {
+    "path": "D:\\FactorResearch\\work\\v6_improvement\\final_independent_audit.json",
+    "sha256": "964ee67d4f4232e2b5b1ef6c52ab707ebd2ed248df6c2f588bc8b7a75ac8288e",
+    "statuses": {
+      "synthetic": "passed",
+      "market": "passed",
+      "real_gpt_integration": "passed"
+    }
+  },
+  "limitations": [
+    "All market periods previously exposed; August reserved for this selection only.",
+    "Twelve noise checks do not establish a calibrated false-positive rate.",
+    "Bounded DSL evolution, not arbitrary source-code rewriting.",
+    "No profitability, price-direction accuracy or future-market claim."
+  ]
+}
