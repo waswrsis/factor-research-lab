@@ -111,7 +111,7 @@ class SOuterContext:
                     or job['version'] != (3 if 'service_restriction' in job['outer_clock'] else 2)
                     or job['deadline'] != job['outer_clock']['wall_deadline']):
                 raise ValueError('Outer scope differs from the actual running research job')
-            verify_job_clock(job,path)
+            _verify_job_clock_binding(job,path)
             result = {'clock': job['outer_clock'], 'authority': job['work_authority'],
                       'directory': job['run_directory'], 'schedule_hash': fingerprint(job['work_schedule']),
                       'config': job['config']['research'], 'spec': job['rolling'],
@@ -160,7 +160,7 @@ def effective_deadlines(clock):
     return {'wall_deadline':wall,'monotonic_deadline':mono}
 
 
-def verify_job_clock(job,path):
+def _verify_job_clock_binding(job,path):
     runtime=project_path(path).parents[3]
     restriction=job['outer_clock'].get('service_restriction')
     if restriction is None:
@@ -170,8 +170,11 @@ def verify_job_clock(job,path):
         raise ValueError('Research restriction belongs to another original runtime')
     if job['deadline']!=job['outer_clock']['wall_deadline']:
         raise ValueError('Research original requested deadline changed')
-    check_clock(job['outer_clock'])
 
+
+def verify_job_clock(job,path):
+    _verify_job_clock_binding(job,path)
+    check_clock(job['outer_clock'])
 
 
 def require_lease_headroom(clock,seconds=300):

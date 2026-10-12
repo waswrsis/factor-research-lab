@@ -13,6 +13,7 @@ import json
 import math
 import os
 import time
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import psutil
@@ -45,16 +46,39 @@ def _counts(value):
     return {k: value.get(k, 0) for k in DEFAULT_LIMITS}
 
 
-def _read(path):
+def _receipt_bytes(path):
     try:
-        if path.stat().st_size > 65536:
+        with path.open('rb') as stream:
+            raw = stream.read(65537)
+        if len(raw) > 65536:
             raise ValueError('Bridge receipt exceeds 64 KiB')
-        value = json.loads(path.read_text('utf-8'))
+        return raw
+    except (OSError, ValueError) as exc:
+        raise ValueError('Missing/damaged bridge receipt: ' + str(path)) from exc
+
+
+def _decode_receipt(path, raw):
+    try:
+        value = json.loads(raw.decode('utf-8'))
         if set(value) != {'record', 'hash'} or fingerprint(value['record']) != value['hash']:
             raise ValueError('Bridge receipt checksum mismatch')
         return value['record']
-    except (OSError, TypeError, KeyError, ValueError) as exc:
+    except (TypeError, KeyError, ValueError) as exc:
         raise ValueError('Missing/damaged bridge receipt: ' + str(path)) from exc
+
+
+def _read(path):
+    return _decode_receipt(path, _receipt_bytes(path))
+
+
+@dataclass(frozen=True)
+class _VerifiedBridgePrefix:
+    """Process-local replay result bound to exact bytes, never mutable counters."""
+    identity_hash: str
+    receipts: tuple[tuple[str, bytes, bytes], ...]
+    reservation_terms: tuple[tuple[str, str], ...]
+    state_json: str
+    state_hash: str
 
 
 def _write(path, value):
@@ -197,16 +221,48 @@ class WorkAuthorityBridge:
         mirrors = {p.name for p in (self.directory / 'steps').glob('*.json')}
         if mirrors - {p.name for p in files}:
             raise ValueError('Bridge authoritative step missing')
-        for index, path in enumerate(files, 1):
-            event = _read(path)
+        prefix = None if repair else getattr(self, '_verified_reload_prefix', None)
+        receipts, prefix_count = [], 0
+        if prefix is not None:
+            if (type(prefix) is not _VerifiedBridgePrefix
+                    or prefix.identity_hash != fingerprint(self.identity)
+                    or len(files) < len(prefix.receipts)):
+                raise ValueError('Verified bridge prefix identity or length changed')
+            for index, (name, original, mirrored) in enumerate(prefix.receipts):
+                path = files[index]
+                if (path.name != name or _receipt_bytes(path) != original
+                        or _receipt_bytes(self.directory / 'steps' / name) != mirrored):
+                    raise ValueError('Verified immutable bridge prefix bytes changed')
+            for rid, terms_hash in prefix.reservation_terms:
+                if rid not in reservations or reservations[rid]['terms_hash'] != terms_hash:
+                    raise ValueError('Verified bridge prefix lost its original authority terms')
+            restored = json.loads(prefix.state_json)
+            if fingerprint(restored) != prefix.state_hash:
+                raise ValueError('Verified bridge prefix replay state changed')
+            budget = MonthlyBudget.from_dict(restored['budget'])
+            actual, works, previous = restored['actual'], restored['works'], restored['head']
+            receipts, prefix_count = list(prefix.receipts), len(prefix.receipts)
+            if projected is not None and 0 < projected['steps'] <= prefix_count:
+                # The projection can lag the latest immutable receipt. Check its
+                # own exact already-byte-verified checkpoint, not just the tip.
+                name, raw, _ = receipts[projected['steps'] - 1]
+                checkpoint = _decode_receipt(self.anchor / 'steps' / name, raw)
+                if (projected['head'] != fingerprint(checkpoint)
+                        or projected['actual_counts'] != checkpoint['actual_counts']):
+                    raise ValueError('RunStore projection contradicts its immutable prefix')
+        for index, path in enumerate(files[prefix_count:], prefix_count + 1):
+            original = _receipt_bytes(path)
+            event = _decode_receipt(path, original)
             if (path.name != f'{index:06d}.json' or event['sequence'] != index
                     or event['previous'] != previous or event['bridge_id'] != self.identifier):
                 raise ValueError('Bridge actual-use chain mismatch')
             mirror = self.directory / 'steps' / path.name
             if not mirror.exists() and repair:
                 _write(mirror, event)
-            if _read(mirror) != event:
+            mirrored = _receipt_bytes(mirror)
+            if _decode_receipt(mirror, mirrored) != event:
                 raise ValueError('Bridge step mirror changed')
+            receipts.append((path.name, original, mirrored))
             rid = event['reservation_id']
             if rid not in reservations:
                 raise ValueError('Bridge work reservation is missing')
@@ -243,9 +299,11 @@ class WorkAuthorityBridge:
                 projected['steps'] == 0 and (projected['head'] != '0' * 64
                                             or projected['actual_counts'] != _counts({})))):
             raise ValueError('Committed bridge steps cannot be removed/reset')
+        baseline_id = (self.preparation.baseline_record()['reservation_id']
+                       if self.preparation is not None else None)
         for rid, record in reservations.items():
             prepared = (self.preparation is not None
-                        and record['reservation_id'] == self.preparation.baseline_record()['reservation_id']
+                        and record['reservation_id'] == baseline_id
                         and record['binding'].get('preparation_hash') == self.identity.get('preparation_hash'))
             if not prepared and record['binding'].get('bridge_identity_hash') != fingerprint(self.identity):
                 raise ValueError('Authority work identity differs from original S envelope')
@@ -254,6 +312,17 @@ class WorkAuthorityBridge:
                 raise ValueError('Authority completed accounting differs from bridge steps')
         self._budget, self._actual, self._works = budget, actual, works
         self._head, self._sequence = previous, len(files)
+        # All bytes are reread on every use, including the pre/post-debit checks.
+        # Restart/repair always performs the original complete replay. The cap
+        # bounds retained bytes; exceeding it only disables this optimization.
+        if len(receipts) <= 4096 and sum(len(a) + len(b) for _, a, b in receipts) <= 4 * 1024 * 1024:
+            restored = {'budget': budget.to_dict(), 'actual': actual, 'works': works, 'head': previous}
+            self._verified_reload_prefix = _VerifiedBridgePrefix(
+                fingerprint(self.identity), tuple(receipts),
+                tuple(sorted((rid, reservations[rid]['terms_hash']) for rid in works)),
+                json.dumps(restored, sort_keys=True, allow_nan=False), fingerprint(restored))
+        else:
+            self._verified_reload_prefix = None
 
     @staticmethod
     def _apply(budget, operation, args):

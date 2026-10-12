@@ -55,6 +55,7 @@ def _charge_scope(authority):
             or authority.manifest_hash != scope['manifest_hash']
             or fingerprint(authority.manifest) != scope['manifest_hash']
             or authority.limits != scope['limits']
+            or str(project_path('.')) != scope['source_root']
             or _database_identity(owner, scope['db']) != scope['database_identity']
             or scope['db'].total_changes != scope['total_changes']):
         raise ValueError('Locked authority charge identity or database changed')
@@ -101,7 +102,20 @@ class BudgetExhausted(RuntimeError):
     """No reservation was created; no work may start."""
 
 
-def source_files():
+def _charge_current_source():
+    # The only owner is one original debit under the bridge lock and authority
+    # transaction. Both boundary audits read current source bytes afresh.
+    scope = _CHARGE_READ_SCOPE.get()
+    if scope is None or scope['verified'] is None:
+        return None
+    checked = _charge_scope(scope['authority'])
+    return dict(checked['authority'].manifest['source_files'])
+
+
+def source_files(*, _fresh=False):
+    cached = None if _fresh else _charge_current_source()
+    if cached is not None:
+        return cached
     root = project_path('.')
     return {p.relative_to(root).as_posix(): file_hash(p) for p in sorted(source_paths(root))}
 
@@ -251,6 +265,7 @@ class MonthlyWorkAuthority:
             scope = {'authority': self, 'db': db, 'thread': get_ident(), 'active': True,
                      'database_identity': _database_identity(self, db),
                      'manifest_hash': self.manifest_hash, 'limits': self.limits.copy(),
+                     'source_root': str(project_path('.')),
                      'total_changes': db.total_changes, 'verified': None}
             identity_token = _IDENTITY_READ_SCOPE.set(scope)
             charge_token = _CHARGE_READ_SCOPE.set(scope)
@@ -289,7 +304,7 @@ class MonthlyWorkAuthority:
             raise ValueError('Authority manifest integrity failure')
         if _read(self.index_path) != {'directory': str(self.directory), 'manifest_hash': self.manifest_hash}:
             raise ValueError('Authority scope index changed')
-        if source_files() != self.manifest['source_files']:
+        if source_files(_fresh=True) != self.manifest['source_files']:
             raise ValueError('Current source differs from authority frozen source')
         if _read(self.directory / 'source/manifest.json') != self.manifest['source_files']:
             raise ValueError('Authority archived source manifest changed')

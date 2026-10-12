@@ -100,6 +100,10 @@ def literature_seeds():
 
 
 def source_files():
+    from .monthly_work_authority import _charge_current_source
+    cached = _charge_current_source()
+    if cached is not None:
+        return cached
     root = project_path('.')
     paths = source_paths(root)
     return {str(path.relative_to(root)).replace('\\', '/'): file_hash(path) for path in sorted(paths)}
