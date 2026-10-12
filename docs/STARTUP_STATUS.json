@@ -1,20 +1,20 @@
 {
-  "at_utc": "2026-10-12T11:00:04.259886+00:00",
+  "at_utc": "2026-10-12T11:03:07.408683+00:00",
   "research_source_hash": "52e7871e17b8716d936812817f6e20eb000f033ca09ea9b2802dc2cbd96dd480",
   "service": {
-    "ActiveState": "active",
-    "CPUUsageNSec": "358782111000",
-    "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/frv7cpuone.slice/fr-layered-research-charge-final08.service",
-    "MainPID": "1051859",
-    "MemoryCurrent": "618287104",
-    "Result": "success",
-    "SubState": "running",
-    "TasksCurrent": "15"
+    "ActiveState": "failed",
+    "CPUUsageNSec": "432413817000",
+    "ControlGroup": "",
+    "MainPID": "0",
+    "MemoryCurrent": "[not set]",
+    "Result": "signal",
+    "SubState": "failed",
+    "TasksCurrent": "[not set]"
   },
   "forecast_count": 0,
   "completed_forward_fit_count": 1,
   "provider_response_count": 1,
-  "candidate_evaluations_completed": 1,
+  "candidate_evaluations_completed": 2,
   "sustained_reliability_proven": false,
   "qualification_status": "P3_P4_CANCELLED_NOT_PASSED",
   "failed_predecessor_preserved": true,
@@ -39,5 +39,9 @@
       "cold_solve_count": 15
     }
   ],
-  "whole_agent_power_certificate": false
+  "whole_agent_power_certificate": false,
+  "status": "FAILED_THIRD_CANDIDATE_DEADLINE",
+  "failure_at_utc": "2026-10-12T11:01:20+00:00",
+  "repair_complete": false,
+  "scheduler_status": "interrupted_consumed"
 }
