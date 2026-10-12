@@ -1,11 +1,11 @@
 Factor Research Lab · 因子研究实验平台
 
 先读 README.md 和 docs/INSTALL_LINUX.md。
-安装版 tag：v7-install-only-2026-10-12；仓库：waswrsis/factor-research-lab。
+当前 tag：v7-startup60-2026-10-12；仓库：waswrsis/factor-research-lab。
 
 实际Linux安装已完成：完整源码、CPU依赖与配置就位，两项CLI help返回0。
-研究服务未启动、未启用：inactive / MainPID=0 / disabled。
-本次未创建campaign、钱包或训练锚点，没有拟合、轮询或GPT调用。
+原服务器已按用户后续授权启动研究；初始运行快照见 docs/STARTUP_STATUS.json。
+首次启动失败记录保留，原额度扣减后使用新运行身份；尚未证明科研增量。
 剩余前向/GPT对照验收已取消，不是通过；没有完整资格审计或可靠alpha证明。
 
 新用户按Linux指南建立独立环境后可查看：

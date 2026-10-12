@@ -495,7 +495,7 @@ def supervise_campaign(directory,*,guard_directory,controller_script,arguments=(
                 creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0)|(4 if os.name=='nt' else 0))
             boundary.attach(controller)
             while not (root/'controller_hello.json').exists():
-                if controller.poll() is not None or time.monotonic()-initial>10:raise RuntimeError('Controller bootstrap failed')
+                if controller.poll() is not None or time.monotonic()-initial>60:raise RuntimeError('Controller bootstrap failed')
                 time.sleep(.01)
             identity=base._read(root/'controller_hello.json');actual=psutil.Process(identity['pid'])
             if identity!=base._identity(actual) or actual.pid not in boundary.members():raise ValueError('Unowned controller')
@@ -518,7 +518,7 @@ def supervise_campaign(directory,*,guard_directory,controller_script,arguments=(
                         continue
                     if not registration.exists():
                         pending_paths.setdefault(name,time.monotonic())
-                        if time.monotonic()-pending_paths[name]>10:raise TimeoutError('Unpublished actor bootstrap expired')
+                        if time.monotonic()-pending_paths[name]>60:raise TimeoutError('Unpublished actor bootstrap expired')
                         continue
                     value=base._read(registration);actor=value['issuer'];proc=psutil.Process(actor['pid'])
                     if (path.name!=protocol.fingerprint(actor) or base._identity(proc)!=actor

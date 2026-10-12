@@ -1,0 +1,22 @@
+{
+  "as_of_utc": "2026-10-12T09:42:38.916860+00:00",
+  "status": "RESEARCH_SERVICE_STARTED",
+  "unit": "fr-layered-research-startup60-final03.service",
+  "active_state": "active",
+  "source_hash": "aeeecdec7b6d3ec1d9b827612d85cd97a7ddbc4e09ada42608a22d0a58592887",
+  "first_session_reserved": true,
+  "completed_fit_count": 0,
+  "gpt_proposals_observed": 0,
+  "forecast_count": 0,
+  "initial_step_in_progress": true,
+  "first_two_failed_runs_preserved": true,
+  "remaining_max_sessions": 2598,
+  "remaining_reserved_seconds": 18712800,
+  "remaining_reserved_steps": 311880,
+  "model": "gpt-6-astra",
+  "reasoning": "high",
+  "tests_rerun": false,
+  "formal_acceptance": "CANCELLED_NOT_PASSED",
+  "verified_scientific_increment": false,
+  "startup_repairs": "Nine startup waits 10s to 60s; new external initializer uses absolute forward/feed paths."
+}

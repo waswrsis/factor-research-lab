@@ -1,6 +1,8 @@
+> 2026-10-12：原服务器已按用户后续授权启动。本文的“不启动”步骤仍是第三方安装默认行为；原安装快照保留，最新启动快照见 STARTUP_STATUS.json。
+
 # Linux安装：完整程序就位，服务保持关闭
 
-对应 `v7-install-only-2026-10-12`，仓库 `waswrsis/factor-research-lab`。本版在现有服务器已完成源码、依赖、配置和最低限度导入/入口检查；服务未启动、未启用。[实际安装摘要](INSTALLATION_SUMMARY.json) 不代表完整科研验收。剩余前向/GPT对照已取消，不能记成通过。
+对应 `v7-startup60-2026-10-12`，仓库 `waswrsis/factor-research-lab`。源码、依赖与配置已安装，原服务器后续按用户授权启动；第三方安装默认保持关闭。[原安装摘要](INSTALLATION_SUMMARY.json)与[启动快照](STARTUP_STATUS.json)分别记录当时状态，不代表完整科研验收。剩余前向/GPT对照已取消，不能记成通过。
 
 ## 环境与源码
 
@@ -9,25 +11,25 @@
 从仓库固定tag获取（tag发布后可用）：
 
 ```sh
-git clone --branch v7-install-only-2026-10-12 --depth 1 https://github.com/waswrsis/factor-research-lab.git factor-research-lab
+git clone --branch v7-startup60-2026-10-12 --depth 1 https://github.com/waswrsis/factor-research-lab.git factor-research-lab
 cd factor-research-lab
 ```
 
-或从同一Release下载 `source-core-3360.tar`、`SHA256SUMS`、源包manifest和安装指南。对照Release公布的校验值；校验文件本身须来自可信发布位置，而非未知第三方。
+或从同一Release下载 `source-core-startup60.tar`、`SHA256SUMS`、源包manifest和安装指南。对照Release公布的校验值；校验文件本身须来自可信发布位置，而非未知第三方。
 
 ```sh
-curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-install-only-2026-10-12/source-core-3360.tar
-curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-install-only-2026-10-12/SHA256SUMS
+curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-startup60-2026-10-12/source-core-startup60.tar
+curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-startup60-2026-10-12/SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS
 ```
 
-core tar SHA-256为 `b95e71c896543fe6d299950c8d65a7de87d4ad69c72b02aca0daab7b63851ac6`，4,669,440字节、234文件。至少确认该tar的校验行显示OK；不能把跳过缺少附件当作全部附件验证。源包map hash `0d1a52e6978045eefdcddd7bff32f5eb87b772835b6ed138cb9ca4d14a4ee83d` 与研究身份 `3360b89b3bdffa8a2907d19d56e3d2b37b15cefacd974d8401045b5f0e512b00` 含义不同：前者覆盖打包记录，后者覆盖220项研究资产。
+core tar SHA-256为 `e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e`，4,669,440字节、234文件。至少确认该tar的校验行显示OK；不能把跳过缺少附件当作全部附件验证。源包map hash `fa03298ebf22ece7182896c9a3e56b8ae334d091cb3d38a1830419c656c390ff` 与研究身份 `aeeecdec7b6d3ec1d9b827612d85cd97a7ddbc4e09ada42608a22d0a58592887` 含义不同：前者覆盖打包记录，后者覆盖220项研究资产。
 
 推荐用固定tag中已经审阅的 `scripts/v7_linux_bootstrap.sh` 做纯包验证和安全解包。其 `verify`/`unpack` 不安装服务；目标目录必须尚不存在，父目录须存在。
 
 ```sh
-python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh verify --package /path/to/source-core-3360.tar --sha256 b95e71c896543fe6d299950c8d65a7de87d4ad69c72b02aca0daab7b63851ac6
-python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh unpack --package /path/to/source-core-3360.tar --sha256 b95e71c896543fe6d299950c8d65a7de87d4ad69c72b02aca0daab7b63851ac6 --workspace /absolute/new-workspace
+python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh verify --package /path/to/source-core-startup60.tar --sha256 e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e
+python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh unpack --package /path/to/source-core-startup60.tar --sha256 e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e --workspace /absolute/new-workspace
 cd /absolute/new-workspace
 ```
 
@@ -60,7 +62,7 @@ python3.12 -m venv .venv
 
 ## 安装后不启动
 
-本次服务器的unit为loaded、inactive、MainPID=0、disabled；campaign、钱包和训练锚点未创建，旧STOP未变。公开附件不提供已登记的私人campaign或认证资料，也不要求安装者复制它们。请勿执行服务start/enable或长期研究命令。
+原安装快照中的unit为loaded、inactive、MainPID=0、disabled；后续授权启动记录另见STARTUP_STATUS.json。公开附件不提供已登记的私人campaign或认证资料，也不要求安装者复制它们。第三方安装步骤不包含服务start/enable或长期研究命令。
 
 首次激活需另行授权，使用自己的真实feed、明确的新配置、source身份和额度冻结；历史样本导入不能伪装实时收件，首次实际数据就绪才确定锚点。研究模式为90日训练窗、15经过日拟合、每日视图刷新；分钟轮询处理小时闭合数据，12小时标签真实成熟后才结算。UTC自然月额度不因安装或重启重发。服务资源安排须核验实际systemd/cgroup，不以配置文本代替运行证据。
 

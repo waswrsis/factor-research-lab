@@ -335,12 +335,12 @@ def supervise(script, arguments, *, directory, source_root, _ownership=None, _ac
         try:
             while not stop.is_set():
                 with lock: current,work,idle=scope,active,idle_clock
-                if not scope_ready and idle is None and time.monotonic()-start>10:
+                if not scope_ready and idle is None and time.monotonic()-start>60:
                     raise TimeoutError('Original scope was not authenticated during startup')
                 if current is None:
                     if idle is not None:
                         prior=_clock(idle,prior,parent_required=not closing.is_set())
-                    elif time.monotonic()-start>10: raise TimeoutError('No trusted original outer scope')
+                    elif time.monotonic()-start>60: raise TimeoutError('No trusted original outer scope')
                 else:
                     prior=_clock(current['clock'],prior,parent_required=not closing.is_set())
                     if work is not None:
@@ -367,7 +367,7 @@ def supervise(script, arguments, *, directory, source_root, _ownership=None, _ac
                 boundary.attach(worker)
                 while not (directory/'hello.json').exists():
                     if not alive():raise RuntimeError('Issuer died during bootstrap')
-                    if time.monotonic()-start>10:raise TimeoutError('Unidentified issuer startup')
+                    if time.monotonic()-start>60:raise TimeoutError('Unidentified issuer startup')
                     time.sleep(.01)
                 hello=base._read(directory/'hello.json');issuer=psutil.Process(hello['pid'])
                 if hello!=base._identity(issuer) or issuer.pid not in boundary.members():raise ValueError('Unowned actual issuer')

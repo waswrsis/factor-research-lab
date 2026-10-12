@@ -80,7 +80,7 @@ def _spawn_hello(directory, token):
     files = _spawn_files(directory, token)
     began = time.monotonic()
     while not files['popen'].exists():
-        if time.monotonic()-began > 10:raise TimeoutError('Original launch handshake missing')
+        if time.monotonic()-began > 60:raise TimeoutError('Original launch handshake missing')
         time.sleep(.005)
     intent, owner = base._read(files['intent']), base._read(files['popen'])
     me = psutil.Process()
@@ -90,7 +90,7 @@ def _spawn_hello(directory, token):
     base._write(files['native'], native)
     while not files['ack'].exists():
         _validate_spawn(intent, owner, native)
-        if time.monotonic()-began > 10:raise TimeoutError('Original parent did not acknowledge native issuer')
+        if time.monotonic()-began > 60:raise TimeoutError('Original parent did not acknowledge native issuer')
         time.sleep(.005)
     if base._read(files['ack']) != {'native_hash': protocol.fingerprint(native), 'nonce': intent['nonce']}:
         raise ValueError('Wrong native launch acknowledgment')
@@ -117,7 +117,7 @@ def _spawn(command,temporary,log_path,children):
     base._write(files['popen'], owner)
     began = time.monotonic()
     while not files['native'].exists():
-        if child.poll() is not None or time.monotonic()-began > 10:
+        if child.poll() is not None or time.monotonic()-began > 60:
             raise RuntimeError('Original owned native launch did not complete its handshake')
         time.sleep(.005)
     native = base._read(files['native'])
@@ -157,7 +157,7 @@ def _worker(directory,token):
             if {k:launch['process'][k] for k in ('pid','created')}!=base._identity(psutil.Process()):
                 raise ValueError('Actual campaign native issuer differs from reservation')
             break
-        if time.monotonic()-began>10:raise TimeoutError('Original native issuer was not durably registered')
+        if time.monotonic()-began>60:raise TimeoutError('Original native issuer was not durably registered')
         time.sleep(.005)
     # Exact actual core remains the controller: source/host guards, shared
     # counts, step reservation, transport policy and session rollover unchanged.
