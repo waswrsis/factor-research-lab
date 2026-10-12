@@ -2,7 +2,7 @@
 
 面向小时级市场数据的因子研究项目：由 GPT 提出公式和假设，本地程序拟合、比较、筛选并记录证据。研究输出包括公式、预测和评分；**不执行交易，不承诺收益。**
 
-**运行状态（截至2026-10-12 09:42 UTC）：用户已授权启动远端研究服务，第一研究步骤正在执行。** 尚未完成本次拟合或观察到GPT提案；运行不代表发现有效因子。[启动快照](docs/STARTUP_STATUS.json)。原安装与取消验收记录仍保留。
+**运行状态（截至2026-10-12 10:28 UTC）：远端研究服务运行中，首次拟合已完成，月度因子搜索已启动，已观察到2个服务步骤。** GPT提案和有效因子仍以真实结果为准；运行不代表可靠alpha。[启动快照](docs/STARTUP_STATUS.json)。失败记录与取消验收记录保留。
 
 ## 实现的研究机制
 
@@ -28,11 +28,11 @@
 
 ## 获取与安装
 
-安装版：[`v7-startup60-2026-10-12`](https://github.com/waswrsis/factor-research-lab/releases/tag/v7-startup60-2026-10-12)。详见 [Linux安装指南](docs/INSTALL_LINUX.md)。
+安装版：[`v7-rolling-cpu1-2026-10-12`](https://github.com/waswrsis/factor-research-lab/releases/tag/v7-rolling-cpu1-2026-10-12)。详见 [Linux安装指南](docs/INSTALL_LINUX.md)。
 
 仓库保留完整程序和测试源码；Linux核心附件提供运行源码、固定CPU依赖清单和安装配置，不包含历史实验、模型、认证、钱包或虚拟环境。220项研究资产身份为：
 
-`aeeecdec7b6d3ec1d9b827612d85cd97a7ddbc4e09ada42608a22d0a58592887`
+`4b5f44c951ef5f0c58592fe12557908b1d12774a20f22583755125d046fdb88a`
 
 Linux使用CPython3.12和独立CPU依赖清单，不能直接使用根目录Windows/CUDA的 `uv.lock` 安装。Windows同步脚本需要原工作区已有uv工具，公开首次获取说明尚不完整。
 

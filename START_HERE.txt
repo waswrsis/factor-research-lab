@@ -1,7 +1,7 @@
 Factor Research Lab · 因子研究实验平台
 
 先读 README.md 和 docs/INSTALL_LINUX.md。
-当前 tag：v7-startup60-2026-10-12；仓库：waswrsis/factor-research-lab。
+当前 tag：v7-rolling-cpu1-2026-10-12；仓库：waswrsis/factor-research-lab。
 
 实际Linux安装已完成：完整源码、CPU依赖与配置就位，两项CLI help返回0。
 原服务器已按用户后续授权启动研究；初始运行快照见 docs/STARTUP_STATUS.json。

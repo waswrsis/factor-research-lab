@@ -632,13 +632,13 @@ def prescreen_candidates(data, cutoff, pool, candidates, *, limit=24, blind_spot
     used = {e['candidate_id'] for e in leading}
     remaining = sorted((e for e in valid if e['candidate_id'] not in used),
                        key=lambda e: fingerprint({'candidate': e['candidate_id'], 'pool': pool.digest,
-                                                   'month': _month(cutoff), 'purpose': 'interaction_blind_spot'}))
+                                                   'cutoff': _aware(cutoff).isoformat(), 'purpose': 'interaction_blind_spot'}))
     selected = leading + remaining[:limit - len(leading)]
     return {'selected_ids': [e['candidate_id'] for e in selected], 'entries': entries,
             'blind_spot_ids': [e['candidate_id'] for e in selected[len(leading):]],
             'label_values_used': False, 'hard_rejection_by_correlation': False,
             'receipt': _receipt('training_only_conditional_prescreen', pool_hash=pool.digest,
-                                cutoff=_month(cutoff), candidates=len(candidates),
+                                cutoff=_aware(cutoff).isoformat(), candidates=len(candidates),
                                 projection_calls=len(valid), selected=[e['candidate_id'] for e in selected])}
 
 
@@ -756,17 +756,17 @@ class DevelopmentPoolArchive:
         if not all(isinstance(v, str) and v for v in (data_hash, protocol_hash, source_hash)):
             raise ValueError('Archive context requires data/protocol/source identities')
         return {'pool_hash': pool.digest, 'reference_pipeline_id': pool.pipeline_id,
-                'cutoff': _month(cutoff), 'data_hash': data_hash,
+                'cutoff': _aware(cutoff).isoformat(), 'data_hash': data_hash,
                 'protocol_hash': protocol_hash, 'source_hash': source_hash}
 
     def record(self, member, result, context, *, state='active_parent'):
         if (result.get('role') != 'S' or result.get('pool_hash') != context['pool_hash']
                 or result.get('candidate_id') != member.member_id
-                or result.get('receipt', {}).get('cutoff') != _month(context['cutoff'])
+                or result.get('receipt', {}).get('cutoff') != _aware(context['cutoff']).isoformat()
                 or result.get('context') != context
                 or state not in {'active_parent', 'dormant', 'retired', 'pending_evidence'}):
             raise ValueError('Archive result is not matching development evidence')
-        _month(context['cutoff'])
+        _aware(context['cutoff']).isoformat()
         key = fingerprint({'member': member.member_id, 'context': context})
         entry = {'member': member.to_dict(), 'result': copy.deepcopy(result),
                  'context': copy.deepcopy(context), 'state': state}

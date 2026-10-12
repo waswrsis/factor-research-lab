@@ -99,10 +99,10 @@ def inherited_limits():
             value = (node / filename).read_text().strip() if (node / filename).exists() else 'max'
             if value != 'max':
                 limits[name] = min(limits[name], int(value))
-    if not (0 < limits['cpu'] <= .25 and 0 < limits['memory'] <= 768 * 2**20
+    if not (0 < limits['cpu'] <= 1.0 and 0 < limits['memory'] <= 768 * 2**20
             and 0 < limits['high'] <= 640 * 2**20
             and limits['swap'] == 0 and 0 < limits['pids'] <= 64):
-        raise ValueError('Research requires shared CPU25%/RAM768MiB/no-swap/PIDs64 limits')
+        raise ValueError('Research requires shared CPU100%/RAM768MiB/no-swap/PIDs64 limits')
     return {'cgroup': str(leaf), 'effective_limits': limits, 'scope': 'inherited_ancestor_limits'}
 
 

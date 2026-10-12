@@ -77,7 +77,7 @@ def _values(path):
 def _limits(raw):
     cpu=raw['cpu.max'].split()
     if len(cpu)!=2 or any(not x.isascii() or not x.isdigit() for x in cpu):return False
-    if int(cpu[1])<=0 or Fraction(int(cpu[0]),int(cpu[1]))!=Fraction(1,4):return False
+    if int(cpu[1])<=0 or Fraction(int(cpu[0]),int(cpu[1]))!=Fraction(1,1):return False
     if any(raw[k]!=str(v) for k,v in {'memory.high':640*2**20,'memory.max':768*2**20,
             'memory.swap.max':0,'pids.max':64}.items()):return False
     pairs=[s.split() for s in raw['memory.events'].splitlines()]
@@ -96,7 +96,7 @@ def _shared(worker,parent_pid):
             try:raw=_values(p)
             except OSError:continue
             if _limits(raw):return {'path':str(p),'inode':p.stat().st_ino,'raw':raw}
-    raise ValueError('Actual shared CPU25/640soft768hard/swap0/tasks64 boundary missing')
+    raise ValueError('Actual shared CPU100/640soft768hard/swap0/tasks64 boundary missing')
 
 
 def _subtree(worker):

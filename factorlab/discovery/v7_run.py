@@ -480,7 +480,8 @@ def _verified_S_receipt_source(bars, cutoff, config, spec, exposure_path, feed_d
             raise ValueError('Actual receipt archive is missing; never create a replacement')
         receipt = ReceiptArchive(feed_directory, config.symbols)
         try:
-            proof = receipt.snapshot(cutoff, start=cutoff-pd.DateOffset(months=6)-pd.Timedelta(hours=1234),
+            proof = receipt.snapshot(cutoff, start=cutoff-(pd.DateOffset(months=6) if spec.window_days is None
+                else pd.Timedelta(days=180))-pd.Timedelta(hours=1234),
                                      archive_delay_seconds=spec.availability_delay_seconds)
             columns = sorted(proof.columns)
             if (receipt.identity != feed_identity or set(columns) != set(selected.columns)
@@ -559,13 +560,17 @@ def run_month(directory, bars, cutoff, *, config=None, spec=None, backend=None,
         if slot['stage'] == 'pruning' and set(slot['counts']) != {'solve'}:
             raise ValueError('Pruning must have its own frozen solve allowance')
     allocation = body['allocation']
+    from .monthly_partition_policy import canonical_policy
+    policy = canonical_policy(authority.manifest.get('partition_policy'))
+    lane = 'S:' + config.search_mode if family_count == 1 else 'S'
+    remaining_S = policy['lanes'][lane]
     if (not isinstance(allocation, dict) or allocation.get('unused_credit_transfer') is not False
             or allocation.get('S_solve') != body['allocated_counts']['solve']
             or any(type(allocation.get(k)) is not int or allocation[k] < low for k,low in
                    [('forward_solve_holdback',1),('nonlinear_solve_holdback',0),
                     ('forward_seconds_holdback',1),('nonlinear_seconds_holdback',0)])
-            or allocation['S_solve'] + allocation['forward_solve_holdback'] + allocation['nonlinear_solve_holdback'] > authority.limits['solve']
-            or body['reserved_seconds'] + allocation['forward_seconds_holdback'] + allocation['nonlinear_seconds_holdback'] > authority.manifest['monthly_seconds']):
+            or remaining_S['counts']['solve'] + allocation['forward_solve_holdback'] + allocation['nonlinear_solve_holdback'] > authority.limits['solve']
+            or remaining_S['seconds'] + allocation['forward_seconds_holdback'] + allocation['nonlinear_seconds_holdback'] > authority.manifest['monthly_seconds']):
         raise ValueError('Missing or inconsistent frozen forward/nonlinear counter and time holdbacks')
     source_reference = {'feed_identity': bars.attrs['feed_identity'],
                         'feed_directory': str(project_path(feed_directory)),
@@ -612,6 +617,13 @@ def run_month(directory, bars, cutoff, *, config=None, spec=None, backend=None,
             exposure_path=exposure_path,feed_directory=feed_directory,authority=authority,
             schedule=schedule,preparation=preparation)
     except BaseException as error:
+        # Persist the original cause BEFORE failure accounting can close the native tree.
+        from .v7_storage import immutable_record
+        cause = {'preparation_hash': preparation.digest, 'error_type': type(error).__name__,
+                 'message': str(error)[:2000], 'stage': 'scheduled_S_preparation'}
+        for parent in (preparation.root, preparation.mirror):
+            try: immutable_record(parent / 'failure-cause.json', {'value': cause, 'sha256': fingerprint(cause)})
+            except BaseException as secondary: error.add_note('Failure diagnostic: ' + type(secondary).__name__)
         try:
             record = preparation.baseline_record()
             if record['status'] not in {'completed','failed_consumed','interrupted_consumed'}:
@@ -649,7 +661,8 @@ def _run_month_offline(directory, bars, cutoff, *, config=None, spec=None, backe
         from .v7_feed import ReceiptArchive
         receipt = ReceiptArchive(feed_directory, config.symbols)
         try:
-            proof = receipt.snapshot(cutoff, start=cutoff-pd.DateOffset(months=6)-pd.Timedelta(hours=1234),
+            proof = receipt.snapshot(cutoff, start=cutoff-(pd.DateOffset(months=6) if spec.window_days is None
+                else pd.Timedelta(days=180))-pd.Timedelta(hours=1234),
                                      archive_delay_seconds=spec.availability_delay_seconds)
             columns = sorted(proof.columns)
             if (receipt.identity != feed_identity or set(columns) != set(selected.columns)
@@ -1037,7 +1050,7 @@ def _run_month_offline(directory, bars, cutoff, *, config=None, spec=None, backe
                     best_id, best = max(group, key=lambda pair: pair[1]['result']['channels']['F']['gain']
                                        if pair[1]['result']['channels']['F']['gain'] is not None else -1e100)
                     evidence_id = memory.bind_result(store, store.exposure, month, best_id)
-                    memory.observe(version, store=store, exposure=store.exposure, month=cutoff,
+                    memory.observe(version, store=store, exposure=store.exposure, month=month_start(cutoff),
                         progress=best['result']['channels']['F']['gain'] or 0.,
                         evidence_sources=[evidence_id], spent=min(len(group), hypothesis['remaining_budget']),
                         failure='No meaningful conditional increment' if (best['result']['channels']['F']['gain'] or 0.) < .005 else None)
@@ -1049,7 +1062,7 @@ def _run_month_offline(directory, bars, cutoff, *, config=None, spec=None, backe
                         parameter_mode='profile' if record['program'].get('parameters') else 'fixed')
                     if member.member_id in selection['selected_ids']:
                         if len(reference_pool.members) < 8:
-                            reference_pool, admission = archive.admit(reference_pool, member, month=cutoff, selection=selection)
+                            reference_pool, admission = archive.admit(reference_pool, member, month=month_start(cutoff), selection=selection)
                             state['pool_admission'] = admission
                         else:
                             state['pool_admission'] = {'status': 'capacity_deferred', 'affects_A0': False}
@@ -1065,7 +1078,7 @@ def _run_month_offline(directory, bars, cutoff, *, config=None, spec=None, backe
                             for trial in step['trials']:
                                 member_id = trial['removed']
                                 if member_id in archive.lifecycle:
-                                    archive.monitor_decay(member_id, month=cutoff, k0_gain=None,
+                                    archive.monitor_decay(member_id, month=month_start(cutoff), k0_gain=None,
                                         pool_gain=1-step['baseline_loss']/trial['loss'] if trial['loss'] > 0 else None)
                         for member_id in pruning['removed_ids']:
                             if member_id in archive.lifecycle:
@@ -1612,7 +1625,7 @@ def _run_month_scheduled_impl(directory, bars, cutoff, *, config=None, spec=None
                     best_id, best = max(group, key=lambda pair: pair[1]['result']['channels']['F']['gain']
                                        if pair[1]['result']['channels']['F']['gain'] is not None else -1e100)
                     evidence_id = memory.bind_result(store, store.exposure, month, best_id)
-                    memory.observe(version, store=store, exposure=store.exposure, month=cutoff,
+                    memory.observe(version, store=store, exposure=store.exposure, month=month_start(cutoff),
                         progress=best['result']['channels']['F']['gain'] or 0.,
                         evidence_sources=[evidence_id], spent=min(len(group), hypothesis['remaining_budget']),
                         failure='No meaningful conditional increment' if (best['result']['channels']['F']['gain'] or 0.) < .005 else None)
@@ -1624,7 +1637,7 @@ def _run_month_scheduled_impl(directory, bars, cutoff, *, config=None, spec=None
                         parameter_mode='profile' if record['program'].get('parameters') else 'fixed')
                     if member.member_id in selection['selected_ids']:
                         if len(reference_pool.members) < 8:
-                            reference_pool, admission = archive.admit(reference_pool, member, month=cutoff, selection=selection)
+                            reference_pool, admission = archive.admit(reference_pool, member, month=month_start(cutoff), selection=selection)
                             state['pool_admission'] = admission
                         else:
                             state['pool_admission'] = {'status': 'capacity_deferred', 'affects_A0': False}
@@ -1641,7 +1654,7 @@ def _run_month_scheduled_impl(directory, bars, cutoff, *, config=None, spec=None
                             for trial in step['trials']:
                                 member_id = trial['removed']
                                 if member_id in archive.lifecycle:
-                                    archive.monitor_decay(member_id, month=cutoff, k0_gain=None,
+                                    archive.monitor_decay(member_id, month=month_start(cutoff), k0_gain=None,
                                         pool_gain=1-step['baseline_loss']/trial['loss'] if trial['loss'] > 0 else None)
                         for member_id in pruning['removed_ids']:
                             if member_id in archive.lifecycle:

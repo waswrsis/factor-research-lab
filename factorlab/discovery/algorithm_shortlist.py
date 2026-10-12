@@ -108,7 +108,7 @@ def _score(result, recipe, rule):
         raise ValueError('Only verified complete-recipe three-fold S evidence is scoreable')
     symbols = result['symbols']
     folds, all_hours, reasons, trained = [], [], [], False
-    for index, (fold, expected) in enumerate(zip(result['folds'], development_folds(result['cutoff']), strict=True)):
+    for index, (fold, expected) in enumerate(zip(result['folds'], development_folds(result['cutoff'], spec=recipe.rolling_spec), strict=True)):
         hours = int((pd.Timestamp(expected['score_end']) - pd.Timestamp(expected['fit_cutoff'])) / pd.Timedelta(hours=1))
         nominal = hours * len(symbols)
         if (fold['status'] != 'completed' or fold.get('role') != 'S'

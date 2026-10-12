@@ -124,7 +124,8 @@ def _input(data, recipe, context, feed_directory, feed_identity):
                 from .s_observation_source import snapshot_from_context
                 bars = snapshot_from_context(context, feed_directory)
             else:
-                bars = archive.snapshot(cutoff, start=cutoff-pd.DateOffset(months=6)-pd.Timedelta(hours=1234),
+                bars = archive.snapshot(cutoff, start=cutoff-(pd.DateOffset(months=6) if recipe.rolling_spec.window_days is None
+                    else pd.Timedelta(days=180))-pd.Timedelta(hours=1234),
                                         archive_delay_seconds=recipe.rolling_spec.availability_delay_seconds)
             actual = build_rolling_data(bars, recipe.rolling_spec)
             if input_data_identity(actual, cutoff) != context['input_id']:

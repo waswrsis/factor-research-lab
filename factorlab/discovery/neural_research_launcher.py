@@ -134,7 +134,7 @@ def _research_result(ticket, data, recipe):
     manifest = json.loads((directory / 'manifest.json').read_text('utf-8'))
     if fingerprint(manifest) != result.get('manifest_id') or any(result.get(k) != v for k, v in manifest.items() if k != 'folds'):
         raise ValueError('S result differs from its original numerical manifest')
-    expected_folds = list(development_folds(ticket.value['context']['cutoff']))
+    expected_folds = list(development_folds(ticket.value['context']['cutoff'], spec=recipe.rolling_spec))
     if len(result['folds']) != 3 or manifest['folds'] != expected_folds:
         raise ValueError('S result lacks all three fixed cold folds')
     hours, support, nominal = [], 0, 0

@@ -201,7 +201,7 @@ class _LinuxService:
         def read(name):
             return (self.path / name).read_text().strip()
         quota, period = read('cpu.max').split()
-        if (quota == 'max' or int(period) <= 0 or int(quota) > .25 * int(period)
+        if (quota == 'max' or int(period) <= 0 or int(quota) > 1.0 * int(period)
                 or not 0 < int(read('memory.max')) <= 768 * 2**20
                 or not 0 < int(read('memory.high')) <= 640 * 2**20
                 or int(read('memory.swap.max')) != 0 or not 0 < int(read('pids.max')) <= 64):

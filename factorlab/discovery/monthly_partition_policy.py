@@ -24,15 +24,18 @@ def frozen_policy(mode):
     if mode not in ('standard', 'controls'):
         raise ValueError('Unknown frozen monthly allocation')
     if mode == 'standard':
-        lanes = {'S': {'counts': counts(ast=96, f=24, gpt_attempt=6, family=3, solve=943), 'seconds': 3480}}
+        lanes = {'S': {'counts': counts(ast=96, f=24, gpt_attempt=6, family=3, solve=922), 'seconds': 2580}}
     else:
         lanes = {f'S:{arm}': {'counts': counts(ast=32, f=8, gpt_attempt=2, family=1, solve=337), 'seconds': 1440}
                  for arm in ('local', 'random', 'gpt')}
     lanes.update(nonlinear={'counts': counts(solve=240, neural_fit=12, epoch=48, tree_fit=3), 'seconds': 900},
-                 forward={'counts': counts(solve=417 if mode == 'standard' else 349, neural_fit=6, epoch=132),
-                          'seconds': 2820 if mode == 'standard' else 1980})
+                 forward={'counts': counts(solve=413 if mode == 'standard' else 349, neural_fit=6, epoch=132),
+                          'seconds': 1620 if mode == 'standard' else 1980})
     return {'version': VERSION, 'mode': mode, 'lanes': lanes, 'unused_transfer': False,
-            'owner_rule': 'actual_month_unique_S_run_or_controls_members_and_single_forward_runtime'}
+            'owner_rule': 'actual_month_unique_S_run_or_controls_members_and_single_forward_runtime',
+            'predecessor_consumption': ({'S': {'counts': counts(solve=21), 'seconds': 900},
+                                        'forward': {'counts': counts(solve=4), 'seconds': 1200}}
+                                       if mode == 'standard' else {})}
 
 
 def canonical_policy(value):

@@ -127,7 +127,7 @@ def _kernel_snapshot():
         values = {name: (node / name).read_text().strip() for name in expected}
         cpu = (node / 'cpu.max').read_text().split()
         if (values != {k: str(v) for k, v in expected.items()} or len(cpu) != 2
-                or cpu[0] == 'max' or int(cpu[1]) <= 0 or int(cpu[0]) / int(cpu[1]) != .25):
+                or cpu[0] == 'max' or int(cpu[1]) <= 0 or int(cpu[0]) / int(cpu[1]) != 1.0):
             continue
         for name in ('memory.peak', 'memory.current', 'memory.events', 'cpu.stat', 'cgroup.procs'):
             values[name] = (node / name).read_text().strip()
@@ -137,7 +137,7 @@ def _kernel_snapshot():
                 'boot_id': Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
                 'raw': values, 'peak': int(values['memory.peak']), 'events': events,
                 'observed_at': _now().isoformat(), 'scope': 'whole_cgroup', 'platform': 'linux'}
-    raise ValueError('Exact shared CPU25/RAM768/high640/swap0/PIDs64 cgroup is required')
+    raise ValueError('Exact shared CPU100/RAM768/high640/swap0/PIDs64 cgroup is required')
 
 
 def _same_boundary(first, last):
@@ -161,7 +161,7 @@ def _validate_kernel(first, last):
         cpu = snapshot['raw']['cpu.max'].split()
         if (any(snapshot['raw'].get(k) != v for k, v in required.items())
                 or len(cpu) != 2 or cpu[0] == 'max' or int(cpu[1]) <= 0
-                or int(cpu[0]) / int(cpu[1]) != .25):
+                or int(cpu[0]) / int(cpu[1]) != 1.0):
             raise ValueError('Kernel envelope changed during the trial')
 
 
@@ -359,7 +359,7 @@ def artifact_from_receipt(path):
     return {'launcher_receipt': str(path), 'launcher_receipt_hash': file_hash(path),
             'platform': 'linux', 'scope': 'whole_cgroup', 'oom': 0, 'oom_kill': 0,
             'memory_max': 768 * 2**20, 'memory_high': 640 * 2**20, 'swap_max': 0,
-            'cpu_quota_fraction': .25, 'memory_peak': after['peak'],
+            'cpu_quota_fraction': 1.0, 'memory_peak': after['peak'],
             'trial_context': job['resource_context'], 'status': receipt['status'],
             'raw_receipt_hash': fingerprint([receipt['kernel_before'], after]),
             'workload_result_hash': receipt['result_hash'],

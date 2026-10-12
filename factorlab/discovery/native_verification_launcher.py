@@ -84,7 +84,7 @@ def _new_group(task, terminal):
         except OSError:
             continue
     if shared is None:
-        raise ValueError('Existing aggregate CPU25/640soft768hard/swap0/tasks64 required')
+        raise ValueError('Existing aggregate CPU100/640soft768hard/swap0/tasks64 required')
     # Ancestor resource limits already govern the inclusive subtree. Enabling
     # child controllers is unnecessary and would conflict with an issuer
     # residing directly in this domain (the no-internal-process constraint).

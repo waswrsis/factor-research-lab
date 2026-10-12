@@ -1,22 +1,56 @@
 {
-  "as_of_utc": "2026-10-12T09:42:38.916860+00:00",
-  "status": "RESEARCH_SERVICE_STARTED",
-  "unit": "fr-layered-research-startup60-final03.service",
+  "as_of_utc": "2026-10-12T10:28:38.018651+00:00",
+  "status": "RESEARCH_SERVICE_RUNNING_S_STARTED",
   "active_state": "active",
-  "source_hash": "aeeecdec7b6d3ec1d9b827612d85cd97a7ddbc4e09ada42608a22d0a58592887",
-  "first_session_reserved": true,
-  "completed_fit_count": 0,
-  "gpt_proposals_observed": 0,
+  "source_hash": "4b5f44c951ef5f0c58592fe12557908b1d12774a20f22583755125d046fdb88a",
+  "completed_forward_fit_count": 1,
+  "service_steps_observed": 2,
+  "monthly_research_jobs": [
+    {
+      "month": "2026-10",
+      "status": "running"
+    }
+  ],
+  "provider_attempts_observed": 1,
+  "completed_provider_replies_observed": 0,
+  "provider_statuses": [
+    "started"
+  ],
   "forecast_count": 0,
-  "initial_step_in_progress": true,
-  "first_two_failed_runs_preserved": true,
-  "remaining_max_sessions": 2598,
-  "remaining_reserved_seconds": 18712800,
-  "remaining_reserved_steps": 311880,
+  "cpu_cores_max": 1,
+  "memory_mib_max": 768,
+  "work_lease_seconds": 300,
+  "training_window_days": 90,
+  "refit_interval_days": 15,
+  "daily_training_view_refresh": true,
   "model": "gpt-6-astra",
   "reasoning": "high",
-  "tests_rerun": false,
+  "knowledge_cutoff": null,
+  "original_stop_preserved": true,
+  "previous_failed_runs_preserved": true,
+  "previous_consumption": {
+    "S_seconds": 900,
+    "S_solve": 21,
+    "authority_seconds": 2100,
+    "authority_solve": 25,
+    "fits": 4,
+    "forward_seconds": 1200,
+    "forward_solve": 4,
+    "launches": 6,
+    "reserved_seconds": 36000,
+    "reserved_steps": 600,
+    "sessions": 5
+  },
+  "shared_monthly_remaining_ceiling": {
+    "solve": 1575,
+    "seconds": 5100
+  },
+  "later_fixed_slots_may_be_unfunded": true,
+  "remaining_max_sessions_before_current_start": 2594,
+  "original_end_at": "2027-05-03T00:00:00+00:00",
   "formal_acceptance": "CANCELLED_NOT_PASSED",
+  "tests_rerun": false,
   "verified_scientific_increment": false,
-  "startup_repairs": "Nine startup waits 10s to 60s; new external initializer uses absolute forward/feed paths."
+  "trading_execution": false,
+  "scope": "Operational snapshot only; requests, fits and iterations do not establish useful factors or sustained reliability."
 }

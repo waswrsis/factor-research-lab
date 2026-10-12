@@ -34,7 +34,7 @@ OBLIGATIONS = {
     'five_claim_A0_controller': 'library, three factor claims and algorithm through actual frozen A0 controller',
     'independent_truth_validation': 'independent selected-learner null/boundary/alternative truth bridge',
     'joint_error_and_power': 'predeclared mixed-truth FWER upper and alternative-power lower confidence bounds',
-    'shared_Linux_resources': 'actual shared cgroup CPU25/high640/max768/swap0/pids64 and deadlines',
+    'shared_Linux_resources': 'actual shared cgroup CPU100/high640/max768/swap0/pids64 and deadlines',
 }
 CLAIMS = ('library_skill', 'factor1', 'factor2', 'factor3', 'algorithm')
 

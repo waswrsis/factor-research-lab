@@ -233,7 +233,7 @@ def _resource(value, expected):
         raise ValueError('Independent resource attestation rejected')
     required = {'platform': 'linux', 'scope': 'whole_cgroup', 'oom': 0, 'oom_kill': 0,
                 'memory_max': 768 * 2**20, 'memory_high': 640 * 2**20,
-                'swap_max': 0, 'cpu_quota_fraction': .25}
+                'swap_max': 0, 'cpu_quota_fraction': 1.0}
     if any(type(value.get(k)) is not type(v) or value.get(k) != v for k, v in required.items()):
         raise ValueError('Linux resource contract mismatch')
     peak = value.get('memory_peak')
@@ -249,9 +249,9 @@ def _resource(value, expected):
 
 def workload_capacity(data, cutoff):
     return {'train_row_capacity': max(int(data.train_mask(f['fit_cutoff']).sum())
-                                     for f in development_folds(cutoff)),
+                                     for f in development_folds(cutoff, spec=data.spec)),
             'score_row_capacity': max(int(data.score_mask(f['fit_cutoff'], f['score_end'], f['score_end']).sum())
-                                     for f in development_folds(cutoff)),
+                                     for f in development_folds(cutoff, spec=data.spec)),
             'frame_row_capacity': len(data.frame.values), 'feature_capacity': data.frame.values.shape[1],
             'frame_byte_capacity': data.frame.values.nbytes}
 
@@ -315,7 +315,7 @@ def _verify_research_evidence(directory, data, cutoff, pool, gate_artifacts, *, 
                 or _stamp(row['started_at']) < _stamp(protocol['available_at'])):
             raise ValueError('Probe is not a protocol-frozen quarterly result')
         quarters.add((point.year, (point.month - 1) // 3))
-        for fold, frozen in zip(result['folds'], development_folds(point), strict=True):
+        for fold, frozen in zip(result['folds'], development_folds(point, spec=data.spec), strict=True):
             if (any(fold.get(k) != v for k, v in frozen.items())
                     or fold.get('pool_id') != pool.digest or fold.get('status') != 'scored'
                     or not fold.get('model_id') or not fold.get('reference_model_id')
@@ -334,7 +334,7 @@ def _verify_research_evidence(directory, data, cutoff, pool, gate_artifacts, *, 
             or _stamp(control['started_at']) < _stamp(protocol['available_at'])):
         raise ValueError('Missing actual known-component recovery probe')
     losses = []
-    for fold, frozen in zip(result['folds'], development_folds(control['context']['cutoff']), strict=True):
+    for fold, frozen in zip(result['folds'], development_folds(control['context']['cutoff'], spec=data.spec), strict=True):
         if (any(fold.get(k) != v for k, v in frozen.items())
                 or not fold.get('support_hash') or fold.get('score_rows', 0) < 1):
             raise ValueError('Known-component support mismatch')
@@ -548,7 +548,7 @@ def run_gated_residual(directory, data, cutoff, pool, gate_artifacts, *, source_
     key = fingerprint({'kind': 'residual', 'context': context, 'config': config.digest,
                        'gate_id': verified['gate_id'],
                        'data': [data.training_identity(f['fit_cutoff'])
-                                for f in development_folds(cutoff)]})
+                                for f in development_folds(cutoff, spec=data.spec)]})
 
     def produce(ledger):
         gate = NeuralGate(**{k: True for k in GATE_FIELDS},

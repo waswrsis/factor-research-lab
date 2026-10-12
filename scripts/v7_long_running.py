@@ -227,7 +227,24 @@ def _historical_outer_matches(job, seconds):
     from factorlab.discovery.work_lease import FrozenWorkLease
     outer = job['outer_clock']
     origin = FrozenWorkLease.from_dict(outer['issuer'])
-    return (job.get('version') == 2 and outer['seconds'] == seconds
+    restricted = 'service_restriction' in outer
+    required = {'issuer', 'seconds', 'wall_deadline', 'monotonic_deadline'}
+    if restricted:
+        required.update({'version', 'service_restriction'})
+    if set(outer) != required:
+        return False
+    if restricted:
+        from factorlab.discovery.forward_service_scope import verify_historical_service_reference
+        restriction = outer['service_restriction']
+        if (outer.get('version') != 'original-S-service-restriction-v1'
+                or project_path(restriction['directory']).parents[1] != project_path(job['exposure_path']).parent):
+            return False
+        verify_historical_service_reference(restriction)
+    elif any((project_path(job['exposure_path']).parent / 'service').glob('*/native-clock.json')):
+        return False
+    return (job.get('version') == (3 if restricted else 2)
+            and type(outer['seconds']) is int and outer['seconds'] == seconds
+            and job['reserved_at'] == origin.wall_started_at
             and outer['monotonic_deadline'] == origin.monotonic_started + seconds
             and stamp(outer['wall_deadline']) == stamp(origin.wall_started_at) + pd.Timedelta(seconds=seconds)
             and job['deadline'] == outer['wall_deadline'])
@@ -266,15 +283,21 @@ def inherited_research_months(plan, core, observed, *, include_anchors=False):
                 raise ValueError('Inherited research job/month integrity failure')
             job_path = project_path(state['job_path'])
             job = _enveloped(job_path)
-            cutoff = pd.Timestamp(month + '-01', tz='UTC')
+            month_begin = pd.Timestamp(month + '-01', tz='UTC')
+            cutoff = stamp(job['cutoff'])
+            valid_cutoff = (cutoff == month_begin if runtime['identity']['rolling']['window_days'] is None
+                            else month_begin <= cutoff < month_begin + pd.DateOffset(months=1))
+            expected_start = cutoff - (pd.DateOffset(months=6) if job['rolling']['window_days'] is None
+                                       else pd.Timedelta(days=180)) - pd.Timedelta(hours=1234)
             if (job_path != autonomous / 'jobs' / month / 'job.json' or job['month'] != month
-                    or stamp(job['cutoff']) != cutoff or cutoff > stamp(observed)
+                    or not valid_cutoff or cutoff > stamp(observed)
                     or fingerprint(job) != state['job_hash'] or job['source_files'] != core
                     or job['feed_id'] != identity['feed_id']
                     or project_path(job['feed_directory']) != project_path(plan.feed_directory)
                     or project_path(job['run_directory']) != autonomous / 'research_run'
                     or project_path(job['exposure_path']) != forward / 'exposure.sqlite'
                     or fingerprint(job['rolling']) != fingerprint(runtime['identity']['rolling'])
+                    or stamp(job['snapshot_start']) != expected_start
                     or not cutoff <= stamp(job['reserved_at']) <= stamp(observed)
                     or not _historical_outer_matches(job, identity['config']['deadline_seconds'])
                     or fingerprint(job['config']) != fingerprint(identity['config'])
@@ -284,9 +307,12 @@ def inherited_research_months(plan, core, observed, *, include_anchors=False):
             if state.get('outcome') is not None:
                 attempt = state['attempts'][-1]
                 result = _enveloped(job_path.parent / f'outcome-{attempt["number"]}.json')
+                effective_deadline = min(stamp(job['deadline']), stamp(job['outer_clock'].get(
+                    'service_restriction', {'wall_deadline': job['deadline']})['wall_deadline']))
                 if (result != state['outcome'] or result['job_hash'] != state['job_hash']
                         or result['token'] != attempt['token']
-                        or (result['status'] == 'complete' and stamp(result['finished_at']) > stamp(job['deadline']))):
+                        or result['attempt'] != attempt['number']
+                        or (result['status'] == 'complete' and stamp(result['finished_at']) > effective_deadline)):
                     raise ValueError('Inherited research result differs from saved attempt receipt')
             elif state['status'] == 'complete':
                 raise ValueError('Inherited completed research has no retained outcome')
@@ -931,7 +957,7 @@ def unit_template(directory, *, clock=now):
         'Type=exec', 'WorkingDirectory=' + working_directory(root),
         'ExecStart=:' + ' '.join(map(quote, command)),  # ':' disables argv environment expansion.
         'ExecStopPost=:' + ' '.join(map(quote, postmortem)),
-        'CPUAccounting=yes', 'MemoryAccounting=yes', 'TasksAccounting=yes', 'CPUQuota=25%',
+        'CPUAccounting=yes', 'MemoryAccounting=yes', 'TasksAccounting=yes', 'CPUQuota=100%',
         'MemoryHigh=640M', 'MemoryMax=768M', 'MemorySwapMax=0', 'TasksMax=64',
         f'RuntimeMaxSec={seconds}', 'Restart=no', 'KillMode=control-group', 'TimeoutStopSec=20',
         'NoNewPrivileges=yes', 'UMask=0077', 'StandardOutput=journal', 'StandardError=journal',

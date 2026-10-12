@@ -2,7 +2,7 @@
 
 # Linux安装：完整程序就位，服务保持关闭
 
-对应 `v7-startup60-2026-10-12`，仓库 `waswrsis/factor-research-lab`。源码、依赖与配置已安装，原服务器后续按用户授权启动；第三方安装默认保持关闭。[原安装摘要](INSTALLATION_SUMMARY.json)与[启动快照](STARTUP_STATUS.json)分别记录当时状态，不代表完整科研验收。剩余前向/GPT对照已取消，不能记成通过。
+对应 `v7-rolling-cpu1-2026-10-12`，仓库 `waswrsis/factor-research-lab`。源码、依赖与配置已安装，原服务器后续按用户授权启动；第三方安装默认保持关闭。[原安装摘要](INSTALLATION_SUMMARY.json)与[启动快照](STARTUP_STATUS.json)分别记录当时状态，不代表完整科研验收。剩余前向/GPT对照已取消，不能记成通过。
 
 ## 环境与源码
 
@@ -11,25 +11,25 @@
 从仓库固定tag获取（tag发布后可用）：
 
 ```sh
-git clone --branch v7-startup60-2026-10-12 --depth 1 https://github.com/waswrsis/factor-research-lab.git factor-research-lab
+git clone --branch v7-rolling-cpu1-2026-10-12 --depth 1 https://github.com/waswrsis/factor-research-lab.git factor-research-lab
 cd factor-research-lab
 ```
 
-或从同一Release下载 `source-core-startup60.tar`、`SHA256SUMS`、源包manifest和安装指南。对照Release公布的校验值；校验文件本身须来自可信发布位置，而非未知第三方。
+或从同一Release下载 `source-core-rolling-cpu1.tar`、`SHA256SUMS`、源包manifest和安装指南。对照Release公布的校验值；校验文件本身须来自可信发布位置，而非未知第三方。
 
 ```sh
-curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-startup60-2026-10-12/source-core-startup60.tar
-curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-startup60-2026-10-12/SHA256SUMS
+curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-rolling-cpu1-2026-10-12/source-core-rolling-cpu1.tar
+curl --fail --location --remote-name https://github.com/waswrsis/factor-research-lab/releases/download/v7-rolling-cpu1-2026-10-12/SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS
 ```
 
-core tar SHA-256为 `e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e`，4,669,440字节、234文件。至少确认该tar的校验行显示OK；不能把跳过缺少附件当作全部附件验证。源包map hash `fa03298ebf22ece7182896c9a3e56b8ae334d091cb3d38a1830419c656c390ff` 与研究身份 `aeeecdec7b6d3ec1d9b827612d85cd97a7ddbc4e09ada42608a22d0a58592887` 含义不同：前者覆盖打包记录，后者覆盖220项研究资产。
+core tar SHA-256为 `927baff95d80441ccc13441c0f93448a9ad6ee8d1dbde797b67ce5939034ce56`，4,669,440字节、234文件。至少确认该tar的校验行显示OK；不能把跳过缺少附件当作全部附件验证。源包map hash `f5842afbf3b21f859d8d4f998918305ca993bf606b9da92392aaa23cb6502ce6` 与研究身份 `4b5f44c951ef5f0c58592fe12557908b1d12774a20f22583755125d046fdb88a` 含义不同：前者覆盖打包记录，后者覆盖220项研究资产。
 
 推荐用固定tag中已经审阅的 `scripts/v7_linux_bootstrap.sh` 做纯包验证和安全解包。其 `verify`/`unpack` 不安装服务；目标目录必须尚不存在，父目录须存在。
 
 ```sh
-python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh verify --package /path/to/source-core-startup60.tar --sha256 e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e
-python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh unpack --package /path/to/source-core-startup60.tar --sha256 e36736b653cd32e130b1d4bc334b515a1403d09e79a95f3d4b84261aa28c4a1e --workspace /absolute/new-workspace
+python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh verify --package /path/to/source-core-rolling-cpu1.tar --sha256 927baff95d80441ccc13441c0f93448a9ad6ee8d1dbde797b67ce5939034ce56
+python3.12 /path/to/tag-checkout/scripts/v7_linux_bootstrap.sh unpack --package /path/to/source-core-rolling-cpu1.tar --sha256 927baff95d80441ccc13441c0f93448a9ad6ee8d1dbde797b67ce5939034ce56 --workspace /absolute/new-workspace
 cd /absolute/new-workspace
 ```
 
@@ -67,3 +67,5 @@ python3.12 -m venv .venv
 首次激活需另行授权，使用自己的真实feed、明确的新配置、source身份和额度冻结；历史样本导入不能伪装实时收件，首次实际数据就绪才确定锚点。研究模式为90日训练窗、15经过日拟合、每日视图刷新；分钟轮询处理小时闭合数据，12小时标签真实成熟后才结算。UTC自然月额度不因安装或重启重发。服务资源安排须核验实际systemd/cgroup，不以配置文本代替运行证据。
 
 模型为gpt-6-astra/high，认证由操作员自行管理，不随包发布；知识截止日期未知。项目不执行交易，旧校准未通过，不声称可靠alpha或完整算法统计功效。Windows首次获取uv的步骤仍不完整，封存fixture缺省仅限制历史验收复现。
+
+当前运行配置使用最多1逻辑CPU核、768MiB内存；CPU25%的旧验收资料不能充作这个配置的完整验收。首次连续90日训练在真实导入后启动，研究cutoff按实际调度时刻冻结。forward_directory与feed_directory须是规范绝对路径。失败尝试及其预付额度保留；本版本保守地在所有月份扣除前驱已消费的forward4solve/1200秒和S21solve/900秒，实际共享月上限1575solve/5100秒，部分后续研究槽可能因额度不足跳过。原安装Release保留；新版实际状态见STARTUP_STATUS.json，不声称有可靠alpha。

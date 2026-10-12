@@ -322,6 +322,15 @@ def current_service_reference():
 
 
 def verify_service_reference(value, *, _verify_source=True):
+    return _verify_service_reference(value, _verify_source=_verify_source, historical=False)
+
+
+def verify_historical_service_reference(value):
+    """Read durable original evidence only; grants no live execution authority."""
+    return _verify_service_reference(value, _verify_source=True, historical=True)
+
+
+def _verify_service_reference(value, *, _verify_source, historical):
     # Read-only restriction usable by the original issuer/direct child. It
     # reconstructs the original service chain; no runtime/service is created.
     import sqlite3
@@ -380,6 +389,8 @@ def verify_service_reference(value, *, _verify_source=True):
         raise ValueError('Research cannot extend its original service deadline')
     ceiling=SimpleNamespace(**{**original.to_dict(),'wall_deadline':value['wall_deadline'],
                               'monotonic_deadline':value['monotonic_deadline']})
+    if historical:
+        return ceiling  # All immutable mirrors/chain checked above; never renew the clock.
     observation=_observe(ceiling)
     checked=_evaluate(ceiling,observation)
     # This is read-only restriction inspection, including neural grandchildren.

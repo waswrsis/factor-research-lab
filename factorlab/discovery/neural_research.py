@@ -168,7 +168,7 @@ def _evaluate(data, cutoff, recipe, *, symbols, directory, budget, fit, artifici
             or not symbols or len(symbols) > 3 or len(set(symbols)) != len(symbols)
             or any(not isinstance(s, str) or not s for s in symbols)):
         raise ValueError('Research input/protocol/universe differs from its full recipe')
-    _, cutoff = calendar_window(cutoff)
+    _, cutoff = recipe.rolling_spec.window(cutoff)
     data = causal_worker_data(data, cutoff)
     directory = project_path(directory)
     if directory.exists():
@@ -177,7 +177,7 @@ def _evaluate(data, cutoff, recipe, *, symbols, directory, budget, fit, artifici
     manifest = {'version': 'v7-complete-neural-S-research-v1', 'role': 'S',
         'cutoff': cutoff.isoformat(), 'recipe': recipe.to_dict(), 'pipeline_id': recipe.pipeline_id,
         'symbols': list(symbols), 'input_id': input_data_identity(data, cutoff),
-        'folds': list(development_folds(cutoff)), 'capacity': capacity, 'test_only': artificial,
+        'folds': list(development_folds(cutoff, spec=recipe.rolling_spec)), 'capacity': capacity, 'test_only': artificial,
         'evidence_status': 'exposed_development_only', 'automatic_adoption': False, 'formal_claim': False}
     immutable_record(directory / 'manifest.json', manifest)
     folds = []

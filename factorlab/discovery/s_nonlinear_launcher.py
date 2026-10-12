@@ -150,7 +150,7 @@ def _research_result(ticket, data, recipe):
         assert_replayed(result['prediction_replay'], replay, roundoff=True)
     else:
         probe, positive = result['probe'], result['positive_control']
-        expected = list(development_folds(cutoff))
+        expected = list(development_folds(cutoff, spec=recipe.rolling_spec))
         if probe.get('status') != 'completed' or len(probe['folds']) != 3 or len(positive['folds']) != 3:
             raise ValueError('Quarterly producer must complete all fixed cold folds and controls')
         if (positive.get('scope') != 'fixed_S_known_component_recovery_diagnostic'
