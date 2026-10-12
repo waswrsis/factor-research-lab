@@ -1,10 +1,10 @@
 {
-  "as_of_utc": "2026-10-12T10:28:38.018651+00:00",
+  "as_of_utc": "2026-10-12T10:30:10.375508+00:00",
   "status": "RESEARCH_SERVICE_RUNNING_S_STARTED",
   "active_state": "active",
   "source_hash": "4b5f44c951ef5f0c58592fe12557908b1d12774a20f22583755125d046fdb88a",
   "completed_forward_fit_count": 1,
-  "service_steps_observed": 2,
+  "service_steps_observed": 3,
   "monthly_research_jobs": [
     {
       "month": "2026-10",
@@ -12,9 +12,9 @@
     }
   ],
   "provider_attempts_observed": 1,
-  "completed_provider_replies_observed": 0,
+  "completed_provider_replies_observed": 1,
   "provider_statuses": [
-    "started"
+    "completed"
   ],
   "forecast_count": 0,
   "cpu_cores_max": 1,
