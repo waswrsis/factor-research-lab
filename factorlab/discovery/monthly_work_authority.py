@@ -25,6 +25,7 @@ from factorlab.protocol import fingerprint, project_path
 
 from .evidence import file_hash, snapshot_source, source_paths
 from .monthly_partition_policy import canonical_policy
+from .monthly_partition_policy import predecessor_debit
 from .monthly_partition_policy import charge as charge_partition
 from .monthly_partition_policy import route as allocation_route
 from .v7_storage import immutable_record
@@ -370,8 +371,9 @@ class MonthlyWorkAuthority:
                 for key in DEFAULT_LIMITS:
                     wallet['counts'][key] += record['counts'][key]
                 wallet['seconds'] += record['lease']['lease_seconds']
-                if (any(wallet['counts'][k] > self.limits[k] for k in self.limits)
-                        or wallet['seconds'] > self.manifest['monthly_seconds']):
+                ceiling = self._month_ceiling(month)
+                if (any(wallet['counts'][k] > ceiling['counts'][k] for k in self.limits)
+                        or wallet['seconds'] > ceiling['seconds']):
                     raise ValueError('Authority committed quota overflow')
                 if self.manifest['partition_policy'] is not None:
                     if allocation_route(self, record['work_key'], record['binding'], current=False,
@@ -417,8 +419,9 @@ class MonthlyWorkAuthority:
 
     def _validate_reserved(self, r):
         lease = FrozenWorkLease.from_dict(r['lease'])
+        ceiling = self._month_ceiling(r['actual_month'])
         if (r['authority_manifest_hash'] != self.manifest_hash or r['authority_directory'] != str(self.directory)
-                or r['limits'] != self.limits or r['status'] != 'reserved' or r['lease_hash'] != lease.digest
+                or r['limits'] != ceiling['counts'] or r['status'] != 'reserved' or r['lease_hash'] != lease.digest
                 or r['actual_month'] != lease.wall_started_at[:7]
                 or r['reservation_id'] != fingerprint({'authority': self.manifest_hash, 'work_key': r['work_key']})
                 or r['counts'] != _counts(r['counts']) or not any(r['counts'].values())
@@ -513,13 +516,14 @@ class MonthlyWorkAuthority:
             if verified['wallets'] and month < max(verified['wallets']):
                 raise ValueError('Actual work month moved backwards')
             wallet = verified['wallets'].get(month, {'counts': _counts({}), 'seconds': 0})
-            if (any(wallet['counts'][k] + counts[k] > self.limits[k] for k in self.limits)
-                    or wallet['seconds'] + lease_seconds > self.manifest['monthly_seconds']):
+            ceiling = self._month_ceiling(month)
+            if (any(wallet['counts'][k] + counts[k] > ceiling['counts'][k] for k in self.limits)
+                    or wallet['seconds'] + lease_seconds > ceiling['seconds']):
                 raise BudgetExhausted('Monthly prepaid work quota exhausted')
             record = {'reservation_id': fingerprint({'authority': self.manifest_hash, 'work_key': work_key}),
                       'work_key': work_key, 'authority_manifest_hash': self.manifest_hash,
                       'authority_directory': str(self.directory), 'actual_month': month,
-                      'binding': binding, 'limits': self.limits.copy(), 'counts': counts,
+                      'binding': binding, 'limits': ceiling['counts'].copy(), 'counts': counts,
                       'lease': lease.to_dict(), 'lease_hash': lease.digest}
             if self.manifest['partition_policy'] is not None:
                 # The complete wallet audit above has finished in this SAME
@@ -614,13 +618,27 @@ class MonthlyWorkAuthority:
             return {'authority_manifest_hash': self.manifest_hash, 'head': verified['head'],
                     'events': verified['sequence'], 'reservations': len(verified['reservations'])}
 
+    def _month_ceiling(self, month):
+        """Pure cap calculation; the database contains only this run's debits."""
+        _month(month)
+        debit = predecessor_debit(self.manifest['partition_policy'], month)
+        result = {'counts': {k: self.manifest['limits'][k] - debit['counts'][k] for k in DEFAULT_LIMITS},
+                  'seconds': self.manifest['monthly_seconds'] - debit['seconds']}
+        if result['seconds'] < 0 or any(value < 0 for value in result['counts'].values()):
+            raise ValueError('Predecessor debit exceeds original global ceiling')
+        return result
+
     def status(self, month):
         _month(month)
         with self._transaction() as db:
             verified = self._verify(db)
             wallet = verified['wallets'].get(month, {'counts': _counts({}), 'seconds': 0})
+            ceiling = self._month_ceiling(month)
             return {'actual_month': month, 'counts': wallet['counts'], 'reserved_seconds': wallet['seconds'],
-                    'limits': self.limits.copy(), 'monthly_seconds': self.manifest['monthly_seconds'],
+                    'limits': ceiling['counts'].copy(), 'monthly_seconds': ceiling['seconds'],
+                    'effective_limits': ceiling['counts'].copy(), 'effective_monthly_seconds': ceiling['seconds'],
+                    'full_limits': self.limits.copy(), 'full_monthly_seconds': self.manifest['monthly_seconds'],
+                    'predecessor_debit': predecessor_debit(self.manifest['partition_policy'], month),
                     'head': verified['head'], 'authority_manifest_hash': self.manifest_hash,
                     'partition_policy': self.manifest['partition_policy'],
                     'partitions': {k.split('|', 1)[1]: v for k, v in verified['partitions'].items() if k.startswith(month+'|')},

@@ -5,6 +5,7 @@ Not yet wired into CLI or the combined campaign service.
 from __future__ import annotations
 
 import ctypes
+import inspect
 import json
 import os
 import runpy
@@ -22,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lease_enforcer as base
 
 from factorlab import protocol
-from factorlab.discovery.monthly_work_authority import MonthlyWorkAuthority
+from factorlab.discovery.monthly_work_authority import MonthlyWorkAuthority, BudgetExhausted
 from factorlab.discovery.s_outer_context import SOuterContext
 from factorlab.discovery.work_lease import FrozenWorkLease, _boot_id
 
@@ -35,6 +36,87 @@ def _write(path,value):
 
 def _copy(value):
     return json.loads(json.dumps(value, allow_nan=False))
+
+
+def _reservation_request(value, lease):
+    """Canonical pre-reserve inputs; normalization grants no work or allowance."""
+    from factorlab.discovery import monthly_work_authority as wallet
+    if type(value) is not dict or set(value) != {'work_key', 'counts', 'binding', 'lease_seconds', 'retry_id'}:
+        raise ValueError('Incomplete original reservation request')
+    work_key = wallet._text(value['work_key'], 'work_key')
+    counts, binding = wallet._counts(value['counts']), wallet._object(value['binding'], 'binding')
+    if value['retry_id'] is not None:
+        wallet._text(value['retry_id'], 'retry_id')
+    seconds = value['lease_seconds']
+    if (not any(counts.values()) or type(seconds) is not int or not 1 <= seconds <= 300
+            or seconds != lease.lease_seconds):
+        raise ValueError('Original reservation counts or lease changed')
+    return {'work_key': work_key, 'counts': counts, 'binding': binding,
+            'lease_seconds': seconds, 'retry_id': value['retry_id']}
+
+
+def _verify_unfunded(scope, pending, error_message, issuer):
+    """Independent read-only proof of actual canonical quota refusal."""
+    from factorlab.discovery import monthly_work_authority as wallet
+    lease = FrozenWorkLease.from_dict(pending['lease'])
+    request = _reservation_request(pending['request'], lease)
+    if (request != pending['request'] or lease.parent_pid != issuer.pid
+            or lease.parent_created != issuer.create_time()
+            or {'directory': pending['authority_directory'],
+                'manifest_hash': pending['authority_manifest_hash']} != scope['authority']):
+        raise ValueError('Unfunded request changed its watched issuer or wallet')
+    _clock(scope['clock'])
+    check, _ = base._lease_check(lease, issuer, None)
+    if not check.allowed:
+        raise TimeoutError('Original unfunded work ' + check.reason)
+    authority = base._authority(pending['authority_directory'])
+    if authority.manifest_hash != pending['authority_manifest_hash']:
+        raise ValueError('Unfunded authority manifest changed')
+    _role(scope, {**request, 'lease': lease.to_dict()})
+    reason = None
+    canonical_reasons = {'Monthly prepaid work quota exhausted'}
+    if authority.manifest['partition_policy'] is not None:
+        canonical_reasons.update('Nontransferable monthly ' + lane + ' quota exhausted'
+                                 for lane in authority.manifest['partition_policy']['lanes'])
+    if error_message not in canonical_reasons:
+        raise ValueError('Unregistered canonical quota exception')
+    with authority._transaction() as db:
+        verified = authority._verify(db)
+        if any(row['work_key'] == request['work_key'] for row in verified['reservations'].values()):
+            raise ValueError('A reserved work cannot close as unfunded')
+        month = lease.wall_started_at[:7]
+        if verified['wallets'] and month < max(verified['wallets']):
+            raise ValueError('Unfunded request moved its work month backwards')
+        ceiling = (authority._month_ceiling(month) if hasattr(authority, '_month_ceiling') else
+                   {'counts': authority.limits, 'seconds': authority.manifest['monthly_seconds']})
+        current = verified['wallets'].get(month, {'counts': wallet._counts({}), 'seconds': 0})
+        if (any(current['counts'][key] + request['counts'][key] > ceiling['counts'][key]
+                for key in ceiling['counts'])
+                or current['seconds'] + request['lease_seconds'] > ceiling['seconds']):
+            reason = 'Monthly prepaid work quota exhausted'
+        elif authority.manifest['partition_policy'] is not None:
+            with authority._identity_read_scope(db):
+                allocation = wallet.allocation_route(authority, request['work_key'], request['binding'],
+                    current=True, lease=lease, debit=request['counts'])
+            try:
+                wallet.charge_partition(authority.manifest['partition_policy'],
+                    _copy(verified['partitions']), _copy(verified['owners']), month,
+                    allocation, request['counts'], request['lease_seconds'])
+            except BudgetExhausted as error:
+                if type(error) is not BudgetExhausted:
+                    raise
+                reason = str(error)
+        # Another owned producer can consume more allowance after the original
+        # refusal. The first failing quota may change; no allowance can return.
+        if reason is None:
+            raise ValueError('Canonical wallet does not prove this quota refusal')
+    if scope != _scope(scope['reference'], base._identity(issuer)):
+        raise ValueError('Outer authorization changed during unfunded verification')
+    _clock(scope['clock'])
+    check, _ = base._lease_check(lease, issuer, None)
+    if not check.allowed:
+        raise TimeoutError('Late unfunded acknowledgement')
+    return reason
 
 
 def _campaign_platform():
@@ -224,6 +306,7 @@ class IssuerScope:
         result=base._read(path)
         if result['scope_hash'] != self.scope['scope_hash']:
             raise ValueError('Acknowledgement changed original scope')
+        return result
 
     @contextmanager
     def installed(self, authority):
@@ -252,11 +335,41 @@ class IssuerScope:
             if (type(lease) is not FrozenWorkLease or lease.parent_pid!=os.getpid()
                     or lease.parent_created!=psutil.Process().create_time()):
                 raise ValueError('Original reservation belongs to another issuer')
+            bound = inspect.signature(original).bind(*args, **kwargs).arguments
+            request = _reservation_request({key: value for key, value in bound.items() if key != 'lease'}, lease)
             path=self.directory/'work'/str(self.sequence)
-            _write(path/'pending.json',{'lease':lease.to_dict(),'authority_directory':str(authority.directory),
-                'authority_manifest_hash':authority.manifest_hash})
-            self._wait(path/'watching.json',self.scope['clock'])
-            record=original(*args,**kwargs)
+            pending = {'lease':lease.to_dict(),'authority_directory':str(authority.directory),
+                'authority_manifest_hash':authority.manifest_hash, 'request': request}
+            _write(path/'pending.json', pending)
+            watching = self._wait(path/'watching.json',self.scope['clock'])
+            if watching != {'scope_hash': self.scope['scope_hash'], 'pending_hash': protocol.fingerprint(pending)}:
+                raise ValueError('Guard did not watch the original reservation request')
+            try:
+                record=original(*args,**kwargs)
+            except BudgetExhausted as error:
+                if type(error) is not BudgetExhausted:
+                    raise
+                lease.assert_parent_alive()
+                _clock(self.scope['clock'])
+                if any((path/name).exists() for name in ('arm.json', 'armed.json', 'done.json', 'released.json')):
+                    raise ValueError('Unfunded request conflicts with prepaid work') from error
+                refused = {'pending_hash': protocol.fingerprint(pending),
+                           'exception_type': 'canonical_wallet_budget_exhausted', 'reason': str(error)}
+                _write(path/'unfunded.json', refused)
+                acknowledged = self._wait(path/'unfunded_ack.json', self.scope['clock'])
+                quota_reason = acknowledged.get('quota_reason')
+                quota_reasons = {'Monthly prepaid work quota exhausted'}
+                if authority.manifest['partition_policy'] is not None:
+                    quota_reasons.update('Nontransferable monthly ' + lane + ' quota exhausted'
+                                         for lane in authority.manifest['partition_policy']['lanes'])
+                if acknowledged != {'scope_hash': self.scope['scope_hash'],
+                        'pending_hash': refused['pending_hash'], 'lease_hash': lease.digest,
+                        'closure': 'unfunded_no_reservation', 'quota_reason': quota_reason} or quota_reason not in quota_reasons:
+                    raise ValueError('Unfunded acknowledgement changed original request') from error
+                lease.assert_parent_alive()
+                _clock(self.scope['clock'])
+                self.sequence += 1
+                raise
             self.current=record
             if record['lease']!=lease.to_dict() or record['status'] not in {'reserved','running'}:
                 raise ValueError('Original prepayment differs from the already watched clock')
@@ -323,6 +436,7 @@ def supervise(script, arguments, *, directory, source_root, _ownership=None, _ac
     _write(directory/'request.json',request)
     boundary=_ownership if borrowed else (base._WindowsJob() if os.name=='nt' else base._LinuxService())
     worker=psutil.Process(_actor['pid']) if borrowed else None; active=None; scope=None; record=None; authority=None; sequence=0
+    active_pending_hash=None
     scope_index=0; idle_clock=None; seen_scopes=set(); total_works=0; scope_ready=False
     stop=threading.Event(); closing=threading.Event(); failed=[]; lock=threading.Lock()
     start=time.monotonic(); status='failed'; reason='startup'; observation=None
@@ -391,17 +505,54 @@ def supervise(script, arguments, *, directory, source_root, _ownership=None, _ac
                     path=root/'work'/str(sequence)
                     if active is None and (path/'pending.json').exists():
                         pending=base._read(path/'pending.json');lease=FrozenWorkLease.from_dict(pending['lease'])
-                        if (lease.parent_pid!=issuer.pid or lease.parent_created!=issuer.create_time()
+                        if (set(pending) != {'lease', 'authority_directory', 'authority_manifest_hash', 'request'}
+                                or _reservation_request(pending['request'], lease) != pending['request']
+                                or lease.parent_pid!=issuer.pid or lease.parent_created!=issuer.create_time()
                                 or {'directory':pending['authority_directory'],'manifest_hash':pending['authority_manifest_hash']}!=scope['authority']):
                             raise ValueError('Pre-reserve clock belongs to another original issuer/wallet')
                         with lock:active=lease
-                        _write(path/'watching.json',{'scope_hash':scope['scope_hash']})
+                        active_pending_hash=protocol.fingerprint(pending)
+                        _write(path/'watching.json',{'scope_hash':scope['scope_hash'],
+                            'pending_hash':active_pending_hash})
+                    if active is not None and (path/'unfunded.json').exists():
+                        refused = base._read(path/'unfunded.json')
+                        pending = base._read(path/'pending.json')
+                        if (set(refused) != {'pending_hash', 'exception_type', 'reason'}
+                                or refused['pending_hash'] != protocol.fingerprint(pending)
+                                or refused['pending_hash'] != active_pending_hash
+                                or refused['exception_type'] != 'canonical_wallet_budget_exhausted'
+                                or pending['lease'] != active.to_dict()
+                                or any((path/name).exists() for name in
+                                       ('arm.json', 'armed.json', 'done.json', 'released.json'))):
+                            raise ValueError('Unfunded closure conflicts with original pending work')
+                        quota_reason = _verify_unfunded(scope, pending, refused['reason'], issuer)
+                        if (base._read(path/'pending.json') != pending
+                                or base._read(path/'unfunded.json') != refused
+                                or any((path/name).exists() for name in
+                                       ('arm.json', 'armed.json', 'done.json', 'released.json'))):
+                            raise ValueError('Unfunded closure changed during canonical verification')
+                        _write(path/'unfunded_ack.json', {'scope_hash': scope['scope_hash'],
+                            'pending_hash': refused['pending_hash'], 'lease_hash': active.digest,
+                            'closure': 'unfunded_no_reservation', 'quota_reason': quota_reason})
+                        _clock(scope['clock'])
+                        check, observation = base._lease_check(active, issuer, None)
+                        if not check.allowed:
+                            raise TimeoutError('Unfunded acknowledgement exceeded original lease')
+                        with lock:active=None
+                        active_pending_hash=None
+                        sequence += 1
                     if active is not None and not (path/'armed.json').exists() and (path/'arm.json').exists():
                         arm=base._read(path/'arm.json');lease=active
                         authority=base._authority(arm['authority_directory']);record=authority.get(arm['reservation_id'])
                         if (record['lease']!=arm['lease'] or record['lease']!=active.to_dict() or record['status'] not in {'reserved','running'}
                                 or scope['authority']!={'directory':str(authority.directory),'manifest_hash':authority.manifest_hash}
                                 or arm['authority_manifest_hash']!=authority.manifest_hash):raise ValueError('Original wallet differs')
+                        pending = base._read(path/'pending.json')
+                        if (protocol.fingerprint(pending) != active_pending_hash
+                                or pending['lease'] != active.to_dict()
+                                or any(record[key] != pending['request'][key] for key in ('work_key', 'counts', 'binding'))
+                                or (path/'unfunded.json').exists() or (path/'unfunded_ack.json').exists()):
+                            raise ValueError('Prepayment changed its original request or conflicts with refusal')
                         _role(scope,record)
                         # Both original clocks stay watched. The effective
                         # deadline is their minimum; never rewrite a signed
@@ -419,6 +570,7 @@ def supervise(script, arguments, *, directory, source_root, _ownership=None, _ac
                         # Only known released work leaves the watchdog set. The
                         # immutable outer remains active across all work gaps.
                         with lock:active=None
+                        active_pending_hash=None
                         _write(path/'released.json',{'scope_hash':scope['scope_hash']})
                         sequence+=1
                     if (root/'done.json').exists():

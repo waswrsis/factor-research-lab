@@ -567,6 +567,32 @@ class ResearchScheduler:
             if not busy:
                 state = self._load(current_month)
                 if state is None:
+                    # A refused baseline cannot be resumed: do not create its
+                    # immutable preparation/job until original capacity exists.
+                    # This is advisory only; the canonical locked reservation
+                    # still checks the actual lease month before any paid work.
+                    actual_month = pd.Timestamp.now(tz='UTC').strftime('%Y-%m')
+                    wallet = self.authority.status(actual_month)
+                    baseline = next(slot for slot in self.schedule.to_dict()['slots']
+                                    if slot['key'] == 'baseline')
+                    required = baseline['counts']
+                    available = (wallet['reserved_seconds'] + baseline['seconds'] <= wallet['monthly_seconds']
+                                 and all(wallet['counts'][k] + required.get(k, 0) <= limit
+                                         for k, limit in wallet['limits'].items()))
+                    policy = wallet['partition_policy']
+                    if policy is not None:
+                        from .monthly_partition_policy import counts, lane_ceiling
+                        lane_name = ('S:' + self.config.research.search_mode
+                                     if self.config.research.budget_policy == 'controls_third' else 'S')
+                        lane = lane_ceiling(policy, actual_month, lane_name)
+                        used = wallet['partitions'].get(lane_name, {'counts': counts(), 'seconds': 0})
+                        available = (available and used['seconds'] + baseline['seconds'] <= lane['seconds']
+                                     and all(used['counts'][k] + required.get(k, 0) <= limit
+                                             for k, limit in lane['counts'].items()))
+                    if not available:
+                        return {'status': 'waiting_monthly_budget', 'actual_month': actual_month,
+                                'reason': 'original_baseline_capacity_unavailable',
+                                'actions': actions, 'A0_changed': False}
                     check_service_work(self.runtime,new_work=True)
                     if self.runtime.spec.window_days is not None:
                         from .v7_feed import SnapshotUnavailable

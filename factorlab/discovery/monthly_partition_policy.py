@@ -7,13 +7,14 @@ verify original immutable provenance without requiring a live old issuer.
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 from contextlib import closing
 
 from factorlab.protocol import fingerprint, project_path
 
 KINDS = ('ast', 'f', 'gpt_attempt', 'family', 'solve', 'neural_fit', 'epoch', 'tree_fit')
-VERSION = 'v7-monthly-partitions-v1'
+VERSION = 'v7-monthly-partitions-v2-month-bound-predecessor'
 
 
 def counts(**values):
@@ -24,17 +25,18 @@ def frozen_policy(mode):
     if mode not in ('standard', 'controls'):
         raise ValueError('Unknown frozen monthly allocation')
     if mode == 'standard':
-        lanes = {'S': {'counts': counts(ast=32, f=20, gpt_attempt=2, family=1, solve=482), 'seconds': 1020}}
+        lanes = {'S': {'counts': counts(ast=96, f=24, gpt_attempt=6, family=3, solve=943), 'seconds': 3480}}
     else:
         lanes = {f'S:{arm}': {'counts': counts(ast=32, f=8, gpt_attempt=2, family=1, solve=337), 'seconds': 1440}
                  for arm in ('local', 'random', 'gpt')}
     lanes.update(nonlinear={'counts': counts(solve=240, neural_fit=12, epoch=48, tree_fit=3), 'seconds': 900},
-                 forward={'counts': counts(solve=411 if mode == 'standard' else 349, neural_fit=6, epoch=132),
-                          'seconds': 1020 if mode == 'standard' else 1980})
+                 forward={'counts': counts(solve=417 if mode == 'standard' else 349, neural_fit=6, epoch=132),
+                          'seconds': 2820 if mode == 'standard' else 1980})
     return {'version': VERSION, 'mode': mode, 'lanes': lanes, 'unused_transfer': False,
             'owner_rule': 'actual_month_unique_S_run_or_controls_members_and_single_forward_runtime',
-            'predecessor_consumption': ({'S': {'counts': counts(ast=64, f=4, gpt_attempt=4, family=2, solve=461), 'seconds': 2460},
-                                        'forward': {'counts': counts(solve=6), 'seconds': 1800}}
+            'predecessor_debit_month': '2026-10' if mode == 'standard' else None,
+            'predecessor_consumption': ({'S': {'counts': counts(ast=96, f=7, gpt_attempt=6, family=3, solve=696), 'seconds': 3330},
+                                        'forward': {'counts': counts(solve=7), 'seconds': 2100}}
                                        if mode == 'standard' else {})}
 
 
@@ -47,6 +49,35 @@ def canonical_policy(value):
     if not isinstance(value, str) and value != expected:
         raise ValueError('Frozen monthly partition policy cannot change')
     return expected
+
+
+def predecessor_debit(policy, month, *, lane=None):
+    """Original failed work remains consumed only in its actual UTC month."""
+    if type(month) is not str or re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])', month) is None:
+        raise ValueError('Invalid actual UTC quota month')
+    policy = canonical_policy(policy)
+    if policy is not None and lane is not None and lane not in policy['lanes']:
+        raise ValueError('Unknown frozen partition')
+    if policy is None or month != policy['predecessor_debit_month']:
+        return {'counts': counts(), 'seconds': 0}
+    debits = policy['predecessor_consumption']
+    selected = debits.values() if lane is None else [debits.get(lane, {'counts': counts(), 'seconds': 0})]
+    selected = list(selected)
+    return {'counts': {k: sum(value['counts'][k] for value in selected) for k in KINDS},
+            'seconds': sum(value['seconds'] for value in selected)}
+
+
+def lane_ceiling(policy, month, lane):
+    """Full lane ceiling less the immutable same-month predecessor debit."""
+    policy = canonical_policy(policy)
+    if policy is None or lane not in policy['lanes']:
+        raise ValueError('Unknown frozen partition')
+    full, debit = policy['lanes'][lane], predecessor_debit(policy, month, lane=lane)
+    result = {'counts': {k: full['counts'][k] - debit['counts'][k] for k in KINDS},
+              'seconds': full['seconds'] - debit['seconds']}
+    if result['seconds'] < 0 or any(value < 0 for value in result['counts'].values()):
+        raise ValueError('Predecessor debit exceeds original lane ceiling')
+    return result
 
 
 def read(path, wrapper=None):
@@ -438,7 +469,7 @@ def charge(policy, partitions, owners, month, allocation, debit, seconds):
         raise ValueError('Unknown frozen partition')
     lane_key = month+'|'+lane
     old = partitions.get(lane_key, {'counts': counts(), 'seconds': 0})
-    limit = policy['lanes'][lane]
+    limit = lane_ceiling(policy, month, lane)
     new = {'counts': {k: old['counts'][k]+debit[k] for k in KINDS}, 'seconds': old['seconds']+seconds}
     if any(new['counts'][k] > limit['counts'][k] for k in KINDS) or new['seconds'] > limit['seconds']:
         from .monthly_work_authority import BudgetExhausted

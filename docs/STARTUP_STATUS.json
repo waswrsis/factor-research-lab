@@ -1,68 +1,58 @@
 {
-  "at_utc": "2026-10-12T11:25:45.337354+00:00",
-  "research_source_hash": "e463f6d03fb89039e9843c27a02145f2780190fb638197d33b1a5f77a965c868",
+  "at_utc": "2026-10-12T11:45:27.805981+00:00",
+  "scope": "actual_short_runtime_observation_not_full_acceptance",
+  "source_hash": "8d4ad94f54b8560545c5647f922f16e32143c2b219b721198db73ea923d683e3",
+  "namespace": "layered-research-quota-final10",
   "service": {
-    "ActiveState": "failed",
-    "CPUUsageNSec": "444375140000",
-    "ControlGroup": "",
-    "MainPID": "0",
-    "MemoryCurrent": "[not set]",
-    "Result": "signal",
-    "SubState": "failed",
-    "TasksCurrent": "[not set]"
+    "ActiveState": "active",
+    "CPUUsageNSec": "132190439000",
+    "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/frv7cpuone.slice/fr-layered-research-quota-final10.service",
+    "MainPID": "1058797",
+    "MemoryCurrent": "320753664",
+    "Result": "success",
+    "SubState": "running",
+    "TasksCurrent": "10"
   },
-  "status": "FAILED_UNFUNDED_PENDING_REUSE",
+  "cpu_cores": 1,
+  "memory_max_mib": 768,
+  "continuous_steps": 3,
+  "campaign_terminal": null,
+  "failure_causes": {},
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "fit_receipts": 1,
+  "actual_fit_solve": 1,
+  "actual_prepaid_seconds": 300,
   "forecast_count": 0,
-  "completed_forward_fit_count": 1,
-  "provider_response_count": 1,
-  "candidate_evaluations_completed": 3,
-  "candidate_work_observations": [
-    {
-      "candidate": [
-        "0",
-        "0"
-      ],
-      "started_at": "2026-10-12T11:20:46.730632+00:00",
-      "completed_at": "2026-10-12T11:21:41.424549+00:00",
-      "seconds": 54.693917,
-      "cold_solve_count": 15,
-      "original_deadline_seconds": 90
-    },
-    {
-      "candidate": [
-        "0",
-        "1"
-      ],
-      "started_at": "2026-10-12T11:21:53.973210+00:00",
-      "completed_at": "2026-10-12T11:22:42.840049+00:00",
-      "seconds": 48.866839,
-      "cold_solve_count": 15,
-      "original_deadline_seconds": 90
-    },
-    {
-      "candidate": [
-        "0",
-        "2"
-      ],
-      "started_at": "2026-10-12T11:22:50.580093+00:00",
-      "completed_at": "2026-10-12T11:23:29.639186+00:00",
-      "seconds": 39.059093,
-      "cold_solve_count": 15,
-      "original_deadline_seconds": 90
-    }
+  "provider_calls_this_version": 0,
+  "research_jobs": 0,
+  "research_capacity_state": "waiting_for_next_UTC_month",
+  "scheduler_return_by_frozen_code": "waiting_monthly_budget",
+  "scheduler_return_persisted": false,
+  "reason": "October S has only150 prepaid seconds available; original baseline requires300. AST/GPT/family allowances are also exhausted.",
+  "model_publication": "verified_waiting_for_next_actual_feed_receipt",
+  "prior_run": "prefix-final09 completed three candidate evaluations then failed in quota-refusal handshake",
+  "prior_candidate_seconds": [
+    54.693917,
+    48.866839,
+    39.059093
   ],
-  "prior_timeout_point_passed": true,
-  "sustained_reliability_proven": false,
-  "qualification_status": "P3_P4_CANCELLED_NOT_PASSED",
-  "whole_agent_power_certificate": false,
-  "failed_predecessors_preserved": true,
-  "original_deadlines_preserved": true,
-  "tests_run": 0,
-  "limits": {
-    "CPU_cores": 1,
-    "memory_MiB": 768
+  "prior_results_are_development_only": true,
+  "month_bound_predecessor_debit": {
+    "month": "2026-10",
+    "solve": 703,
+    "seconds": 5430
   },
-  "not_scientific_validation": true,
-  "repair_complete": false,
-  "failure_at_utc": "2026-10-12T11:25:01+00:00"
+  "November_effective_ceiling": {
+    "solve": 1600,
+    "seconds": 7200
+  },
+  "tests_run_this_repair": 0,
+  "review": "syntax and static cross-review; actual authorized operation observed",
+  "P3_P4": "CANCELLED_NOT_PASSED",
+  "full_research_round_verified_this_version": false,
+  "reliable_alpha_proven": false,
+  "whole_algorithm_power_certificate": false,
+  "unknown_model_knowledge_cutoff": true,
+  "end_at": "2027-05-03T00:00:00+00:00",
+  "old_sources_results_STOP_and_prepaid_consumption_preserved": true
 }

@@ -25,3 +25,5 @@
 
 
 后续更新（11:26 UTC）：三个候选完成后，11:25 UTC跳过未获得额度的family时，multiwork预付款握手未释放原pending序号，下一次reserve复用了work/5/pending.json，FileExistsError使原尝试终止。没有新reservation被该失败握手扣款；仍需修復未获得额度的预付款闭环，不能宣称整轮成功。
+
+第三轮修复（quota-final10）：unfunded请求保持原监视，只有canonical BudgetExhausted才进入不可变拒绝/ack握手；监督者独立确认无reservation并复算实际UTC月不足，双方ack后递增序号。基线容量不足在创建job前返回waiting_monthly_budget。月度政策恢复完整原上限，旧费用只扣实际2026-10。源身份为`8d4ad94f54b8560545c5647f922f16e32143c2b219b721198db73ea923d683e3`。静态交叉审阅与语法解析完成，没有运行测试套件；完整研究轮尚未在本版运行验证，下一次实际研究受剩余额度约束。

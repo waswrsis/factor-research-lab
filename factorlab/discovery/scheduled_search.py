@@ -88,10 +88,8 @@ def validate_schedule_authority(authority, schedule):
         lane = 'S:'+body['config']['search_mode'] if mode == 'controls' else 'S'
         if policy is None or policy['mode'] != mode or lane not in policy['lanes']:
             raise ValueError('Allocation table requires the exact authoritative monthly partition policy')
-        prepaid = policy.get('predecessor_consumption', {}).get(lane, {'counts': {}, 'seconds': 0})
-        original_counts = {k: v + prepaid['counts'].get(k, 0) for k, v in policy['lanes'][lane]['counts'].items()}
-        if (body['allocated_counts'] != original_counts
-                or body['reserved_seconds'] != policy['lanes'][lane]['seconds'] + prepaid['seconds']):
+        if (body['allocated_counts'] != policy['lanes'][lane]['counts']
+                or body['reserved_seconds'] != policy['lanes'][lane]['seconds']):
             raise ValueError('Allocation table requires the exact authoritative monthly partition policy')
     return body
 
