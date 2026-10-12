@@ -38,11 +38,13 @@ def formula_identity(program: dict, lookback=48):
 
 
 class _ScalarProfileCache:
-    """Fit-local LRU of parameter-independent scalar vectors, never windows.
+    """Fit-local bounded LRU of scalar vectors and exact aligned outputs.
 
     Keys include the exact clipped input bytes, shape, dtype, program identity
     and node path. Changed inputs cannot reuse earlier data. All support and
-    parameter checks still execute normally. This cache never contains labels,
+    parameter checks still execute normally. Aligned-output keys additionally
+    bind validated parameter values and full frame metadata. No windows are
+    stored. This cache never contains labels,
     fitted coefficients or a solver result and grants no budget exemption.
     """
     def __init__(self, max_bytes=8 * 1024 * 1024, max_entries=4096):
@@ -261,6 +263,14 @@ def execute_formula(program: dict, frame: FactorFrame, *, lookback=48, parameter
         except (TypeError, ValueError, KeyError):
             # Unsupported metadata retains the original evaluator/error path.
             frame_key = None
+    aligned_key = (('aligned-output-v1', frame_key, fingerprint(theta))
+                   if frame_key is not None else None)
+    if aligned_key is not None:
+        cached = _scalar_cache.get(aligned_key)
+        if cached is not None:
+            # Return ownership to the caller: later masks or mutations cannot
+            # change the fit-local cache. No fitted model or solve is reused.
+            return cached.copy()
     covered = frame_key is not None and _features_covered(program, plan)
     for positions in metadata.groupby('symbol', sort=False).groups.values():
         positions = np.asarray(positions)
@@ -297,4 +307,6 @@ def execute_formula(program: dict, frame: FactorFrame, *, lookback=48, parameter
                     result = _execute(program, inputs, theta, scalar_cache=_scalar_cache,
                                       cache_namespace=cache_namespace, cache_input_key=input_key)
                     output[destinations] = result
+    if aligned_key is not None:
+        _scalar_cache.put(aligned_key, output)
     return output

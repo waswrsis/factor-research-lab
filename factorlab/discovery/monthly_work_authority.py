@@ -39,6 +39,26 @@ VERSION = 'monthly-work-authority-v2'
 # Only recursive immutable-identity reads may use this active verification stack.
 # This is not a cached wallet result and never replaces explicit verify/get/status.
 _IDENTITY_READ_SCOPE = ContextVar('monthly_authority_identity_read_scope', default=None)
+_CHARGE_READ_SCOPE = ContextVar('monthly_authority_charge_read_scope', default=None)
+
+
+def _charge_scope(authority):
+    """Only the live, same-thread locked debit may reuse its verified inventory."""
+    scope = _CHARGE_READ_SCOPE.get()
+    if scope is None:
+        return None
+    if not scope['active'] or scope['thread'] != get_ident():
+        raise ValueError('Expired or foreign-thread authority charge read')
+    owner = scope['authority']
+    if (authority.database != owner.database or authority.directory != owner.directory
+            or authority.index_path != owner.index_path
+            or authority.manifest_hash != scope['manifest_hash']
+            or fingerprint(authority.manifest) != scope['manifest_hash']
+            or authority.limits != scope['limits']
+            or _database_identity(owner, scope['db']) != scope['database_identity']
+            or scope['db'].total_changes != scope['total_changes']):
+        raise ValueError('Locked authority charge identity or database changed')
+    return scope
 
 
 def _database_identity(authority, db):
@@ -69,8 +89,11 @@ def _nested_identity_read(authority):
             or authority.manifest_hash != owner.manifest_hash
             or authority.manifest != owner.manifest or authority.limits != owner.limits):
         raise ValueError('Nested authority immutable identity changed')
-    owner._verify_identity()
-    authority._verify_identity()
+    # The charge scope checks all source/identity bytes at its entry and exit.
+    # Ordinary verification retains its original recursive identity checks.
+    if _charge_scope(authority) is None:
+        owner._verify_identity()
+        authority._verify_identity()
     return True
 
 
@@ -193,6 +216,8 @@ class MonthlyWorkAuthority:
 
     @contextmanager
     def _transaction(self):
+        if _CHARGE_READ_SCOPE.get() is not None:
+            raise ValueError('No new authority transaction during a locked charge read')
         # mode=rw prevents sqlite's otherwise automatic missing-file recreation.
         if not self.database.is_file():
             raise ValueError('Authority database missing; prepaid work cannot be reset')
@@ -207,6 +232,52 @@ class MonthlyWorkAuthority:
             raise
         finally:
             db.close()
+
+    @contextmanager
+    def _charge_read_scope(self):
+        """Fresh locked inventory with full entry/exit audits for one debit."""
+        import sys
+        from .work_authority_bridge import AuthorityWorkBudget
+        # contextlib.__enter__ advances this generator on the original caller.
+        caller = sys._getframe(2)
+        budget = caller.f_locals.get('self')
+        if (caller.f_code is not AuthorityWorkBudget._charge.__code__
+                or type(budget) is not AuthorityWorkBudget
+                or budget.bridge.authority is not self or not budget.bridge._lock.is_locked
+                or _CHARGE_READ_SCOPE.get() is not None):
+            raise ValueError('Only the original locked bridge debit may share authority reads')
+        with self._transaction() as db:
+            self._verify_identity()
+            scope = {'authority': self, 'db': db, 'thread': get_ident(), 'active': True,
+                     'database_identity': _database_identity(self, db),
+                     'manifest_hash': self.manifest_hash, 'limits': self.limits.copy(),
+                     'total_changes': db.total_changes, 'verified': None}
+            identity_token = _IDENTITY_READ_SCOPE.set(scope)
+            charge_token = _CHARGE_READ_SCOPE.set(scope)
+            try:
+                scope['verified'] = self._verify_rows(db)
+                yield
+            finally:
+                try:
+                    try:
+                        _charge_scope(self)
+                        if (scope['verified'] is not None
+                                and self._verify_rows(db) != scope['verified']):
+                            raise ValueError('Authority ledger changed during a locked bridge debit')
+                    finally:
+                        self._verify_identity()
+                finally:
+                    scope['active'] = False
+                    _CHARGE_READ_SCOPE.reset(charge_token)
+                    _IDENTITY_READ_SCOPE.reset(identity_token)
+
+    def _charge_inventory(self):
+        scope = _charge_scope(self)
+        if scope is None:
+            return None
+        if scope['verified'] is None:
+            raise ValueError('Authority inventory is not verified yet')
+        return json.loads(_json(scope['verified']))
 
     def _verify_identity(self):
         if (self.manifest.get('version') != VERSION or 'partition_policy' not in self.manifest
@@ -357,6 +428,8 @@ class MonthlyWorkAuthority:
             raise ValueError('Completion outside original lease')
 
     def _commit_event(self, db, verified, record, kind):
+        if _CHARGE_READ_SCOPE.get() is not None:
+            raise ValueError('Authority mutation is forbidden during a locked charge read')
         seq = verified['sequence'] + 1
         body = {'seq': seq, 'previous': verified['head'], 'authority_manifest_hash': self.manifest_hash,
                 'kind': kind, 'reservation': record}
@@ -505,6 +578,11 @@ class MonthlyWorkAuthority:
 
     def get(self, reservation_id):
         """Verified read only; completed work does not require a still-live issuer."""
+        verified = self._charge_inventory()
+        if verified is not None:
+            if reservation_id not in verified['reservations']:
+                raise ValueError('Unknown authority reservation')
+            return verified['reservations'][reservation_id]
         with self._transaction() as db:
             verified = self._verify(db)
             if reservation_id not in verified['reservations']:
@@ -512,6 +590,10 @@ class MonthlyWorkAuthority:
             return verified['reservations'][reservation_id]
 
     def verify(self):
+        verified = self._charge_inventory()
+        if verified is not None:
+            return {'authority_manifest_hash': self.manifest_hash, 'head': verified['head'],
+                    'events': verified['sequence'], 'reservations': len(verified['reservations'])}
         with self._transaction() as db:
             verified = self._verify(db)
             return {'authority_manifest_hash': self.manifest_hash, 'head': verified['head'],

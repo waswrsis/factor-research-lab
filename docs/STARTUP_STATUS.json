@@ -1,56 +1,33 @@
 {
-  "as_of_utc": "2026-10-12T10:30:10.375508+00:00",
-  "status": "RESEARCH_SERVICE_RUNNING_S_STARTED",
-  "active_state": "active",
-  "source_hash": "4b5f44c951ef5f0c58592fe12557908b1d12774a20f22583755125d046fdb88a",
-  "completed_forward_fit_count": 1,
-  "service_steps_observed": 3,
-  "monthly_research_jobs": [
-    {
-      "month": "2026-10",
-      "status": "running"
-    }
-  ],
-  "provider_attempts_observed": 1,
-  "completed_provider_replies_observed": 1,
-  "provider_statuses": [
-    "completed"
-  ],
+  "at_utc": "2026-10-12T10:55:48.827471+00:00",
+  "research_source_hash": "52e7871e17b8716d936812817f6e20eb000f033ca09ea9b2802dc2cbd96dd480",
+  "service": {
+    "ActiveState": "active",
+    "CPUUsageNSec": "131974221000",
+    "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/frv7cpuone.slice/fr-layered-research-charge-final08.service",
+    "MainPID": "1051859",
+    "MemoryCurrent": "483995648",
+    "Result": "success",
+    "SubState": "running",
+    "TasksCurrent": "15"
+  },
   "forecast_count": 0,
-  "cpu_cores_max": 1,
-  "memory_mib_max": 768,
-  "work_lease_seconds": 300,
-  "training_window_days": 90,
-  "refit_interval_days": 15,
-  "daily_training_view_refresh": true,
-  "model": "gpt-6-astra",
-  "reasoning": "high",
-  "knowledge_cutoff": null,
-  "original_stop_preserved": true,
-  "previous_failed_runs_preserved": true,
-  "previous_consumption": {
-    "S_seconds": 900,
-    "S_solve": 21,
-    "authority_seconds": 2100,
-    "authority_solve": 25,
-    "fits": 4,
-    "forward_seconds": 1200,
-    "forward_solve": 4,
-    "launches": 6,
-    "reserved_seconds": 36000,
-    "reserved_steps": 600,
-    "sessions": 5
+  "completed_forward_fit_count": 1,
+  "provider_response_count": 0,
+  "candidate_evaluations_completed": 0,
+  "sustained_reliability_proven": false,
+  "qualification_status": "P3_P4_CANCELLED_NOT_PASSED",
+  "failed_predecessor_preserved": true,
+  "original_deadlines_preserved": true,
+  "tests_run": 0,
+  "limits": {
+    "CPU_cores": 1,
+    "memory_MiB": 768
   },
-  "shared_monthly_remaining_ceiling": {
-    "solve": 1575,
-    "seconds": 5100
-  },
-  "later_fixed_slots_may_be_unfunded": true,
-  "remaining_max_sessions_before_current_start": 2594,
-  "original_end_at": "2027-05-03T00:00:00+00:00",
-  "formal_acceptance": "CANCELLED_NOT_PASSED",
-  "tests_rerun": false,
-  "verified_scientific_increment": false,
-  "trading_execution": false,
-  "scope": "Operational snapshot only; requests, fits and iterations do not establish useful factors or sustained reliability."
+  "fixes": [
+    "fresh locked debit verification scope",
+    "bounded aligned scalar formula cache",
+    "consumed job settlement after whole-tree exit"
+  ],
+  "not_scientific_validation": true
 }

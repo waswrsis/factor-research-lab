@@ -175,9 +175,11 @@ class WorkAuthorityBridge:
         # Use the authority's own verifier ONCE for a consistent inventory.
         # Its get() per reservation would reverify the full wallet N times.
         # No writes, repair or counter grants are performed in this transaction.
-        with self.authority._transaction() as db:
-            records = self.authority._verify(db)['reservations'].values()
-            records = _copy(list(records))
+        verified = self.authority._charge_inventory()
+        if verified is None:
+            with self.authority._transaction() as db:
+                verified = self.authority._verify(db)
+        records = _copy(list(verified['reservations'].values()))
         return {r['reservation_id']: r for r in records
                 if r['binding'].get('bridge_id') == self.identifier}
 
@@ -452,11 +454,15 @@ class AuthorityWorkBudget(DurableBudget):
 
     def _charge(self, operation, args):
         try:
-            self.check_time()
             with self.bridge._lock:
-                self.bridge._reload()
-                self.bridge._append(self.record, operation, args)
-            self.check_time()
+                with self.bridge.authority._charge_read_scope():
+                    self.check_time()
+                    self.bridge._reload()
+                    self.bridge._append(self.record, operation, args)
+                    self.check_time()
+                # Source verification and transaction exit also consume the
+                # original lease; no numerical work may start after that tail.
+                self.lease.assert_parent_alive()
         except LocalQuotaExhausted:
             self._closed = True
             raise

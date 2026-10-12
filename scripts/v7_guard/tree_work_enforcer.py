@@ -309,13 +309,82 @@ def _postmortem_boundary(value):
         raise ValueError('Original postmortem cgroup changed during unit inspection')
 
 
+def _settle_stopped_jobs(root, plan, issuers):
+    """Close stale flags only after all original owned issuers are proven dead.
+
+    Retain the complete before/after state in a recoverable immutable intent;
+    never remove an attempt, fabricate an outcome or grant another execution.
+    """
+    autonomous = protocol.project_path(plan.forward_directory) / 'autonomous'
+    database = autonomous / 'scheduler.sqlite'
+    if not database.is_file():
+        return []
+    marker = root / 'scheduler_settlement.json'
+    with FileLock(str(autonomous / '.lock'), timeout=0):
+        db = sqlite3.connect(database.as_uri() + '?mode=rw', uri=True)
+        try:
+            db.execute('BEGIN IMMEDIATE')
+            if marker.exists():
+                settlement = base._read(marker)
+                if set(settlement) != {'changes', 'new_work_permission'} or settlement['new_work_permission'] is not False:
+                    raise ValueError('Stopped scheduler settlement identity changed')
+                changes = settlement['changes']
+            else:
+                changes = []
+                for month, raw, digest in db.execute('SELECT month,value,hash FROM jobs ORDER BY month'):
+                    before = json.loads(raw)
+                    if protocol.fingerprint(before) != digest or before['month'] != month:
+                        raise ValueError('Stopped scheduler checkpoint changed')
+                    attempts = before['attempts']
+                    process = attempts[-1].get('process') if attempts else None
+                    if (before['status'] not in {'running', 'interrupted'} or process is None
+                            or (process['pid'], process['created']) not in issuers):
+                        continue
+                    if not _original_dead({k: process[k] for k in ('pid', 'created')}):
+                        raise ValueError('Cannot settle a live original research issuer')
+                    after = {**before, 'status': 'interrupted_consumed',
+                             'stop_reason': 'whole_tree_guard_consumed'}
+                    changes.append({'month': month, 'before': before, 'after': after})
+                multi._write(marker, {'changes': changes, 'new_work_permission': False})
+            for item in changes:
+                if set(item) != {'month', 'before', 'after'} or item['before']['month'] != item['month']:
+                    raise ValueError('Stopped scheduler settlement month changed')
+                before = item['before']
+                attempts = before['attempts']
+                process = attempts[-1].get('process') if attempts else None
+                if (before['status'] not in {'running', 'interrupted'} or process is None
+                        or (process['pid'], process['created']) not in issuers
+                        or not _original_dead({k: process[k] for k in ('pid', 'created')})
+                        or item['after'] != {**before, 'status': 'interrupted_consumed',
+                                             'stop_reason': 'whole_tree_guard_consumed'}):
+                    raise ValueError('Stopped scheduler settlement cannot reset original attempts')
+                if sum(r['month'] == item['month'] for r in changes) != 1:
+                    raise ValueError('Duplicate stopped scheduler settlement month')
+                row = db.execute('SELECT value,hash FROM jobs WHERE month=?', (item['month'],)).fetchone()
+                if row is None or protocol.fingerprint(json.loads(row[0])) != row[1]:
+                    raise ValueError('Stopped scheduler settlement lost its checkpoint')
+                current = json.loads(row[0])
+                if current not in (item['before'], item['after']):
+                    raise ValueError('Stopped scheduler settlement cannot overwrite another state')
+                db.execute('UPDATE jobs SET value=?,hash=? WHERE month=?',
+                           (json.dumps(item['after'], sort_keys=True),
+                            protocol.fingerprint(item['after']), item['month']))
+            db.commit()
+            return [{'month': item['month'], 'status': item['after']['status']} for item in changes]
+        except BaseException:
+            db.rollback()
+            raise
+        finally:
+            db.close()
+
+
 def postmortem(directory, guard_directory):
     """Terminalize a stopped original attempt without returning any allowance.
 
     Source/campaign/boundary/issuer evidence is re-read each invocation. The
     frozen intent permits finishing partial accounting after I/O failure;
     canonical wallet recover is idempotent. Historical scheduler attempts stay
-    intact; their original running flag is diagnostic, never new permission.
+    intact; dead owned attempts receive a consumed status, never new permission.
     """
     directory = protocol.project_path(directory)
     root = protocol.project_path(guard_directory)
@@ -381,7 +450,13 @@ def postmortem(directory, guard_directory):
             if any(intent[k] != v for k, v in fixed.items()):
                 raise ValueError('Postmortem original charged evidence changed')
         else:
-            intent = {**fixed, 'original_active_step': state['active_step']}
+            intent = {**fixed, 'original_active_step': state['active_step'],
+                      'expired_owned_work_deadlines': [
+                          {'reservation_id': rid, 'work_key': row['work_key'],
+                           'deadline': row['lease']['wall_deadline']}
+                          for rid, row in owned.items()
+                          if row['status'] in {'reserved', 'running'}
+                          and datetime.now(UTC) >= datetime.fromisoformat(row['lease']['wall_deadline'])]}
             multi._write(intent_path, intent)
         for rid, row in owned.items():
             if row['status'] in {'reserved', 'running'}:
@@ -413,13 +488,17 @@ def postmortem(directory, guard_directory):
             store.close()
         with authority._transaction() as db:
             final_work = authority._verify(db)['reservations']
+        settled_jobs = _settle_stopped_jobs(root, plan, issuers)
         result = {'version': 'whole-tree-postmortem-v1', 'intent_hash': intent_hash,
                   'terminal': campaign.inspect_campaign(directory)['terminal'],
                   'work_status_hash': protocol.fingerprint(
                       {rid: final_work[rid]['status'] for rid in owned}),
                   'owned_work_count': len(owned),
                   'new_work_permission': False, 'refunds': False,
-                  'scheduler_attempts_preserved': True}
+                  'scheduler_attempts_preserved': True,
+                  'research_jobs_settled': settled_jobs,
+                  'expired_owned_work_deadlines': intent['expired_owned_work_deadlines'],
+                  'expiry_is_diagnostic_not_original_exception': True}
         output = root/'postmortem.json'
         if output.exists():
             if base._read(output) != result:
