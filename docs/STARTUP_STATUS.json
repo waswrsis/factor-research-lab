@@ -1,20 +1,20 @@
 {
-  "at_utc": "2026-10-12T10:55:48.827471+00:00",
+  "at_utc": "2026-10-12T11:00:04.259886+00:00",
   "research_source_hash": "52e7871e17b8716d936812817f6e20eb000f033ca09ea9b2802dc2cbd96dd480",
   "service": {
     "ActiveState": "active",
-    "CPUUsageNSec": "131974221000",
+    "CPUUsageNSec": "358782111000",
     "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/frv7cpuone.slice/fr-layered-research-charge-final08.service",
     "MainPID": "1051859",
-    "MemoryCurrent": "483995648",
+    "MemoryCurrent": "618287104",
     "Result": "success",
     "SubState": "running",
     "TasksCurrent": "15"
   },
   "forecast_count": 0,
   "completed_forward_fit_count": 1,
-  "provider_response_count": 0,
-  "candidate_evaluations_completed": 0,
+  "provider_response_count": 1,
+  "candidate_evaluations_completed": 1,
   "sustained_reliability_proven": false,
   "qualification_status": "P3_P4_CANCELLED_NOT_PASSED",
   "failed_predecessor_preserved": true,
@@ -29,5 +29,15 @@
     "bounded aligned scalar formula cache",
     "consumed job settlement after whole-tree exit"
   ],
-  "not_scientific_validation": true
+  "not_scientific_validation": true,
+  "candidate_observation_at": "2026-10-12T10:59:02.786903+00:00",
+  "candidate_work_observations": [
+    {
+      "started_at": "2026-10-12T10:57:34.105446+00:00",
+      "completed_at": "2026-10-12T10:58:51.363929+00:00",
+      "seconds": 77.258483,
+      "cold_solve_count": 15
+    }
+  ],
+  "whole_agent_power_certificate": false
 }
