@@ -1,0 +1,20 @@
+{
+  "backend": "codex",
+  "max_attempts": 3,
+  "max_jobs": 96,
+  "max_validation_batches": 3,
+  "deadline_seconds": 7200,
+  "research": {
+    "symbols": ["BTCUSDT"],
+    "search_mode": "gpt",
+    "formulas_per_family": 8,
+    "lookback": 48,
+    "profile_candidates": 6,
+    "research_seconds": 7200,
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "formal_confirmation_enabled": false,
+    "evaluation_mode": "joint",
+    "nonlinear_mode": "isolated"
+  }
+}

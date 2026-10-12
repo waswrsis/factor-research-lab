@@ -1,0 +1,205 @@
+V7 Linux CPU package and operations recipe — 2026-10-05 audit revision
+
+Current release note (2026-10-12): this dated package recipe is not the final
+P6 deployment bundle. Its original prepared/pending statements describe that
+revision; current actual acceptance and remaining work are listed in README.
+Use the final Release-specific source, CPU dependency and evidence manifests.
+
+Status and scope
+These files prepare a new Linux workspace. They do not deploy, stop an old job,
+install a service, download data, call GPT, or claim Linux resource acceptance.
+The bootstrap subcommand explicitly installs wheels only when an operator runs it.
+The package/tests were prepared locally on Windows. Linux systemd, cgroup, wheel
+installation and numeric expf equivalence must still be verified on the target.
+Do not resume long80 under this source identity. A new workspace and new run are
+mandatory; an already existing extraction destination is refused.
+
+Runtime and pinned dependency provenance
+Target: CPython 3.12, Linux x86_64, glibc >= 2.28, cgroup v2 and systemd.
+The requirements file pins the eight requested CPU packages plus ten transitive
+runtime dependencies to versions read from D:/FactorResearch/.venv on 2026-10-04.
+It contains no Torch, CUDA, Qlib, MLflow or legacy training dependency tree.
+pyproject.toml and uv.lock are packaged unchanged because V7 source identity and
+snapshot_source include them. DO NOT install them, run uv sync, or pip install -e.
+Bootstrap creates a fresh workspace/.venv and installs only the dedicated CPU list
+with --only-binary=:all: --no-deps; pip check must pass. A missing wheel, dependency
+or Python venv capability is a hard failure, not authorization for source builds,
+sudo, OS package changes, global installs, upgrades or relaxed version pins.
+
+Official release file inventories checked (no wheels downloaded during preparation):
+https://pypi.org/project/numpy/1.26.4/#files
+https://pypi.org/project/pandas/2.2.3/#files
+https://pypi.org/project/scipy/1.15.3/#files
+https://pypi.org/project/scikit-learn/1.7.2/#files
+https://pypi.org/project/pyarrow/23.0.1/#files
+https://pypi.org/project/filelock/3.29.7/#files
+https://pypi.org/project/requests/2.34.2/#files
+https://pypi.org/project/psutil/7.2.2/#files
+The numeric libraries list CPython 3.12 manylinux x86_64 wheels; PyArrow sets the
+highest inspected glibc floor, 2.28. Platform-independent packages use pure wheels.
+This is availability metadata, not a completed dependency installation. Bootstrap
+saves pip's install report with wheel URL/hash and a hash of that report, actual
+installed distribution versions, Python/platform and source hash in runtime/.
+The pins freeze versions, not every platform artifact; use those receipts when
+reviewing the actual Linux wheel/environment identity before accepting any run.
+
+Source package contract
+scripts/v7_linux_bootstrap.sh is a shell/Python polyglot: run with sh on Linux or
+the explicit project Python on Windows. V7_PYTHON may name an existing 3.12 binary.
+It uses only the Python standard library before bootstrap. It never downloads Python.
+
+The exact source allowlist is all regular factorlab/**/*.py plus:
+AGENTS.md, pyproject.toml, uv.lock, config/discovery_v7_local.json,
+config/discovery_v7_gpt.json, config/v7-linux-requirements.txt,
+config/v7-linux-neural-requirements.txt, config/v7-linux-neural-lock.json,
+scripts/v7_linux_bootstrap.sh, this document, docs/V7_RUNTIME_GUIDE.txt,
+config/v7_service_pilot.json, config/v7_autonomous_pilot.json,
+config/discovery_v7_full_gpt.json and config/v7_autonomous_full.json,
+scripts/v7_public_fetch.py, scripts/v7_long_running.py and docs/V7_LONG_RUNNING.txt.
+Also included are scripts/v7_guard/{lease_enforcer,multiwork_enforcer,
+tree_work_enforcer,guarded_runtime,campaign_guard_entry}.py and the owned
+tools/linux_full_path/linux_production_path.py plus its README.txt.
+No credentials/authentication directory, .env, data, old runs, outputs, work,
+tests, virtual environment, cache or third-party checkout is included.
+Every selected file has a byte count and SHA-256 in V7_PACKAGE_MANIFEST.json.
+The canonical file table has a source_hash; the completed deterministic plain tar
+has a separate SHA-256 recorded beside it. Finalize source BEFORE packing.
+Never package a live source tree while another process is changing its modules.
+Run identity now also covers all present runtime helper scripts above. Keep them
+alongside core code: changing or deleting one requires a new run identity.
+
+Windows packaging (no network):
+  . ./scripts/Enter-Research.ps1 -Quiet
+  .venv/Scripts/python.exe -B scripts/v7_linux_bootstrap.sh pack --source D:/FactorResearch --output D:/FactorResearch/work/v7_implementation_20261004/v7-cpu-source.tar
+Read the emitted .tar.sha256.json. Transfer the tar and its expected hash through
+the operator's normal reviewed channel. An expected hash from an untrusted archive
+does not authenticate it: obtain the expected hash from the source packaging receipt.
+
+Target verification and extraction (replace placeholders explicitly):
+  python3.12 /path/to/reviewed/v7_linux_bootstrap.sh verify --package /path/to/v7-cpu-source.tar --sha256 EXPECTED_SHA256
+  python3.12 /path/to/reviewed/v7_linux_bootstrap.sh unpack --package /path/to/v7-cpu-source.tar --sha256 EXPECTED_SHA256 --workspace /home/plague/factorresearch-regression/workspaces/research-v7-NEW
+Parent workspace directory must already exist. Existing target directories, links,
+absolute/member traversal paths, duplicate entries, symlinks, hardlinks, devices,
+out-of-allowlist members and oversized content are rejected. The extractor verifies
+all content before writing and writes regular files explicitly, never extractall.
+An interrupted new extraction may be incomplete; preserve it for inspection and
+choose a new workspace. There is no cleanup/delete/overwrite fallback.
+
+Preflight and installation
+The verified old unit is fr-regression-active.service under --scope user. Its
+ExecStart identifies /tools/long80/supervise_iteration.py pilot; the service name
+itself does not contain long80. Recheck this exact identity from operations receipts. The check requires
+LoadState=loaded and ActiveState=inactive or failed; active/transitional/unknown,
+wrong name, unavailable systemd, under 4 GiB free disk, wrong platform or modified
+package content stop the operation. It never kills or disables the old service.
+The operator must ensure the old service cannot be independently restarted during
+the new pilot; this read-only preflight is not an atomic cross-service lock.
+
+If a loaded inactive transient no longer exposes ExecStart, the guard additionally
+requires --old-service-receipt /absolute/path/to/frozen-old-service.json. This is
+an operator-captured receipt from the earlier read-only systemctl inspection:
+exact fields unit, scope, exec_start and sha256. The sha256 is over canonical JSON
+of the first three fields (sorted keys, separators comma/colon, UTF-8). Unit must
+equal fr-regression-active.service, scope user, and exec_start must identify the
+verified /tools/long80/supervise_iteration.py supervisor. Preserve the original
+operations evidence alongside this immutable receipt; a self-authored hash alone
+does not authenticate a historical service. Pass the receipt also when generating
+the service template so its startup guard uses the same frozen identity.
+This option NEVER bypasses loaded/inactive checks: active services remain refused,
+and LoadState=not-found is never accepted, including with a receipt.
+
+  cd /home/plague/factorresearch-regression/workspaces/research-v7-NEW
+  python3.12 scripts/v7_linux_bootstrap.sh preflight --workspace "$PWD" --old-unit fr-regression-active.service --scope user
+  python3.12 scripts/v7_linux_bootstrap.sh bootstrap --workspace "$PWD" --old-unit fr-regression-active.service --scope user
+
+All project environment/cache/temp paths are under this new workspace: .venv,
+.cache, tmp and runtime. Python user-site and bytecode are disabled; numerical
+thread counts are one. Existing Codex authentication is not copied into the tar
+and bootstrap neither installs nor authenticates a proposer. Linux's workspace root
+is the equivalent of the project's D-drive containment, using FACTOR_RESEARCH_ROOT.
+Installation uses a bounded 1200-second pip timeout; installation itself is not
+claimed as a shared-cgroup runtime test. Apply the same operator-approved resource
+scope when running it if the server's administrative envelope requires that.
+
+Resource-constrained service template
+Generate, inspect, and explicitly install a NEW unit through existing user service
+management; the script does not write ~/.config/systemd or call daemon-reload/start.
+The command following -- must use THIS workspace .venv/bin/python and the fixed
+whole-campaign guardian. Direct V7 CLI commands, including read-only inspect,
+are deliberately rejected by unit-template. First freeze the new campaign using
+the documented long-running controller; its campaign.json and campaign.sqlite
+must already exist, and its canonical whole_tree_guard directory must be unused.
+Generating a template does not authorize starting it before full acceptance.
+
+  .venv/bin/python scripts/v7_linux_bootstrap.sh unit-template --workspace "$PWD" --old-unit fr-regression-active.service --scope user -- "$PWD/.venv/bin/python" -B "$PWD/scripts/v7_guard/campaign_guard_entry.py" guard "$PWD/runs/NEW_V7_CAMPAIGN" "$PWD/runs/NEW_V7_CAMPAIGN/whole_tree_guard" > runtime/v7-pilot.service
+
+Template resource contract:
+CPUQuota=25%; MemoryHigh=640M; MemoryMax=768M; MemorySwapMax=0; TasksMax=64;
+CPU/Memory/TasksAccounting=yes; RuntimeMaxSec=7200; TimeoutStopSec=20;
+KillMode=control-group; Restart=no; NoNewPrivileges=yes; UMask=0077.
+The template contains no sudo, privilege escalation or resource-limit relaxation.
+Its guard-exec reruns preflight and rejects an effective cgroup CPU quota above
+25%, memory high/max above 640/768 MiB, nonzero swap allowance or pids above 64.
+Systemd user controllers must actually enforce these properties; a printed unit
+file alone is not evidence. If delegation is missing, stop and ask the operator
+to resolve it without widening the frozen resource envelope.
+
+Read-only resource receipt:
+  .venv/bin/python scripts/v7_linux_bootstrap.sh resources
+Run inside the service's cgroup. It records effective limits, memory.current,
+memory.peak, memory.events, cpu.stat and pids.current. ExecStopPost prints the same
+receipt to the journal before the cgroup disappears. Capture unit properties,
+journal output and exit status as evidence; a Windows working-set measurement
+cannot substitute for shared Linux cgroup memory (including proposer descendants).
+memory.events oom/oom_kill increments, timeout, resource rejection or incomplete
+output are failures/consumed attempts, never instructions to raise the limit.
+
+Target acceptance checklist (not yet performed here)
+1. Verify source tar/hash and unchanged installed-source manifest.
+2. Verify exact CPython 3.12 version, glibc, binary wheels, pip check, environment
+   receipt and Torch-free V7 import/program parsing. Preserve actual wheel hashes.
+3. Under the exact cgroup limits run tiny synthetic monthly/recovery checks, then
+   a bounded previously authorized development-data pilot using a NEW run identity.
+4. Verify shared memory peak/events, effective CPU/pids/swap, wall-clock stop,
+   descendant process termination and restart/read-only inspect evidence.
+5. Real GPT, new data ingestion or continuous forward operation need their own
+   explicit bounded acceptance; successful source packaging does not supply it.
+
+Optional longer campaign
+scripts/v7_long_running.py is separate from the two-hour pilot entry. Freeze an
+explicit finite plan using its init command, review status and unit-template,
+then install a NEW unit only after the bounded target acceptance above succeeds.
+See docs/V7_LONG_RUNNING.txt for cumulative prepaid budgets, source identity,
+monthly research anchors and STOP/recovery behavior. Its generated service uses
+the frozen campaign's remaining calendar time; inner sessions stay <=7200 seconds.
+The controller does not stop long80, create cgroups or install a service.
+
+Optional nonlinear research
+The default convex CPU environment omits Torch. A separate reviewed profile is
+now included: config/v7-linux-neural-requirements.txt and v7-linux-neural-lock.json.
+For a fresh dedicated workspace use bootstrap --neural to install that profile.
+This never starts training, modifies an existing environment or restarts services.
+It retains all original convex pins and adds the exact Torch 2.11.0+cpu Linux
+CPython 3.12 wheel, with the active dependencies and SHA256 for all 28 packages.
+Local downloaded wheel audit: 328165613 bytes compressed, no CUDA dependencies.
+Official upstream CPU index: https://download.pytorch.org/whl/cpu/torch/
+Other wheels were checked against their matching PyPI version JSON and metadata.
+Bootstrap validates the lock before creating the environment, installs binary
+wheels only with no dependency resolution and mandatory hashes, runs pip check,
+then checks CPU-only Torch/autograd in a separate process. Ordinary registry and
+service import smoke checks must still leave Torch out of their process.
+No actual Linux installation or cgroup workload acceptance is implied by this
+local wheel/package validation. Do not use Windows CUDA receipts as CPU receipts.
+
+Default nonlinear_mode is disabled; probes uses the CPU tree libraries. isolated requires two
+scheduled, genuinely completed quarterly evidence artifacts plus a real isolated
+workload receipt under the SAME cgroup, input dimensions and source identity.
+Missing Torch or resource evidence closes the channel, without changing pins or
+installing additional packages. Full neural forward recipes now have dedicated
+ticket, launcher, registry and independent complete-algorithm validation paths.
+The merged full-policy and fixed-estimand calibration paths are undergoing the
+unified audit and repair; genuine complete-grid statistical evidence is pending.
+See docs/V7_CONSTRUCTION_STATUS.txt for the current acceptance stage. S research outputs cannot
+enter A0 or count as market confirmation. The remote partial service stays stopped
+until full implementation, audit and acceptance.
+

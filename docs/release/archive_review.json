@@ -1,4 +1,5 @@
 {
+  "_historical_notice": {"version_scope": "Historical V6 portable archive, 2026-10-03 only", "not_current_v7_acceptance": true, "instruction": "Historical archive audit only. Not current V7 installation, deployment acceptance, or authorization for full pytest. Consult project README; final P6 release binding remains pending."},
   "reviewer": "full_migration_payload_audit",
   "status": "passed_archive_scope_and_sample_integrity",
   "archive": "factorresearch-portable-20261003-v1.zip",

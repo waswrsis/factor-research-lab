@@ -1,4 +1,7 @@
-# 从 GitHub Release 部署 FactorResearch
+# 历史 V6 Release 部署记录（2026-10-03）
+
+**本页只适用于下述旧 V6 包，不是当前 V7 的安装或上线步骤。** 不要把旧包的身份、锁文件改写、测试或研究启动命令用于当前V7源码。
+当前版本的完整 Release/实际部署尚待最终交付绑定；入口与状态见根目录 README.md、START_HERE.txt。以下旧版本包尺寸、摘要与执行记录保留原义。
 
 此指南对应公开仓库 `waswrsis/FactorResearch` 的 `deployment-2026-10-03-v1` Release。目标是取得完整项目，在 dot 云端项目磁盘中完成新的 Linux CPU 部署。部署助手应先读本指南，再读完整包中的 `outputs/DOT_DEPLOYMENT_MANUAL.md`。
 

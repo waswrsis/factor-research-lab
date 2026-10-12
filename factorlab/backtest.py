@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .statistics import risk_metrics
+from .time_utils import hourly_contiguous
 
 
 @dataclass(frozen=True)
@@ -73,7 +74,7 @@ def run_backtest(execution_prices: pd.DataFrame, target_weights: pd.DataFrame | 
     index, symbols = execution_prices.index, execution_prices.columns
     if not index.equals(index.floor("h")):
         raise ValueError("Execution prices must be at whole-hour boundaries")
-    if len(index) > 1 and not (np.diff(index.asi8) == pd.Timedelta(hours=1).value).all():
+    if not hourly_contiguous(index):
         raise ValueError("Execution price gaps are unsupported; supply every hourly bar")
     if target_weights is None:
         if weight_policy is None:

@@ -6,11 +6,13 @@ Promotion is an operational research rule, never independent market evidence.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import sqlite3
 import time
 from dataclasses import asdict, dataclass, replace
+from itertools import zip_longest
 from uuid import uuid4
 
 import numpy as np
@@ -18,9 +20,10 @@ import pandas as pd
 from filelock import FileLock
 
 from factorlab.protocol import fingerprint, project_path, utc
+from factorlab.time_utils import hour_ids
 
 from .contracts import ExperimentSpec, ModuleSpec, RepresentationSpec, TaskDataset
-from .evidence import EvidenceRegistry, file_hash, immutable_json, snapshot_source
+from .evidence import EvidenceRegistry, file_hash, immutable_json, snapshot_source, source_paths
 from .experiment import ModelGroup
 from .learning import FittedResearchModel, fit
 from .replay import _data_hash, _model_cutoffs, _prediction_inputs, _training_parts
@@ -68,6 +71,100 @@ def _json(value):
     return json.dumps(value, ensure_ascii=False, allow_nan=False, sort_keys=True)
 
 
+RESEARCH_INLINE_BYTES = 256 * 1024
+
+
+def _canonical_chunks(value):
+    return json.JSONEncoder(sort_keys=True, separators=(',', ':'), allow_nan=False).iterencode(value)
+
+
+def _large_research(value):
+    size = 0
+    for chunk in _canonical_chunks(value):
+        size += len(chunk.encode())
+        if size > RESEARCH_INLINE_BYTES:
+            return True
+    return False
+
+
+def _research_summary(value):
+    """Bounded report facts; full candidate histories remain in the artifact."""
+    result = {key: item for key, item in list(value.items())[:128]
+              if key != '_research_ref' and len(key) <= 100
+              and (item is None or type(item) in (bool, int, float)
+                   or isinstance(item, str) and len(item) <= 2000)}
+    records = value.get('records', [])
+    operations = sorted({row.get('proposal', {}).get('operation') for row in records
+                         if isinstance(row, dict) and isinstance(row.get('proposal'), dict)
+                         and isinstance(row['proposal'].get('operation'), str)
+                         and len(row['proposal']['operation']) <= 100})
+    memory = value.get('development_memory', [])
+    result.update(summary_scope='bounded_research_summary_v1', records_count=len(records),
+                  operations=operations[:64], operations_truncated=len(operations) > 64,
+                  development_memory_count=len(memory),
+                  development_memory=[{key: row[key] for key in (
+                      'candidate_id', 'status', 'iteration', 'evidence_cutoff', 'source_protocol_hash')
+                      if key in row and (row[key] is None or type(row[key]) in (int, float, bool)
+                                         or isinstance(row[key], str) and len(row[key]) <= 256)}
+                      for row in memory[-4:] if isinstance(row, dict)])
+    return result
+
+
+def _research_reference_path(directory, reference):
+    if (not isinstance(reference, dict) or set(reference) != {'format', 'path', 'sha256'}
+            or reference['format'] != 'research-artifact-v1'
+            or not isinstance(reference['sha256'], str) or len(reference['sha256']) != 64
+            or any(char not in '0123456789abcdef' for char in reference['sha256'])
+            or reference['path'] != f"research-objects/{reference['sha256']}.json"):
+        raise ValueError('Invalid research artifact reference')
+    path = project_path(directory / reference['path'])
+    if not path.is_relative_to(directory.resolve()):
+        raise ValueError('Research artifact reference escaped its run directory')
+    return path
+
+
+def _verify_research_reference(directory, research):
+    if not isinstance(research, dict) or '_research_ref' not in research:
+        return
+    reference = research['_research_ref']
+    path = _research_reference_path(directory, reference)
+    if not path.is_file() or file_hash(path) != reference['sha256']:
+        raise ValueError('Research artifact is missing or changed')
+
+
+def _store_research(directory, research):
+    if '_research_ref' in research:
+        _verify_research_reference(directory, research)
+        return research
+    if not _large_research(research):
+        return research
+    folder = project_path(directory / 'research-objects')
+    if not folder.is_relative_to(directory.resolve()):
+        raise ValueError('Research artifact directory escaped its run directory')
+    folder.mkdir(exist_ok=True)
+    temporary = folder / (uuid4().hex + '.tmp')
+    digest = hashlib.sha256()
+    try:
+        with temporary.open('xb') as stream:
+            for chunk in _canonical_chunks(research):
+                encoded = chunk.encode()
+                digest.update(encoded)
+                stream.write(encoded)
+        sha256 = digest.hexdigest()
+        reference = {'format': 'research-artifact-v1',
+                     'path': f'research-objects/{sha256}.json', 'sha256': sha256}
+        target = _research_reference_path(directory, reference)
+        with FileLock(str(target) + '.lock'):
+            if target.exists():
+                if file_hash(target) != sha256:
+                    raise ValueError('Research artifact is missing or changed')
+            else:
+                temporary.replace(target)
+        return {**_research_summary(research), '_research_ref': reference}
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def _members(model):
     return model.models if isinstance(model, ModelGroup) else [model]
 
@@ -109,7 +206,7 @@ def _visible_hash(data, cutoff):
 def _current_source_files():
     """Freeze the full project Python program and declared locked dependencies."""
     root = project_path('.')
-    files = [*root.glob('factorlab/**/*.py'), root / 'pyproject.toml', root / 'uv.lock']
+    files = source_paths(root)
     return {str(path.relative_to(root)).replace('\\', '/'): file_hash(path)
             for path in sorted(files)}
 
@@ -141,6 +238,10 @@ def _verify_source_archive(directory, identity):
             continue
         if not path.resolve().is_relative_to(folder):
             raise ValueError('Evolution source archive contains an external file reference')
+        # immutable_json's OS lock is metadata, not an archived source member.
+        # Keep the external-reference check above, and never exempt a symlink.
+        if path == folder / 'manifest.json.lock' and not path.is_symlink():
+            continue
         actual[str(path.relative_to(folder)).replace('\\', '/')] = file_hash(path)
     if actual != files:
         raise ValueError('Evolution source archive integrity failure')
@@ -190,7 +291,15 @@ class EvolutionStore:
     def _table_hash(self, table):
         if table not in {'cycles', 'models'}:
             raise ValueError('Unexpected ledger table')
-        return fingerprint([dict(row) for row in self.db.execute(f'SELECT * FROM {table} ORDER BY id')])
+        digest = hashlib.sha256(b'[')
+        separator = b''
+        for row in self.db.execute(f'SELECT * FROM {table} ORDER BY id'):
+            digest.update(separator)
+            for chunk in _canonical_chunks(dict(row)):
+                digest.update(chunk.encode())
+            separator = b','
+        digest.update(b']')
+        return digest.hexdigest()
 
     def event(self, event, timestamp, value):
         row = self.db.execute('SELECT seq,hash FROM events ORDER BY seq DESC LIMIT 1').fetchone()
@@ -199,58 +308,108 @@ class EvolutionStore:
         self.db.execute('INSERT INTO events VALUES (?,?,?)',
                         (payload['sequence'], _json(payload), fingerprint(payload)))
 
-    def events(self):
+    def iter_events(self):
+        """Verify and yield one immutable event at a time, including artifact integrity."""
         previous = '0' * 64
-        result = []
+        references = set()
         for index, row in enumerate(self.db.execute('SELECT * FROM events ORDER BY seq')):
             payload = json.loads(row['value'])
             if (payload['previous'] != previous or row['hash'] != fingerprint(payload)
                     or row['seq'] != index or payload['sequence'] != index):
                 raise ValueError('Evolution event chain is invalid')
             previous = row['hash']
-            result.append({**payload, 'sha256': previous})
+            research = payload['value'].get('research', {}) if isinstance(payload['value'], dict) else {}
+            if isinstance(research, dict) and '_research_ref' in research:
+                key = fingerprint(research['_research_ref'])
+                if key not in references:
+                    _verify_research_reference(self.directory, research)
+                    references.add(key)
+            yield {**payload, 'sha256': previous}
+
+    def events(self, *, compact=False):
+        if not compact:
+            return list(self.iter_events())
+        result = {'event_count': 0, 'event_head': None}
+        for event in self.iter_events():
+            result.update(event_count=result['event_count'] + 1, event_head=event['sha256'])
         return result
 
-    def verify(self):
-        events = self.events()
-        checkpoints = [row['value'] for row in events if row['event'] == 'state_checkpoint']
-        state = self.state()
-        if state is None or not checkpoints or checkpoints[-1] != {
-            'state': fingerprint(state), 'cycles': self._table_hash('cycles'), 'models': self._table_hash('models')
-        }:
-            raise ValueError('Evolution ledger state/cycle/model integrity failure')
-        expected = {}
-        for event in events:
-            if event['event'] == 'forecast_batch':
-                for row in event['value']['records']:
-                    key = (row['sample'], row['task'], row['model'])
-                    if key in expected:
-                        raise ValueError('Duplicate forecast in immutable ledger')
-                    expected[key] = {**row, 'settled': 0, 'loss': None, 'status': None, 'target': None}
-            elif event['event'] == 'settlement':
-                for row in event['value']['records']:
-                    key = (row['sample'], row['task'], row['model'])
-                    if key not in expected or expected[key]['settled']:
-                        raise ValueError('Unexpected settlement in immutable ledger')
-                    expected[key].update({k: row[k] for k in ('settled', 'loss', 'status', 'target')})
-        actual = {(row['sample'], row['task'], row['model']): dict(row)
-                  for row in self.db.execute('SELECT * FROM predictions')}
-        if actual != expected:
-            raise ValueError('Evolution prediction/settlement ledger integrity failure')
+    def verify(self, *, compact=False):
+        """Replay into a disposable disk ledger; compact mode retains no event list."""
+        scratch_path = project_path(self.directory / ('.verify-' + uuid4().hex + '.sqlite'))
+        scratch = sqlite3.connect(scratch_path)
+        scratch.row_factory = sqlite3.Row
+        events = [] if not compact else None
+        checkpoint, count, head = None, 0, None
+        try:
+            scratch.execute('PRAGMA journal_mode=OFF')
+            scratch.execute('PRAGMA synchronous=OFF')
+            scratch.execute('PRAGMA cache_size=-1024')
+            schema = self.db.execute("SELECT sql FROM sqlite_master WHERE name='predictions'").fetchone()[0]
+            scratch.execute(schema)
+            for event in self.iter_events():
+                count, head = count + 1, event['sha256']
+                if events is not None:
+                    events.append(event)
+                if event['event'] == 'state_checkpoint':
+                    checkpoint = event['value']
+                elif event['event'] == 'forecast_batch':
+                    for row in event['value']['records']:
+                        expected = {**row, 'settled': 0, 'loss': None, 'status': None, 'target': None}
+                        columns = ('sample', 'task', 'model', 'origin', 'value', 'role', 'cycle',
+                                   'symbol', 'settled', 'loss', 'status', 'target')
+                        if set(expected) != set(columns):
+                            raise ValueError('Evolution prediction ledger schema changed')
+                        try:
+                            scratch.execute('INSERT INTO predictions VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+                                            tuple(expected[key] for key in columns))
+                        except sqlite3.IntegrityError as exc:
+                            raise ValueError('Duplicate forecast in immutable ledger') from exc
+                elif event['event'] == 'settlement':
+                    for row in event['value']['records']:
+                        changed = scratch.execute('''UPDATE predictions SET settled=?,loss=?,status=?,target=?
+                            WHERE sample=? AND task=? AND model=? AND settled=0''', tuple(row[key] for key in (
+                                'settled', 'loss', 'status', 'target', 'sample', 'task', 'model')))
+                        if changed.rowcount != 1:
+                            raise ValueError('Unexpected settlement in immutable ledger')
+            state = self.state()
+            if state is None or checkpoint != {
+                'state': fingerprint(state), 'cycles': self._table_hash('cycles'),
+                'models': self._table_hash('models')
+            }:
+                raise ValueError('Evolution ledger state/cycle/model integrity failure')
+            query = 'SELECT * FROM predictions ORDER BY sample,task,model'
+            for actual, expected in zip_longest(self.db.execute(query), scratch.execute(query)):
+                if actual is None or expected is None or dict(actual) != dict(expected):
+                    raise ValueError('Evolution prediction/settlement ledger integrity failure')
+            for row in self.db.execute('SELECT value FROM cycles'):
+                _verify_research_reference(self.directory, json.loads(row['value']).get('research', {}))
+        finally:
+            scratch.close()
+            scratch_path.unlink(missing_ok=True)
         manifest = json.loads((self.directory / 'manifest.json').read_text('utf-8'))
         identity = {key: value for key, value in manifest['manifest'].items() if key != 'evidence_exposure'}
         if (manifest['sha256'] != fingerprint(manifest['manifest'])
                 or fingerprint(identity) != fingerprint(state['identity'])):
             raise ValueError('Evolution manifest identity integrity failure')
         _verify_source_archive(self.directory, state['identity'])
-        return events
+        return events if events is not None else {'event_count': count, 'event_head': head}
 
     def cycle(self, cycle_id):
         row = self.db.execute('SELECT value FROM cycles WHERE id=?', (cycle_id,)).fetchone()
         return json.loads(row['value']) if row else None
 
     def put_cycle(self, record):
+        if isinstance(record.get('research'), dict):
+            record['research'] = _store_research(self.directory, record['research'])
         self.db.execute('INSERT OR REPLACE INTO cycles VALUES (?,?)', (record['id'], _json(record)))
+
+    def load_research(self, summary):
+        """Explicit full-artifact read for audit; summaries never expand implicitly."""
+        _verify_research_reference(self.directory, summary)
+        if '_research_ref' not in summary:
+            return summary
+        return json.loads(_research_reference_path(self.directory, summary['_research_ref']).read_text('utf-8'))
 
     def save_model(self, model, cutoff):
         identifier = model.digest
@@ -424,8 +583,7 @@ def _shadow_auxiliary_guard(store, cycle, spec):
         frame['hour'] = pd.to_datetime(frame.origin, utc=True).dt.floor('h')
         hourly = frame.groupby(['hour', 'symbol'])[['candidate_loss', 'reference_loss']].mean()
         hourly = hourly.groupby(level='hour').mean()
-        block_size = pd.Timedelta(hours=spec.bootstrap_block_hours).value
-        blocks = len(np.unique(hourly.index.asi8 // block_size))
+        blocks = len(np.unique(hour_ids(hourly.index) // spec.bootstrap_block_hours))
         candidate, reference = hourly.mean().tolist()
         degradation = (candidate - reference) / max(abs(reference), 1e-12)
         record.update(support=len(valid), n_hours=len(hourly), n_blocks=blocks,
@@ -546,7 +704,7 @@ def run_evolution(data: TaskDataset, initial_model, spec: ExperimentSpec, output
                 if not resume:
                     raise ValueError('Existing evolution run requires explicit resume')
                 if state['identity'].get('source_archive') is None:
-                    store.verify()
+                    store.verify(compact=True)
                     raise ValueError('Legacy hash-only evolution run supports historical inspection; '
                                      'start a new archived-source run to resume research')
                 identity['initial_digest'] = state['identity']['initial_digest'] if initial_model is None else initial_model.digest
@@ -555,7 +713,7 @@ def run_evolution(data: TaskDataset, initial_model, spec: ExperimentSpec, output
                 manifest = json.loads((directory / 'manifest.json').read_text('utf-8'))
                 if manifest['sha256'] != fingerprint(manifest['manifest']):
                     raise ValueError('Evolution manifest changed')
-                store.verify()
+                store.verify(compact=True)
                 if (state['last_timestamp'] is not None
                         and _visible_hash(data, state['last_timestamp']) != state['visible_hash']):
                     raise ValueError('Previously observed data or mature labels changed')
@@ -769,7 +927,8 @@ def _research_candidate(train, development, incumbent, spec, policy, directory, 
         from .operator_search import program_contract
         program_contract(parents[0], spec.lookback, train.features)
         room = min(policy.revived_parents, policy.population_size - 1, spec.candidates - 1)
-        for fact in prior:
+        # Prompt memory is chronological; revival still prefers the newest facts.
+        for fact in reversed(prior):
             if len(revived) >= room:
                 break
             if fact.get('status') != 'ok' or not fact.get('architecture'):
@@ -837,15 +996,23 @@ def _research_candidate(train, development, incumbent, spec, policy, directory, 
             directory, model, record, fold, validation))
     result['revived_architectures'] = revived
     result['program_search'] = policy.program_search
+    result = _store_research(directory.parent.parent, result)
     immutable_json(directory / 'result.json', result)
     if model is None:
         raise ValueError('Population search produced no valid candidate')
     return model, result
 
 
-def _summary(store, spec, policy):
+def _summary(store, spec, policy, *, verified=None):
     state = store.state()
-    cycles = [json.loads(row['value']) for row in store.db.execute('SELECT value FROM cycles ORDER BY id')]
+    cycles = []
+    for row in store.db.execute('SELECT value FROM cycles ORDER BY id'):
+        cycle = json.loads(row['value'])
+        research = cycle.get('research')
+        if isinstance(research, dict) and '_research_ref' not in research and _large_research(research):
+            cycle['research'] = _research_summary(research)
+            cycle['research']['summary_scope'] = 'legacy_inline_research_summary_v1'
+        cycles.append(cycle)
     tasks = {}
     for task in spec.tasks:
         row = store.db.execute('''SELECT COUNT(*) AS n,AVG(loss) AS loss FROM predictions
@@ -853,12 +1020,12 @@ def _summary(store, spec, policy):
         pending = store.db.execute('''SELECT COUNT(*) AS n FROM predictions
             WHERE role='incumbent' AND task=? AND settled=0''', (task.name,)).fetchone()['n']
         tasks[task.name] = {'support': row['n'], 'loss': row['loss'], 'pending': pending}
-    events = store.verify()
+    verified = verified if verified is not None else store.verify(compact=True)
     return {'format': 'discovery-evolution-v1', 'scope': 'development_sequential_research',
             'mode': policy.mode, 'ticks': state['ticks'], 'last_timestamp': state['last_timestamp'],
             'incumbent': state['incumbent'], 'cycles': cycles, 'tasks': tasks,
             'promotions': sum(c['status'] == 'promoted' for c in cycles),
-            'event_head': events[-1]['sha256'] if events else None,
+            'event_head': verified['event_head'],
             'pending_cycle': state['active_cycle'],
             'source_evidence': _verify_source_archive(store.directory, state['identity']),
             'can_resume': state['identity'].get('source_archive') is not None}
@@ -872,9 +1039,9 @@ def inspect_evolution(directory):
             raise ValueError('No evolution state')
         spec = ExperimentSpec.from_dict(state['identity']['protocol'])
         policy = EvolutionPolicy(**state['identity']['policy'])
-        store.verify()
+        verified = store.verify(compact=True)
         for row in store.db.execute('SELECT id FROM models').fetchall():
             store.load_model(row['id'])
-        return _summary(store, spec, policy)
+        return _summary(store, spec, policy, verified=verified)
     finally:
         store.close()

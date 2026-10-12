@@ -14,12 +14,15 @@ from datetime import UTC, datetime
 from factorlab.protocol import fingerprint, project_path, utc
 
 from .contracts import RepresentationSpec, TaskSpec
-from .robust_selection import ROBUST_METRIC_FIELDS, clean_robust_metrics
+from .robust_selection import (
+    ROBUST_METRIC_FIELDS,
+    TASK_METRIC_FIELDS,
+    TASK_METRIC_STRINGS,
+    clean_robust_metrics,
+)
 from .search import OPERATIONS
 
-METRIC_FIELDS = frozenset({'status', 'predictive', 'support', 'eligible_support', 'loss',
-                          'coverage', 'label_coverage', 'brier', 'primary_loss',
-                          'parameter_count'}) | ROBUST_METRIC_FIELDS
+METRIC_FIELDS = TASK_METRIC_FIELDS | ROBUST_METRIC_FIELDS | {'primary_loss', 'parameter_count'}
 STATUSES = frozenset({'ok', 'failed', 'proposed', 'rejected', 'timeout', 'duplicate'})
 FORBIDDEN = frozenset({'confirmation', 'confirmation_loss', 'calibration', 'heldout', 'test',
                        'confirmation_metrics', 'confirmation_result', 'test_loss'})
@@ -68,7 +71,10 @@ def clean_metrics(metrics: dict, task_names: set[str] | None = None) -> dict:
                 raise ValueError('Metric field is not in the development whitelist')
             if value is not None and not isinstance(value, (str, bool, int, float)):
                 raise ValueError('Metric summaries must be scalar')
-            if isinstance(value, str) and (name != 'status' or value not in {
+            if name in TASK_METRIC_STRINGS:
+                if not isinstance(value, str) or value not in TASK_METRIC_STRINGS[name]:
+                    raise ValueError('Only bounded metric scope/kind strings are allowed')
+            elif isinstance(value, str) and (name != 'status' or value not in {
                 'ok', 'insufficient', 'insufficient_support', 'no_support', 'failed',
                 'unsupported', 'supported', 'unobserved', 'not_predictive', 'descriptive',
                 'empty', 'no_observations', 'unavailable', 'insufficient_evidence', 'not_applicable'
@@ -196,6 +202,7 @@ class ResearchMemory:
 
     def retrieve(self, task, evidence_cutoff, *, protocol_hash=None, limit=20,
                  context_hash=None):
+        """Return the latest eligible facts, newest first; history conversion reverses time."""
         if type(limit) is not int or not 1 <= limit <= 1000:
             raise ValueError('Memory retrieval limit must be in 1..1000')
         task_hash, _ = task_identity(task)
@@ -255,9 +262,14 @@ def to_development_history(rows, current_spec=None):
 
     A recorded action is evidence of an attempted intervention, not a recovered
     free-form LLM rationale. The neutral descriptions below state that distinction.
+    Retrieval is newest first to bound the selected facts, but search histories
+    are oldest first so appending current outcomes and tail trimming keep the
+    newest evidence. Use the same cutoff/recording/identity tie-break as retrieval.
     """
     result = []
-    for index, row in enumerate(rows):
+    ordered = sorted(rows, key=lambda row: (utc(row['evidence_cutoff']),
+                                            row.get('recorded_at', ''), row.get('event_id', '')))
+    for index, row in enumerate(ordered):
         reject_forbidden(row)
         if row.get('partition') != 'development':
             raise ValueError('Only development memory can become agent history')

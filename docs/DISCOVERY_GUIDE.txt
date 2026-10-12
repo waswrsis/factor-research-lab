@@ -123,6 +123,6 @@ replay.py回放；evidence.py登记资料使用；catalog.py保存质量；repor
 data/discovery_evidence.sqlite和data/discovery_catalog.sqlite是持久档案，不能删除来重置证据。
 所有新文件在D盘；C盘备份不参与新运行。
 
-验证：python -m pytest -q；python -m ruff check factorlab tests（使用项目Python）。
+验证按实际修改选择相关测试节点与受影响调用链，使用项目Python；不要仅为安装、文档或打包运行完整pytest。旧验收数量仅适用于原版本。
 测试发现范围是tests；external下Qlib/RD-Agent是第三方参考源码，不是本项目测试集。
 本平台不保证持续找到有效因子，不保证模块增加就改善，也没有自动交易功能。

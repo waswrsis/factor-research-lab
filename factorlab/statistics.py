@@ -4,6 +4,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .time_utils import constant_intervals
+
 
 def risk_metrics(returns, equity=None, periods_per_year=8760) -> dict:
     r = np.asarray(returns, dtype=float).reshape(-1)
@@ -52,10 +54,9 @@ def paired_block_bootstrap(candidate_returns, reference_returns, block_length=24
                 or candidate_returns.index.has_duplicates
                 or not candidate_returns.index.is_monotonic_increasing):
             raise ValueError("Paired returns require the identical ordered, unique time index")
-        if isinstance(candidate_returns.index, pd.DatetimeIndex) and len(candidate_returns) > 2:
-            intervals = np.diff(candidate_returns.index.asi8)
-            if not (intervals == intervals[0]).all():
-                raise ValueError("Time gaps must be resolved explicitly before block resampling")
+        if (isinstance(candidate_returns.index, pd.DatetimeIndex) and len(candidate_returns) > 2
+                and not constant_intervals(candidate_returns.index)):
+            raise ValueError("Time gaps must be resolved explicitly before block resampling")
     candidate = np.asarray(candidate_returns, dtype=float)
     reference = np.asarray(reference_returns, dtype=float)
     if candidate.ndim != 1 or reference.ndim != 1 or candidate.shape != reference.shape:

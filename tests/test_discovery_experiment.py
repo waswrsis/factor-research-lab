@@ -29,6 +29,7 @@ def controlled_data():
     return data, spec
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_full_research_probes_confirmation_and_bundle_reload(tmp_path):
     import torch
     torch.set_num_threads(2)
@@ -108,3 +109,14 @@ def test_failed_pipeline_records_failure_without_overwriting_old_run(tmp_path):
         run_experiment(data, spec, target, data_hash='fixture', modes=(),
                        registry_path=tmp_path / 'registry.sqlite', evidence_source='fixture')
     assert before == (target / 'journal.jsonl').read_bytes()
+
+
+@pytest.fixture
+def _preserve_native_thread_count():
+    """Only this test's native thread choice; restore even after a failed assertion."""
+    import torch
+    original_threads = torch.get_num_threads()
+    try:
+        yield
+    finally:
+        torch.set_num_threads(original_threads)

@@ -18,6 +18,19 @@ from factorlab.protocol import fingerprint, utc
 ROBUST_METRIC_FIELDS = frozenset({'robustness_rank', 'mean_relative_gain', 'relative_gain_std',
                                  'winning_fold_fraction', 'worst_primary_relative_degradation',
                                  'robust_eligible', 'selection_reason'})
+TASK_METRIC_FIELDS = frozenset({'status', 'kind', 'predictive', 'interpretation',
+                                'support', 'eligible_support', 'total_rows', 'n_hours',
+                                'fold_count', 'loss', 'coverage', 'label_coverage', 'brier',
+                                'aggregation', 'coverage_scope', 'support_scope'})
+TASK_METRIC_STRINGS = {
+    'kind': frozenset({'volatility', 'return', 'first_event', 'state'}),
+    'interpretation': frozenset({'future_target', 'descriptive_only'}),
+    'aggregation': frozenset({'equal_symbol_within_hour_then_equal_hour',
+                             'equal_fold_of_equal_symbol_within_hour_then_equal_hour'}),
+    'coverage_scope': frozenset({'provided_dataset_observed_task_labels',
+                                'fold_rows_including_repeats'}),
+    'support_scope': frozenset({'fold_observations_including_repeats'}),
+}
 SELECTION_REASONS = frozenset({'passed', 'reference_root', 'incomplete_folds', 'unsupported_primary',
                                'unsupported_predictive_task', 'incomparable_support_or_aggregation',
                                'auxiliary_degradation', 'minimum_relative_improvement_not_met',
@@ -146,6 +159,41 @@ def macro_metrics(data, predictions):
         row.update(loss=float(hours.mean()), n_hours=len(hours),
                    aggregation='equal_symbol_within_hour_then_equal_hour')
     return metrics
+
+
+def summarize_fold_metrics(scores, tasks):
+    """Summarize fold occurrences, preserving the equal-fold selection loss.
+
+    Counts include repeated rows/hours if folds overlap; they are not distinct
+    evidence counts. Probability diagnostics stay in the original fold records:
+    a pooled Brier/ECE is not supplied without pooled predictions and a defined
+    weighting contract. Missing optional-task evidence cannot inherit fold 0's
+    successful status.
+    """
+    if not scores:
+        raise ValueError('A fold summary requires at least one fold')
+    result = {}
+    for task in tasks:
+        rows = [score[task.name] for score in scores]
+        complete = all(row['status'] == 'ok' for row in rows)
+        summary = {'kind': task.kind, 'predictive': task.predictive,
+                   'interpretation': 'future_target' if task.predictive else 'descriptive_only',
+                   'status': 'ok' if complete else 'insufficient_evidence',
+                   'fold_count': len(rows),
+                   'loss': float(np.mean([row['loss'] for row in rows])) if complete else None,
+                   'aggregation': 'equal_fold_of_equal_symbol_within_hour_then_equal_hour',
+                   'support_scope': 'fold_observations_including_repeats',
+                   'coverage_scope': 'fold_rows_including_repeats'}
+        for field in ('support', 'eligible_support', 'total_rows', 'n_hours'):
+            if all(field in row for row in rows):
+                summary[field] = sum(row[field] for row in rows)
+        if 'total_rows' in summary:
+            total = summary['total_rows']
+            for coverage, count in (('coverage', 'support'), ('label_coverage', 'eligible_support')):
+                if count in summary:
+                    summary[coverage] = summary[count] / total if total else 0.0
+        result[task.name] = summary
+    return result
 
 
 def compare_folds(candidate, reference, tasks, primary_task, policy):
@@ -371,10 +419,7 @@ def search_walk_forward_population(train, development, parents, spec, *, mode='r
             reason = comparison['reasons'][0].split(':')[0] if comparison['reasons'] else 'passed'
             if reason == 'unsupported':
                 reason = 'unsupported_predictive_task'
-            metrics = {task.name: {**scores[0][task.name],
-                       'loss': float(np.mean([score[task.name]['loss'] for score in scores]))
-                       if all(score[task.name]['status'] == 'ok' for score in scores) else None,
-                       'support': sum(score[task.name]['support'] for score in scores)} for task in spec.tasks}
+            metrics = summarize_fold_metrics(scores, spec.tasks)
             record.update(status='ok', metrics=metrics, primary_loss=metrics[spec.primary_task]['loss'],
                           comparison=comparison, reference=is_reference, parameter_count=model.parameter_count,
                           digest=model.digest, digest_scope='last_forward_fold',

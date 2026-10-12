@@ -1,0 +1,54 @@
+{
+  "schema": "factor-research-lab-public-installation-summary-v1",
+  "release_tag": "v7-install-only-2026-10-12",
+  "observed_at_utc": "2026-10-12T09:01:25.815726+00:00",
+  "status": "COMPLETE_SOURCE_ENVIRONMENT_CONFIGURATION_INSTALLED_NOT_ACTIVATED_OR_STARTED",
+  "source_hash": "3360b89b3bdffa8a2907d19d56e3d2b37b15cefacd974d8401045b5f0e512b00",
+  "source_assets": 220,
+  "python_version": "3.12.3",
+  "runtime_profile": "cpu_neural_locked",
+  "environment_receipt_sha256": "fcb2bdacac72a51bbba6f8f61a97fd4436c95e1e31c63965c95bdf745c62ee95",
+  "configuration": {
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "research_spec_hash": "9c01ca1f866e97255b8ca503ea435b80d9402400f7d38821015f96d90e323512",
+    "training_window_days": 90,
+    "refit_interval_days": 15
+  },
+  "entrypoint_checks": [
+    {
+      "entrypoint": "factorlab.discovery.v7_cli",
+      "returncode": 0
+    },
+    {
+      "entrypoint": "scripts.v7_long_running",
+      "returncode": 0
+    }
+  ],
+  "unit_state": {
+    "LoadState": "loaded",
+    "ActiveState": "inactive",
+    "MainPID": "0",
+    "UnitFileState": "disabled"
+  },
+  "service_started": false,
+  "service_enabled": false,
+  "campaign_registered": false,
+  "wallet_created": false,
+  "training_anchor_created": false,
+  "fits": 0,
+  "GPT_calls": 0,
+  "polls": 0,
+  "old_STOP_unchanged": true,
+  "remaining_acceptance": "CANCELLED_BY_USER_NOT_PASSED",
+  "full_qualification_claimed": false,
+  "scientific_gain_certified": false,
+  "model_knowledge_cutoff": null,
+  "package": {
+    "package_sha256": "b95e71c896543fe6d299950c8d65a7de87d4ad69c72b02aca0daab7b63851ac6",
+    "package_content_map_hash": "0d1a52e6978045eefdcddd7bff32f5eb87b772835b6ed138cb9ca4d14a4ee83d",
+    "package_files": 234,
+    "package_bytes": 4669440
+  },
+  "privacy": "Public subset only: no server identity, SSH command, private path or authentication contents."
+}

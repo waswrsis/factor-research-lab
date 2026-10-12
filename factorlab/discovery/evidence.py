@@ -195,11 +195,31 @@ class EvidenceRegistry:
                     claim=claim, role='legacy_seen')
 
 
+def source_paths(root: Path | None = None) -> list[Path]:
+    """Executable research source, including owned operational workers.
+
+    Small artificial workspaces may omit operational entry points. If an entry
+    point exists at freeze time its removal or mutation changes the identity.
+    Runtime launchers independently require their exact installed worker path.
+    """
+    root = project_path('.') if root is None else root
+    scripts = ('v7_public_fetch.py', 'v7_long_running.py', 'v7_linux_bootstrap.sh', 'v7_layered_validation.py')
+    guards = ('v7_guard/lease_enforcer.py', 'v7_guard/multiwork_enforcer.py', 'v7_guard/tree_work_enforcer.py', 'v7_guard/guarded_runtime.py', 'v7_guard/campaign_guard_entry.py')
+    present = [(root / "scripts" / name).is_file() for name in guards]
+    if any(present) and not all(present):
+        raise ValueError("Incomplete fixed whole-tree guard source set")
+    scripts += guards
+    owned_tools = ('linux_full_path/linux_production_path.py',)
+    return sorted([*root.glob('factorlab/**/*.py'), root / 'pyproject.toml', root / 'uv.lock',
+                   *(root / 'scripts' / name for name in scripts if (root / 'scripts' / name).exists()),
+                   *(root / 'tools' / name for name in owned_tools if (root / 'tools' / name).is_file())])
+
+
 def snapshot_source(directory: str | Path) -> dict:
     destination = project_path(directory)
     destination.mkdir(parents=True, exist_ok=True)
     root = project_path('.')
-    files = [*root.glob('factorlab/**/*.py'), root / 'pyproject.toml', root / 'uv.lock']
+    files = source_paths(root)
     hashes = {}
     for source in files:
         relative = source.relative_to(root)

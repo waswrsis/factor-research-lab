@@ -269,7 +269,8 @@ class ProgramModule(nn.Module):
 
     def __init__(self, program: Program | dict, feature_names=None, lookback=None):
         super().__init__()
-        self.program = Program.from_dict(program.to_dict() if isinstance(program, Program)
+        from .program_contract import Program as ContractProgram
+        self.program = Program.from_dict(program.to_dict() if isinstance(program, (Program, ContractProgram))
                                          else program)
         if feature_names is not None and tuple(feature_names) != self.program.feature_names:
             raise ValueError('Feature order differs from program schema')
@@ -393,7 +394,8 @@ class ProgramModule(nn.Module):
 
 def validate_program(value: Program | dict, features=None) -> dict:
     """Return canonical defensive JSON data; optionally require exact input order."""
-    program = Program.from_dict(value.to_dict() if isinstance(value, Program) else value)
+    from .program_contract import Program as ContractProgram
+    program = Program.from_dict(value.to_dict() if isinstance(value, (Program, ContractProgram)) else value)
     if features is not None and tuple(features) != program.feature_names:
         raise ValueError('Feature order differs from program schema')
     return program.to_dict()

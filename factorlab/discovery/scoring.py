@@ -18,6 +18,7 @@ from scipy.special import logsumexp
 
 from factorlab.discovery.contracts import ExperimentSpec, TaskDataset, TaskSpec
 from factorlab.protocol import project_path, save_json
+from factorlab.time_utils import hour_ids
 
 VOLATILITY_FLOOR = 1e-8
 PROBABILITY_FLOOR = 1e-12
@@ -189,7 +190,7 @@ def paired_comparison(data: TaskDataset, candidate: dict[str, np.ndarray],
     # Avoid letting repeated decisions for one symbol overweight a shared hour.
     hourly = rows.groupby(['hour', 'symbol'], observed=True).improvement.mean()
     hourly = hourly.groupby(level='hour').mean().sort_index()
-    hour_id = hourly.index.asi8 // (3600 * 1_000_000_000)
+    hour_id = hour_ids(hourly.index)
     blocks = pd.DataFrame({'value': hourly.to_numpy(),
                            'block': hour_id // spec.bootstrap_block_hours}).groupby('block').value
     sums, counts = blocks.sum().to_numpy(), blocks.count().to_numpy()

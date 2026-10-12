@@ -28,6 +28,7 @@ def fixture(candidates=1):
                                                        min_validation_hours=48))
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_real_production_pipeline_retains_every_forward_model_and_forecast(tmp_path):
     data, spec = fixture()
     directory = tmp_path / 'production'
@@ -59,6 +60,7 @@ def test_real_production_pipeline_retains_every_forward_model_and_forecast(tmp_p
     assert reloaded.digest not in {fold['digest'] for fold in search['records'][0]['folds']}
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_production_chooser_uses_forward_rank_even_when_single_dev_prefers_other_arm(tmp_path, monkeypatch):
     data, spec = fixture()
     original_score = experiment._score
@@ -83,6 +85,7 @@ def test_production_chooser_uses_forward_rank_even_when_single_dev_prefers_other
     assert result['selection']['selected_on'] == 'cold_walk_forward_robust_rank'
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_production_fails_closed_when_all_forward_searches_are_invalid(tmp_path, monkeypatch):
     data, spec = fixture()
     monkeypatch.setattr(experiment, 'search_candidates', lambda *args, **kwargs:
@@ -97,6 +100,7 @@ def test_production_fails_closed_when_all_forward_searches_are_invalid(tmp_path,
     assert not (directory / 'bundle' / 'candidate').exists()
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_real_evolution_research_keeps_programs_fold_artifacts_and_gate_memory(tmp_path):
     data, spec = fixture(candidates=2)
     train, development = partition(data, spec, 'train'), partition(data, spec, 'development')
@@ -124,6 +128,7 @@ def test_real_evolution_research_keeps_programs_fold_artifacts_and_gate_memory(t
                for record in result['records'] if 'architecture' in record)
 
 
+@pytest.mark.usefixtures('_preserve_native_thread_count')
 def test_memory_context_changes_with_frozen_selection_and_checkpoint_policy():
     data, spec = fixture()
     changed = replace(spec, selection=replace(spec.selection, stability_penalty=2))
@@ -133,3 +138,14 @@ def test_memory_context_changes_with_frozen_selection_and_checkpoint_policy():
     assert _memory_context_hash(data, legacy) != _memory_context_hash(data, joint)
     later = replace(spec, train_end='2024-01-16', dev_end='2024-01-23')
     assert _memory_context_hash(data, spec) == _memory_context_hash(data, later)
+
+
+@pytest.fixture
+def _preserve_native_thread_count():
+    """Only this test's native thread choice; restore even after a failed assertion."""
+    import torch
+    original_threads = torch.get_num_threads()
+    try:
+        yield
+    finally:
+        torch.set_num_threads(original_threads)

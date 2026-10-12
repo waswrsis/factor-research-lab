@@ -1,0 +1,208 @@
+V7 滚动研究接口说明（原2026-10-05记录；2026-10-12修正当前模式说明）
+
+发布状态以根目录 README 和对应 Release 为准。本文保留历史接口，不构成完整部署验收或启动授权。
+
+用途与当前边界
+本版本用于因子发现、迭代训练、预测评分，没有持仓或下单模块。
+工程功能和有效性证据分别验收。2025 年市场数据是已暴露的开发数据。
+K0 曾在该数据上弱于 HAR-cal；不能把人工数据测试或搜索折收益称为发现 alpha。
+完整功效校准尚未通过，正式 C 确认和 A0 采用不会自动放行。
+可选神经通道已有实际工作负载的 Linux 资源收据生产器；缺少真实收据、
+季度证据或容量证明时关闭。尚未完成目标服务器上的神经工作负载验收。
+完整神经配方现在具备前向票据、隔离工作进程和外部准入注册接口；
+三折完整 ensemble 的 S 研究入口也已独立接线，S 收据不能用于 serving。
+factor1..3 的确认与整体算法验证使用独立入口，结构短名单、算法验证和
+统一计费控制器、主控制器连续运行和后继确认已经合并；统一审计发现的新边界问题
+正在暂存修复。当前尚未取得完整工程交付和正式统计接纳。
+固定 HAR_cal/K0 模型可通过实际收据、共享钱包和完成见证注册，
+离线 version 1 模型不能直接封存、激活或读取为实际前向模型。
+旧服务器 long80 已在用户授权下停止并保留工作区归档；新部署不能与其重叠启动重任务。
+
+工程结构
+v7_feed.py：公开 Binance 已闭合小时 K 线，完整内容按哈希共享保存。
+  输入落盘后记录实际逻辑发布时间，再提交可见索引；待发布输入不进入历史快照。
+  此时间不冒充最后一次索引 fsync 完成时刻；旧原始收据不覆盖、不重置时间。
+  分页中断后不会因重复页误判补数结束；只检查本次最多384小时的已发布覆盖。
+  完整核验使用单次调用内的有界内容缓存，后续调用重新读盘，逐条来源与发布证据仍核对。
+scripts/v7_public_fetch.py：轻量隔离的公开抓取进程；整次网络抓取含启动/清理共30秒。
+  慢磁盘与 SQLite 等待不在操作系统级30秒保证内。响应内容哈希不是原始HTTP字节哈希。
+v7_seed.py：显式、有界下载已完成月份的公开小时归档，校验哈希并构建初始化数据。
+v7_forward.py：原始收据快照、显式90天窗口冷拟合、合法新时点激活、唯一预测与标签结算。
+v7_lifecycle.py：拟合、预测、未来 V、一次 C 评分、完整管线采用的状态机。
+v7_service.py：分钟级轮询、每日训练视图刷新及每15个经过日的拟合调度；持久化墙钟、尝试数与停止状态。
+v7_autonomous.py：独立 GPT 研究子进程，主循环继续接收数据；拟合工作避免并行争抢。
+scripts/v7_long_running.py：显式冻结结束时间与累计预算的长期控制器，跨两小时
+  内部会话保留同一研究进程、档案、曝光账本和月度额度；重启不退还预付预算。
+v7_run.py：三个开发折、K0/HAR-cal 基准、联合因子池 F/P/S、短名单和断点恢复。
+monthly_work_authority.py / reserved_work_budget.py：实际 UTC 月份的唯一钱包；
+  子进程和原父进程的 solve-only 计数器绑定原 lease，预付款不退款、不重置。
+known_linear_reference.py / known_linear_forward.py：完整固定参考配方、冷拟合、
+  实际训练快照、一次工作票据、完整发布见证和历史只读恢复。无需安装 Torch。
+neural_forward_ticket.py / neural_forward_launcher.py / neural_forward_admission.py：
+  完整神经前向的固定票据、隔离执行、实际完成收据及外部准入校验。
+neural_research.py / neural_research_ticket.py / neural_research_launcher.py：
+  三折完整模型研究评分；保留 ensemble 与诊断控制，永不授予 serving 权限。
+claim_protocol.py：两个额外六个月评价端点的预冻结、真实逐小时损失和一次评分；
+  正式五声明校准未完成，数值结果不能自行打开正式门。
+v7_memory.py / hypotheses.py：假设族、双岛父代、停滞休眠、复活和旧证据溯源。
+  默认已收费S/GPT族在提示前可按固定新数据规则自动复活：必须重构原S准备、
+  完整数据身份、基准记录和曝光；月界前进且数据发生变化才生成新版本。
+  每岛每月最多一个休眠亲本；旧父代与失败证据保留，本期增益重置为空。
+  恢复不得重复复活，完成S月不能事后复活，不增加任何研究或确认额度。
+joint_pool.py：固定参考池、参数轮廓优化、稳定性筛选、后向剪枝和开发池衰减。
+prompt_builder.py / v7_agent.py：紧凑表达式、批量假设与模板、Astra/high、实际请求遥测。
+pipeline_calibration.py：受限的真实冷拟合校准诊断；当前不能签发完整 V7 正式证书。
+full_pipeline_calibration.py：五个不同声明槽及独立模拟路径风险估计；覆盖受限本地搜索，
+  不覆盖真实GPT分布、真实服务延迟及生产A0，因此也不签发完整V7证书。
+nonlinear_channel.py / nonlinear_runtime.py：季度树探针与受控神经原语、证据准入和独立预算。
+nonlinear_orchestration.py / nonlinear_launcher.py：月度 S 所有者内的可选季度证据生产、
+  同一个预算事务、真实输入绑定、隔离子进程与 Linux 工作负载资源证明。
+target_experiments.py：独立 5 分钟已实现方差目标及 QLIKE 比较，不暗中替换主目标。
+
+滚动与证据
+当前分层研究模式显式冻结连续90天训练窗口和15个经过日的重拟合间隔；每日刷新训练视图不等于每日拟合。
+原兼容模式仍保留三个UTC日历月窗口。旧三折研究和上下文需求属于各自冻结协议，不能与当前前向90天窗混称。
+原始数据保留；训练视图滚动，并非删除可复现档案。
+固定种子回测可采用已声明的历史到达约定；实时入口必须提供真实 ReceiptArchive。
+历史种子导入的发布时刻就是实际导入时刻，不能声称它在过去月初已经到达。
+首次数据实际就绪后才建立拟合锚点并计划首次冷拟合，之后沿原锚点每15个经过日推进；不必等下一自然月初。
+自然月仍用于UTC研究钱包计账及另行冻结的统计端点，不能据此改回月度拟合或重发额度。
+GPT 仅见 S 信息。旧月份 F/S 分数标明原日期、数据和参考池，不冒充本月增益。
+本月残差诊断明确针对 K0，采用小时内标的等权、小时等权。
+每月六次 GPT 尝试、三成功族、96 AST、24 F、1600 求解；失败、重复、中断也收费。
+研究停滞时保留原参考与失败记录，不放宽门槛制造通过。
+同批 V/C 保护由同一曝光账本执行，不能换一个干净账本继续搜索。
+每次进入 V 的是预先冻结的完整参考池加候选管线；不是剪枝后的 Pdev 组合。
+月度研究成功不等于模型已经替换 A0。
+
+Windows 本地开发
+在 D:/FactorResearch 操作前：
+  . ./scripts/Enter-Research.ps1 -Quiet
+开发归档入口：
+  .venv/Scripts/python.exe -B -m factorlab.discovery.v7_cli research --bars data/discovery/2025-hourly/bars.parquet --run runs/NEW_EXPOSED_S --cutoff 2025-08-01T00:00:00Z --config config/discovery_v7_local.json --availability-delay-seconds 5 --offline-diagnostic
+将配置换为 discovery_v7_gpt.json 会实际调用 Codex 并消耗额度。
+该兼容配置未启用神经研究。新完整研究配置是 discovery_v7_full_gpt.json：
+nonlinear_mode=isolated登记季度探针和通过原证据/资源闸门后的神经结构通道。
+它不会跳过任何闸门或开放正式确认；原钱包、任务和候选总预算保持相同。
+当前版本修改了代码，旧 run 仅可 inspect，不可用新代码续跑。
+  .venv/Scripts/python.exe -B -m factorlab.discovery.v7_cli inspect --run runs/NEW_EXPOSED_S
+
+Linux 底层接口示例（不是最终P6一键部署路线；缺少冻结附件时不执行）
+本地已经安装的 CUDA/Qlib 环境不应复制到 Linux。使用独立 CPU requirements 与 bootstrap。
+详细打包、校验、部署、资源限制见 docs/V7_LINUX_OPERATIONS.txt。
+必须以旧用户服务 fr-regression-active.service 的真实状态为准，不能查系统级同名服务。
+以下运行命令需在外部 systemd/cgroup 的 CPU25%/高水位640MiB/上限768MiB/
+swap0/PIDs64/RuntimeMaxSec7200 约束内执行；启动脚本会拒绝缺少该约束的真实研究。
+必须已有 Codex CLI 登录；不复制认证文件，不自动换模型或 API。
+环境应设置 FACTOR_RESEARCH_ROOT 为新 Linux 工作区。
+
+  .venv/bin/python -B -m factorlab.discovery.v7_cli prepare-seed --run data/v7-seed-job --symbol BTCUSDT --months 8 --max-new-archives 1
+  重复同一命令继续同一有界任务，核对返回的完整状态和bars_path，不另建任务重置失败额度。
+  .venv/bin/python -B -m factorlab.discovery.v7_cli seed --feed data/v7-live --bars 返回的完整bars_path --symbol BTCUSDT
+  .venv/bin/python -B -m factorlab.discovery.v7_cli autonomous --run runs/NEW_V7_FORWARD --feed data/v7-live --symbol BTCUSDT --polling-pages 4 --window-days 90 --plan 原冻结生命周期.json --research-spec 原冻结分层研究规格.json --config config/v7_service_pilot.json --research-config config/v7_autonomous_full.json --work-authority 原已绑定的authority目录 --research-work-schedule 原已冻结的S工作排程.json
+  .venv/bin/python -B -m factorlab.discovery.v7_cli forward-status --run runs/NEW_V7_FORWARD --feed data/v7-live --symbol BTCUSDT --polling-pages 4 --window-days 90 --plan 原冻结生命周期.json --research-spec 原冻结分层研究规格.json
+
+初始化只下载完整月份。当月桥接由四页轮询补足，最多覆盖约16天。
+当月已超过16天的初始化需额外日归档桥接；初版会报告该缺口，不伪称数据完整。
+polling-pages是冻结配置，之后fit/tick/status/service均须保持相同值。
+
+autonomous 命令显式启用公开数据轮询及真实 GPT。service 命令只调度前向操作，不启动 GPT。
+真实 GPT 研究在独立子进程中运行，继承整个服务的资源限制，不能另开不受约束的服务。
+退出、STOP、宿主阻挡、超预算时仅停止自己的研究树，不停止其他服务。
+如需停止，在 runs/NEW_V7_FORWARD/service/v7-pilot-001/STOP 建立文件。
+同 session 的已消费时间和尝试数保留，但原 native clock 绑定首次执行的真实父进程。
+父进程退出后，新 PID 只能检查原状态，不能接管原会话、续租或重新获得剩余时间。
+原 clock/state 缺失亦拒绝重新初始化；总量耗尽不会自动改 session 名字重置预算。
+当前两小时 pilot 不是已经安装的长期驻留服务，也不能保证未来月份自动得到有效因子。
+长期服务已有单独控制器和恢复测试；实际长期 Linux 运行仍需单独验收。
+账本恢复与原活跃进程的执行权限分开：恢复记录不证明原子进程已清理或允许续跑。
+不能靠重复启动 pilot 或修改 session 名称模拟长跑，具体协议见 docs/V7_LONG_RUNNING.txt。
+长期方案必须显式填写 end_at、累计会话/时间/步数/拟合次数、同一研究配置与数据身份。
+控制器输出服务模板，不自动安装或启动；STOP、日历到期或激活后的宿主阻挡会永久结束
+该方案。未激活时的宿主阻挡不消耗一次运行，也不会延期既定结束时刻。
+研究档案有 96 月任务容量、前三个 V 批次的证据限制，满额后明确停止并要求新协议。
+完整长期campaign的research使用config/v7_autonomous_full.json中的完整配置；
+兼容pilot配置v7_autonomous_pilot.json仍保留。换配置必须新建冻结身份，不能续旧run。
+
+诊断和受限实验
+controls：旧同输入、每臂相同完整上限的本地/随机对照；加 --gpt 才真实调用提供方。
+  它不是三臂共享一个月额度。旧实验与报告保留，不追溯改写预算。
+shared-controls：新的三臂预分摊对照。必须显式 --gpt；每臂32 AST/8 F/2 P/
+  533 solves/1族/2次GPT/2400秒，三臂合计96/24/6/1599 solves/7200秒。
+  剩余1次solve注销；未用额度不转移，失败和中断不退款。共享原始双时钟
+  lease及主机启动身份；删除分摊记录、重启或回拨不能另获完整墙钟。
+  --availability-delay-seconds必须与数据来源一致，默认1；现有公开2025档案用5。
+  shared-controls-status --run <原目录>只读核验全部账本和派生完成结论。
+  Python协作检查不是OS硬实时限制；正式Linux资源验收仍独立进行。
+prepare-seed --allow-daily-bridge：冻结显式日档补齐政策，允许月档先准备完；
+  超过REST四页16天覆盖时仍返回requires_daily_bridge/data_ready=False。
+prepare-daily-bridge --run <新作业> --symbol BTCUSDT --start <UTC日初>：
+  默认补到冻结as-of日前15日；每调用默认1档、最多3档，每日最多3次尝试，
+  校验和与完整24根小时K线均验真。窗口/源码/版本冻结，失败不退档案额度。
+import-daily-bridge --run <该日档作业> --feed <收据库> --symbol BTCUSDT：
+  以真实发布时钟导入，没有历史预测起点。随后仍须补REST尾部并检查完整覆盖。
+  所有初次导入均不能让模型在过去的月初假装已有这些数据。
+calibration_coverage.CoverageHarness：执行并核验真实run_month与新共享对照链；
+  只报告已执行路径，完整GPT分布/真实服务五claim/A0/oracle功效仍未认证。
+neural_forward：完整冻结配方、三个月人工冷fit、JSON恢复与NumPy预测已可工程测试。
+  完整前向票据、固定隔离启动、外部admission及注册器已接入；人工冷fit仍是test-only。
+  正式工作必须取得原共享钱包、完整配方、原来源快照和真实资源/完成收据，不能翻布尔值采纳。
+calibrate：分步受限校准；max-new-trials 控制单次工作量，失败不会靠重启退还预算。
+full-calibrate：更完整的五槽本地模拟诊断；每个主试验和每条独立oracle路径各算一单元。
+  full-calibration-status只读核验冻结源码、预算、试验日志和报告。
+  默认仅两个oracle路径，效应真值会不确定；不足重复、精度或功效时明确拒绝认证。
+  本地协作式300秒/768MiB检查不能代替外部OS硬资源限制。
+probe：一次独立树探针诊断；该旧诊断入口不是生产门控收据，也不是已接通的季度服务。
+nonlinear_runtime 的收据入口另有协议冻结、季度证据与资源验证；不能用布尔字段绕过。
+月度联合研究配置新增 nonlinear_mode，默认 disabled；probes 只生成季度树与阳性对照，
+isolated 在两个已排定季度及资源门通过后尝试隔离神经研究。季度证据只在真实完成之后
+的月度截止时刻可用；工作只能使用原物理UTC月剩余额度和原付费期限，不另开预算。
+失败、重启、资源容量扩大均不退还该月通道票据或求解预算。该通道不会修改因子池、
+因子公式短名单；完整神经配方另走typed算法短名单、前瞻V/qualifier及整体算法确认。
+原神经诊断或typed影子评价本身不授予A0采用权限。
+隔离神经子进程另有父进程身份及原票据双时钟截止；父进程丢失时只退出自身。
+线程调度、启动早期写盘、Linux限额下的响应与内存仍需实机验收，不能宣称硬实时。
+variance-target：保存独立方差标签与输入/源码哈希；没有自动迁移主波动任务。
+
+验收记录
+完整施工设计：outputs/V7_THREE_MONTH_ROLLING_CONSTRUCTION_PLAN_20261004.txt。
+早期第一阶段记录：outputs/V7_CONSTRUCTION_RECEIPT_20261004.txt（历史范围，后续功能以新记录为准）。
+本阶段测试与请求收据：work/v7c/、work/v7_implementation_20261004/。
+已验证旧核心检查点：outputs/V7_CORE_CONSTRUCTION_CHECKPOINT_20261004.txt；
+其中1149项通过仅对应记录中的旧源码，不自动覆盖本次审计后的代码。
+市场有效性、真实 Linux 内存峰值、完整 FWER/功效与未来 V/C 结果须分别报告。
+
+2026-10-07完整施工与独立固定配方验证入口
+三个月冷训练、完整learner结构迭代、共享付费前向、五声明原控制器和证书重算已合并，
+当前处于统一审计后的修复阶段；暂存修复通过不能代替最终主源码的完整验收。
+当前结果以V7_CONSTRUCTION_STATUS.txt为准。
+trial-registry-freeze/status管理前瞻冻结的完整试验网格；trial-controller-freeze/status
+冻结或读取原控制器。状态命令不初始化丢失证据，也不触发GPT。
+trial-controller-run用于同一原父进程持续运行，policy-execution-run用于完整原策略排程。
+两者默认max-pumps=7200，仅限制遍历次数，不创造7200次研究机会，不延长原总期限。
+必须沿用原注册、钱包、机会排程、来源和源码身份；旧v1实验只读，不迁移成新v2续跑。
+trial-controller-pump用于库内存活issuer的单步调试；独立CLI进程退出后不能换父进程续租。
+每个原step的结果先是awaiting_successor_witness；同一存活控制器的下一次锁内检查
+才可确认双份结果和原LC记录已在期限内存在。这次确认不发布数据、不预约或执行新工作。
+completed_opportunities只按原后继见证计算，不能直接按结果自报state或时间计算。
+trial-risk-prepare必须先在已到完整端点的validation上冻结原五声明estimand。
+整体algorithm的oracle仍执行原搜索、原排程和原钱包，不拿固定学习器替代。
+library_skill和factor1..3另使用独立、事先注册的原配方完整窗口验证replica：
+  trial-enroll --registry <原网格> --cell <原场景> --repetition <原重复>
+    --oracle-index <原atom> --estimand-slot <library_skill|factor1|factor2|factor3>
+  fixed-oracle-freeze（同地址参数，--slot替代--estimand-slot，另--generator <原生成器>）
+  fixed-oracle-run（同进程连续执行原机会与只做确认的后继调用，严格沿用首7200秒截止）
+  fixed-oracle-pump（库内存活原issuer的单步调试；多次独立CLI不保留原父进程）
+  fixed-oracle-status/report（只读原配方、完整窗口、缺测、付费和来源记录）
+运行full配置必须先有原共享钱包和匹配完整配置的冻结S排程；以上中文路径是
+需要替换的真实原目录，不是会自动创建钱包/排程的开关。研究和外部系统服务
+仍须完整验收后才允许启动。fixed-oracle-run遇到失败/原期限结束即停止，
+退出后不允许新进程复用剩余时间。原六个月观察与实际UTC月份计费保持分离。
+禁止把oracle自己重新搜出的winner当作validation入选公式的条件真值，禁止首月冷拟合
+替代原完整C窗口。各replica仍有唯一standard钱包；校准总成本另报，不能给生产加额度。
+独立验证负载与原完整服务的可用性分布是否等价，属于未证明的科学条件；未明确前瞻
+声明时证书保持pending。即使声明，也只给出条件性结论，不称服务器已证明该条件。
+确认门还检查真实零效应、混合和阳性覆盖，标签名称不能制造真值；未知/非selection不
+自动变成已证零效应。精确边界效应及小增量仍可能无法识别，不能靠扩大阈值获得通过。
+tools/linux_full_path/README.txt说明实际Linux原路径与严格真实UTC月闸门的等待条件。
+旧部分远端服务继续停止；代码存在、工程验证、统计通过和未来端点到达是四种不同状态。

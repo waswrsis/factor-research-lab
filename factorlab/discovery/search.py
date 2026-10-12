@@ -12,7 +12,7 @@ from factorlab.protocol import fingerprint, project_path, utc
 
 from .contracts import ExperimentSpec, ModuleSpec, RepresentationSpec, TrainingSpec
 from .evidence import immutable_json
-from .robust_selection import ROBUST_METRIC_FIELDS, clean_robust_metrics
+from .robust_selection import ROBUST_METRIC_FIELDS, TASK_METRIC_FIELDS, clean_robust_metrics
 
 OPERATIONS = ('add', 'drop', 'merge', 'dimension', 'replace', 'combine', 'learning_rate',
               'features', 'scale', 'width', 'depth', 'write_program')
@@ -169,7 +169,7 @@ def action_menu(parent: RepresentationSpec, spec: ExperimentSpec,
 
 
 def _clean_history(history: list[dict], spec: ExperimentSpec) -> list[dict]:
-    """Versioned, typed action/structure/outcome memory, with no arbitrary nesting."""
+    """Clean an oldest-first history without changing append order or nesting."""
     clean = []
     for row in history:
         if row.get('partition') != 'development' or utc(row['evidence_cutoff']) > utc(spec.dev_end):
@@ -229,9 +229,10 @@ def _clean_history(history: list[dict], spec: ExperimentSpec) -> list[dict]:
         for name, values in metrics.items():
             if name in ROBUST_METRIC_FIELDS:
                 continue
-            permitted = ('status', 'predictive', 'support', 'eligible_support', 'loss',
-                         'coverage', 'label_coverage', 'brier')
-            result['metrics'][name] = {key: values[key] for key in permitted if key in values}
+            # Share the memory/worker whitelist so scope is not lost in transit.
+            from .research_memory import clean_metrics
+            result['metrics'][name] = clean_metrics(
+                {key: values[key] for key in sorted(TASK_METRIC_FIELDS) if key in values})
             if any(isinstance(value, (dict, list)) for value in result['metrics'][name].values()):
                 raise ValueError('Development metric summaries must be scalar')
         json.dumps(result, allow_nan=False)
@@ -309,6 +310,8 @@ def propose(parent: RepresentationSpec, spec: ExperimentSpec, history: list[dict
         context['instruction'] = 'Write a new or revised indicator program and review measured development feedback.'
         while len(context['history']) > 1 and len(json.dumps(context).encode()) > 90000:
             context['history'].pop(0)
+        if len(json.dumps(context).encode()) > 90000:
+            raise ValueError('Program request exceeds byte budget with newest history retained')
     if mode == 'external':
         if exchange is None:
             raise ValueError('External agent requires an exchange directory')

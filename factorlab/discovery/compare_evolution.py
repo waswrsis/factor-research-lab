@@ -11,6 +11,7 @@ import pandas as pd
 from filelock import FileLock
 
 from factorlab.protocol import fingerprint, project_path, utc
+from factorlab.time_utils import hour_ids
 
 from .contracts import ExperimentSpec, TaskDataset
 from .evidence import file_hash, immutable_json
@@ -240,8 +241,8 @@ def compare_evolutions(candidate_dir: str | Path, reference_dir: str | Path,
                    for key in sorted(set(ci['policy']) | set(ri['policy']))
                    if ci['policy'].get(key) != ri['policy'].get(key)}
     segments = []
-    for block, indices in meta.groupby(meta.available_at.dt.floor('h').astype('int64')
-                                       // (spec.bootstrap_block_hours * 3600 * 10**9)).groups.items():
+    for block, indices in meta.groupby(hour_ids(meta.available_at.dt.floor('h'))
+                                       // spec.bootstrap_block_hours).groups.items():
         mask = np.zeros(n, dtype=bool)
         mask[np.asarray(indices)] = True
         segments.append({'calendar_block': int(block), 'start': meta.loc[mask, 'available_at'].min().isoformat(),

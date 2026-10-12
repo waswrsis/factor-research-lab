@@ -1,0 +1,10 @@
+{
+  "session_id": "v7-pilot-001",
+  "wall_seconds": 7200,
+  "max_steps": 120,
+  "tick_seconds": 60,
+  "max_fits_per_step": 1,
+  "max_fit_attempts": 3,
+  "retry_seconds": 60,
+  "poll": true
+}

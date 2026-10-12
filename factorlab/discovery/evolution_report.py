@@ -52,9 +52,11 @@ def export_evolution(directory, output):
         cycle_rows = ''
         for cycle in summary['cycles']:
             gate = cycle.get('gate', {})
-            actions = [record.get('proposal', {}).get('operation')
-                       for record in cycle.get('research', {}).get('records', [])
-                       if record.get('proposal')]
+            research = cycle.get('research', {})
+            actions = research.get('operations')
+            if actions is None:
+                actions = [record.get('proposal', {}).get('operation')
+                           for record in research.get('records', []) if record.get('proposal')]
             cycle_rows += (f'<tr><td>{cycle["id"]}</td><td>{e(cycle["cutoff"])}</td>'
                 f'<td>{e(cycle["status"])}</td><td>{e(", ".join(actions))}</td>'
                 f'<td>{e(gate.get("estimate", "—"))}</td>'

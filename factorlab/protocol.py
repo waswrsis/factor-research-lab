@@ -4,12 +4,16 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path('D:/FactorResearch')
+# Windows work stays on the user-designated D drive. A Linux deployment is a
+# new source identity rooted at its checkout; it never resumes a Windows run.
+ROOT = (Path('D:/FactorResearch') if os.name == 'nt' else
+        Path(os.environ.get('FACTOR_RESEARCH_ROOT', str(Path(__file__).resolve().parent.parent))))
 
 
 def fingerprint(value: object) -> str:

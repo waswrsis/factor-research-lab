@@ -1,0 +1,163 @@
+V7 finite long-running campaign controller — construction, not deployment
+======================================================================
+
+Current layered mode must explicitly freeze training_window_days=90 and
+refit_interval_days=15, with daily training-view refresh. UTC calendar months
+still govern research budgets; they are not the fit interval. These low-level
+commands require an approved final deployment plan and original evidence,
+not an unfilled template or a copied historical campaign identity.
+
+Freeze without running: python -B -m scripts.v7_long_running init
+                        --directory <campaign> --plan <explicit-campaign-plan.json>
+Run/resume: python -B -m scripts.v7_long_running run --directory <campaign>
+Status: replace run with status. Existing status takes no new plan and does not
+create identity, budget, directory or database records. SQLite may coordinate
+read locks through existing WAL shared memory while a writer is active.
+Template: replace run with unit-template. This emits text only, after checking
+the existing frozen campaign; it cannot create, install or enable a service.
+The source package must explicitly include scripts/v7_long_running.py and this
+document. This script does not install dependencies or install/start services.
+
+The plan requires end_at (aware UTC), max_sessions, max_reserved_seconds,
+max_reserved_steps, max_fit_attempts, forward_directory, feed_directory,
+research (the existing AutonomousConfig JSON), and lifecycle (LifecyclePlan
+JSON with the real feed source_id). It optionally fixes symbols, session_seconds
+(<=7200), session_steps, tick_seconds, polling_pages, old_unit and old_exec_start.
+The revised contract also freezes step_limit_seconds (default 300) and
+max_consecutive_transport_failures (default 5). A new numerical step starts only
+with its full preallocated work allowance plus two seconds remaining; otherwise
+the controller rolls to a new prepaid session and leaves research running.
+The effective step allowance is
+min(step_limit_seconds, (session_seconds - 2) // 2), with sessions >=4 seconds.
+The integer half-window gives short sessions actual initialization headroom;
+the normal 7200-second session still has the frozen 300-second work allowance.
+Each work reservation stores its original monotonic start/deadline and Linux
+boot identity, as well as the UTC endpoint. The watchdog and parent use that
+original lease; a first observation never grants new time from a changed wall
+clock. A changed boot, backward monotonic clock or wall time before reservation
+fails closed. Non-Linux synthetic tests have only a process-local boot marker;
+this is not a production cross-process clock guarantee.
+An overlong step still consumes its reservation and terminates the campaign;
+these are operational safety limits, not a guarantee that every fit completes.
+Only specifically classified public transport failures may continue, with a
+durable consecutive-failure count across sessions and process recovery. Successful
+ticks reset that count; schema, certificate, authentication, integrity, clock and
+resource errors remain fail-closed. Failure limits and all prepaid work remain
+finite. Unused time on an early session rotation is lost, so calendar end_at is
+a latest deadline rather than a promise of that many days of completed work.
+No plan is generated or enabled implicitly. GPT still uses the frozen existing
+gpt-6-astra/high policy; tests use disabled backend and artificial input only.
+
+At creation, the adapter freezes its own hash, all core source hashes, Python
+path, complete plan, start time, end time, and eligible UTC calendar months.
+Each session prepays its entire wall/step allowance before any work. Interrupted
+or short sessions do not return this allowance. The total fit cap is separate
+from the original monthly S budget (6 GPT attempts, 3 families, 96 ASTs, 24 F
+evaluations and 1600 solves). The latter remains in the SAME research RunStore;
+changing an internal session never creates a new monthly research budget.
+The campaign manifest reports the cumulative ceiling for the UNION of eligible
+calendar months and inherited scheduler job months. At construction it validates
+the old runtime, source/config, month/job and saved outcome identities. Existing
+consumed monthly work is part of this ceiling, never added on top. Resume uses
+that frozen inherited list; later jobs cannot rewrite the campaign's identity.
+The immutable inherited anchors also retain each job hash, attempt token/time
+prefix and completed outcome hash. Resume verifies these against the actual
+scheduler; deleting a month or coherently rolling back its attempts is rejected.
+New campaign-created months use CampaignScheduler: the independent global anchor
+is committed before the local scheduler row, including before process spawning.
+A global success/local failure refuses unsafe recovery rather than refunding it.
+
+Every fit reserves the global per-job count BEFORE the pilot service records its
+local reservation. New/internal/recovered sessions carry the authoritative global
+count and last_at, including a global commit followed by local write failure.
+Each job retains the same maximum of 3 attempts across all sessions. A separate
+campaign-wide total fit attempt limit is enforced before calling fit_month.
+Pending/finalized freeze requests retain exact request payload and freeze time;
+completed status cannot be reverted to pending by an older local checkpoint.
+The implementation adapts private ForwardService _save/_open_state contracts;
+future core upgrades require a new campaign and re-running these adapter tests.
+A future public core hook could expose reserve_fit(job) and persistent queue
+storage directly; no core hook or core source modification was required here.
+
+There is one owned campaign worker. It keeps the same ForwardRuntime and research
+scheduler across internal sessions. It does NOT invoke the pilot run() cleanup at
+every 2-hour boundary, because that would stop active research prematurely. The
+next session continues the same scheduler, research run and shared exposure.
+Full STOP, calendar expiry, global fit exhaustion or a failed host guard AFTER
+launch ends the campaign; source/protocol changes also stop rather than restart
+under a new label. Before any launch or session reservation, a failed host guard
+returns blocked and may wait for an actual operator unlock. The same total UTC
+deadline remains frozen while blocked; it is never postponed to grant more time.
+STOP is a file in the campaign directory. Once recorded terminal, deleting STOP
+does not authorize a fresh budget. Recovery retains the same journal and identity.
+
+Run only within one externally configured Linux cgroup inherited by all children:
+CPUQuota <=25%; MemoryHigh <=640 MiB; MemoryMax <=768 MiB; MemorySwapMax=0;
+TasksMax <=64. The controller never creates another service or raises limits.
+Both parent and worker verify inherited limits and HostGuard. The actual
+direct leaf service cgroup is the only source of memory credit: two readings of
+memory.current bracket the host inspection; the smaller reading reduces the
+remaining 768 MiB allowance, plus a fixed 128 MiB host reserve. Unknown/uncapped
+groups, shared ancestors, missing self-PID, changed path/inode/boot/cap and
+unreadable living Python services block execution. Confirmed zombie/disappeared
+processes are ignored. Current memory, not peak or summed RSS, is credited.
+This avoids reserving an extra full allowance after this same service has
+already occupied it. The reserve is a policy margin, not protection against
+every external concurrent allocation; kernel limits remain the final boundary.
+An optional frozen research.not_before_month (UTC YYYY-MM) prevents creation
+of new monthly research before that date. Existing jobs/STOP/queues still get
+checked; this field never resets, migrates or refunds an existing wallet.
+The exact existing
+user unit defaults to fr-regression-active.service. It must be loaded and inactive
+or failed; missing/transitional/active is a blocker. A frozen old_exec_start is
+used for an inactive transient whose ExecStart is empty. This is an operator
+identity assertion, not evidence of live systemd inspection; the loaded/active
+state is always inspected and cannot be bypassed with an invented missing unit.
+If ExecStart is empty, old_service_receipt and old_service_receipt_sha256 must
+refer to an existing prior operator inspection artifact. Its file hash, internal
+hash, exact user scope, unit and executable must match. Merely typing the expected
+executable in the plan cannot substitute for that artifact. An operator receipt
+is retained provenance, not cryptographic proof of who observed the old service.
+There is no automatic kill/stop of long80 or any unrelated service.
+
+The parent owns one campaign lock; its child owns a separate worker lock. Launches
+are reserved before spawn. Recovery resolves the exact argv/token and PID birth
+time; PID reuse never authorizes killing another process. The campaign worker has
+a deadline/parent-loss watchdog; the parent also enforces the frozen UTC deadline.
+Terminal cleanup stops the owned process tree and any separately registered
+research child after validating its command, manifest path and PID identity.
+The original research worker retains its own frozen deadline independently.
+Before every actual step the worker durably records its original monotonic work
+deadline and boot identity, bounded by the prepaid session/calendar endpoints.
+The one-second watchdog applies that deadline to in-progress fitting, polling and
+endpoint work. Main-thread completion also rejects late work if the watchdog was
+not scheduled in time. Sleep and session handover are not new work: an expired old
+deadline does not kill a newly prepaid slot, and no step can start on an expired
+slot. Sessions normally hand over slightly early; the unused allowance is lost,
+not refunded. The total calendar deadline is monitored even while idle.
+
+The generated systemd template uses RuntimeMaxSec equal to the frozen campaign's
+remaining whole seconds (at most 366 days), Restart=no, KillMode=control-group,
+TimeoutStopSec=20, NoNewPrivileges=yes and UMask=0077 with the resource caps above.
+The run entry itself rechecks source, old-unit state and inherited resource limits.
+The controller monitors every ten seconds; the child monitors STOP/deadlines each
+second. These are polling/scheduler bounds, not hard real-time execution claims.
+
+Missing state, mismatched hash chains, changed source/config or conflicting
+forward-directory campaign ownership refuse recovery. These checks detect
+accidental deletion/corruption; they are not a cryptographic defense against an
+administrator replacing all journals and identities consistently. They never
+authorize switching to a clean directory to continue the same experiment.
+Construction/restart verifies the full journal. Subsequent reads check the
+checkpoint and verified anchor, then only new sequential records and the new
+head in one consistent SQLite read transaction. Missing/rewound/changed anchors
+fail immediately. Tampering with an older already verified history row is caught
+by the next full restart verification, not repeatedly scanned every tick.
+Unchanged freeze queues generate no event. The 10,000-event six-month artificial
+test checks zero/one new row per subsequent verification and one full restart scan.
+
+Validation is artificial engineering evidence only. No Linux long-duration run,
+OS OOM/kill endurance, real GPT, real market training or deployment is claimed.
+The controller, campaign worker and research worker share the fixed 768 MiB cap;
+their combined Linux footprint still needs actual acceptance measurement.
+Formal confirmation and A0 adoption continue to require the unchanged core gates.

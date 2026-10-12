@@ -1,0 +1,12 @@
+{
+  "symbols": ["BTCUSDT"],
+  "search_mode": "gpt",
+  "formulas_per_family": 8,
+  "lookback": 48,
+  "profile_candidates": 6,
+  "research_seconds": 7200,
+  "model": "gpt-6-astra",
+  "reasoning": "high",
+  "formal_confirmation_enabled": false,
+  "evaluation_mode": "joint"
+}

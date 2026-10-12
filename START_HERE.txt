@@ -1,63 +1,24 @@
-自适应因子研究平台 · 第六版稳健指标研究
+Factor Research Lab · 因子研究实验平台
 
-工作目录：D:/FactorResearch
-当前入口：factorlab.discovery，专注因子发掘、研究评分、迭代训练与结构搜索。
-旧版回测说明完整保存在 docs/LEGACY_START_HERE.txt。
+先读 README.md 和 docs/INSTALL_LINUX.md。
+安装版 tag：v7-install-only-2026-10-12；仓库：waswrsis/factor-research-lab。
 
-第六版入口：scripts/Start-RobustResearch.ps1
-第六版说明：docs/ROBUST_RESEARCH_V6.txt
-第六版改进实测：outputs/ROBUST_V6_IMPROVEMENT_REPORT.txt
-第六版机器摘要：outputs/robust_v6_improvement_summary.json
-第六版配置：config/discovery_v6.json、config/evolution_v6.json
-新增主任务选模、前向多折筛选、辅助任务退化保护与简单基准。
-本轮96次市场拟合未选出可靠新候选，共用旧参照的组合分支保留原模型；主任务选模分支点改善0.14%，证据不足。
-548项工程测试通过；真实GPT连续写出并修订两个新公式，训练完成后均被拒绝。详见实测报告。
+实际Linux安装已完成：完整源码、CPU依赖与配置就位，两项CLI help返回0。
+研究服务未启动、未启用：inactive / MainPID=0 / disabled。
+本次未创建campaign、钱包或训练锚点，没有拟合、轮询或GPT调用。
+剩余前向/GPT对照验收已取消，不是通过；没有完整资格审计或可靠alpha证明。
 
-先打开PowerShell：
-  Set-Location D:/FactorResearch
-  . ./scripts/Enter-Research.ps1
+新用户按Linux指南建立独立环境后可查看：
+  .venv/bin/python -B -m factorlab.discovery.v7_cli --help
+  .venv/bin/python -B -m scripts.v7_long_running --help
+这些只是入口说明，不启动研究。当前不要求执行pytest。
+首次激活仍需自己的真实feed、新配置与额度冻结，并另行获得启动授权。
+不复用旧钱包/运行身份，不删旧STOP，不用旧V6或特定服务器P6脚本绕过初始化条件。
 
-第五版自动公式与参数研究：docs/AUTONOMOUS_OPERATOR_GUIDE.txt
-第五版工程与市场开发验收：outputs/OPERATOR_V5_ACCEPTANCE.txt
-第五版第二轮测试（真实GPT修复、信号/噪声对照、4月行情）：outputs/OPERATOR_V5_TEST_REPORT.txt
-第五版三轮调参（开发误差下降3.16%，七月误差增加8.03%，保留原基准）：outputs/OPERATOR_V5_TUNING_REPORT.txt
-第五版配置：config/discovery_v5.json 与 config/evolution_v5.json
+运行模式：90个连续日训练窗、每15个经过日重拟合、每日训练视图更新。
+分钟轮询处理小时闭合数据，未来12小时标签成熟后才结算；月钱包另按UTC自然月计账。
 
-第五版入口：
-  ./scripts/Start-AutonomousResearch.ps1 -Mode Help
-  ./scripts/Start-AutonomousResearch.ps1 -Mode Run -Output runs/my-autonomous-v5
-  ./scripts/Start-AutonomousResearch.ps1 -Mode Resume -Output runs/my-autonomous-v5
-  ./scripts/Start-AutonomousResearch.ps1 -Mode Inspect -Output runs/my-autonomous-v5
-  ./scripts/Start-AutonomousResearch.ps1 -Mode Report -Output runs/my-autonomous-v5 -ReportOutput outputs/my-autonomous-v5-report
-
-Run/Resume默认使用已有Codex登录，调用gpt-6.1-sol/high提出和修订指标公式。
-这是一套有限预算内无需逐轮人工干预的研究流程；训练使用成熟标签。
-公式由可信因果解释器执行，支持新表达式与内部可训练参数，不运行任意Python。
-首次正式启动前阅读第五版说明；默认资料仍是已经使用过的2025年历史开发资料。
-
-第四版持续研究说明：docs/EVOLUTION_GUIDE.txt
-持续研究验收：docs/EVOLUTION_IMPLEMENTATION.md
-连续运行设置：config/discovery_v4.json 与 config/evolution_v4.json
-第三版独立实验说明仍保留：docs/DISCOVERY_GUIDE.txt、config/discovery.json
-
-第四版保留操作：
-  ./scripts/Start-Evolution.ps1 -Mode Help
-  ./scripts/Start-Evolution.ps1 -Mode Run -Output runs/my-evolution
-  ./scripts/Start-Evolution.ps1 -Mode Run -Output runs/my-agent-evolution -Agent
-  ./scripts/Start-Evolution.ps1 -Mode Resume -Output runs/my-evolution
-  ./scripts/Start-Evolution.ps1 -Mode Report -Output runs/my-evolution -ReportOutput outputs/my-evolution-report
-
-第三版一次性研究与旧回放：
-  ./scripts/Start-Discovery.ps1 -Mode Help
-  ./scripts/Start-Discovery.ps1 -Mode Prepare
-  ./scripts/Start-Discovery.ps1 -Mode Research -Output runs/my-new-development
-  ./scripts/Start-Discovery.ps1 -Mode Replay -Output runs/my-new-replay
-  ./.venv/Scripts/python.exe -m factorlab.discovery catalog
-
-验证：
-  ./.venv/Scripts/python.exe -m pytest -q
-  ./.venv/Scripts/python.exe -m ruff check factorlab tests
-
-新实验输出目录必须是新的；持续研究仅显式Resume可接续同一冻结协议。独立确认资料使用后不能通过重命名、换任务或重新下载
-恢复未见身份。默认确认区间是否已用，请查看evidence命令。
-流程跑通与因子得到确认支持是两个结论，质量档案会分别记录。
+Linux使用公开独立CPU清单，不能将Windows/CUDA uv.lock直接用于Linux。
+Windows Sync脚本需要原已安装uv，首次公开获取步骤仍不完整。
+封存验收另依赖未公开fixture；这些不是运行主程序必要输入。
+旧54,000条校准的三组标准均未通过，V6未证明可靠增量，项目不执行交易。

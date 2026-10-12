@@ -1,3 +1,6 @@
+历史原型入口存档：不是当前 V7 部署指南；其中数据、模型偏好和验收状态仅属于原版本。
+当前入口见根目录 START_HERE.txt。
+
 自演化因子研究平台（本地研究原型）
 
 全部项目文件：D:/FactorResearch
@@ -8,7 +11,7 @@
   . ./scripts/Enter-Research.ps1
 
 查看和验证
-  ./.venv/Scripts/python.exe -m pytest tests -q
+  只选择此次修改及受影响依赖的必要测试；不默认运行全部tests。
   ./.venv/Scripts/python.exe -m ruff check factorlab tests
   ./scripts/Start-Research.ps1 -Mode Check
 
