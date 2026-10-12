@@ -1,17 +1,17 @@
 {
-  "at_utc": "2026-10-12T11:24:20.430480+00:00",
+  "at_utc": "2026-10-12T11:25:45.337354+00:00",
   "research_source_hash": "e463f6d03fb89039e9843c27a02145f2780190fb638197d33b1a5f77a965c868",
   "service": {
-    "ActiveState": "active",
-    "CPUUsageNSec": "399759894000",
-    "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/frv7cpuone.slice/fr-layered-research-prefix-final09.service",
-    "MainPID": "1055412",
-    "MemoryCurrent": "626458624",
-    "Result": "success",
-    "SubState": "running",
-    "TasksCurrent": "15"
+    "ActiveState": "failed",
+    "CPUUsageNSec": "444375140000",
+    "ControlGroup": "",
+    "MainPID": "0",
+    "MemoryCurrent": "[not set]",
+    "Result": "signal",
+    "SubState": "failed",
+    "TasksCurrent": "[not set]"
   },
-  "status": "ACTIVE_THREE_CANDIDATES_COMPLETE",
+  "status": "FAILED_UNFUNDED_PENDING_REUSE",
   "forecast_count": 0,
   "completed_forward_fit_count": 1,
   "provider_response_count": 1,
@@ -62,5 +62,7 @@
     "CPU_cores": 1,
     "memory_MiB": 768
   },
-  "not_scientific_validation": true
+  "not_scientific_validation": true,
+  "repair_complete": false,
+  "failure_at_utc": "2026-10-12T11:25:01+00:00"
 }

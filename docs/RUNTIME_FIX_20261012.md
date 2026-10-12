@@ -22,3 +22,6 @@
 
 
 实际观察（2026-10-12 11:24 UTC）：三个候选分别在54.693917、48.866839、39.059093秒内完成预定15次cold solve，均早于原90秒期限；此时服务active，campaign未terminal，未记录failure-cause。旧第三候选超时在本轮没有重现。只证明这个实际候选批次跑完，不是长期稳定性、全算法功效或alpha证明。
+
+
+后续更新（11:26 UTC）：三个候选完成后，11:25 UTC跳过未获得额度的family时，multiwork预付款握手未释放原pending序号，下一次reserve复用了work/5/pending.json，FileExistsError使原尝试终止。没有新reservation被该失败握手扣款；仍需修復未获得额度的预付款闭环，不能宣称整轮成功。
